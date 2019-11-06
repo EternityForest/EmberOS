@@ -57,4 +57,4 @@ Find your shiny new image in the workspace folder
 
 ## Making it actually read only
 
-You just add ro to the kernel command line and the fstab. Everything else is already there, all the tmpfses are set up.
+You just add ro to the fstab entry for /sketch

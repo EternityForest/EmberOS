@@ -14,7 +14,7 @@ set -e
 last_update=$(stat -c %Y /var/cache/apt/pkgcache.bin)
 now=$(date +%s)
 apt update -y --allow-releaseinfo-change
-
+apt update
 
 apt install -y ntfs-3g
 #Don't try to launch graphically by default
