@@ -10,15 +10,49 @@
 set -x
 set -e
 
+#Run apt update if it has been too long
+last_update=$(stat -c %Y /var/cache/apt/pkgcache.bin)
+now=$(date +%s)
+apt update -y --allow-releaseinfo-change
+
+
+apt install -y ntfs-3g
+#Don't try to launch graphically by default
+systemctl set-default multi-user.target
+
+! apt purge -y ^wolfram-engine$
+! apt purge -y ^scratch2$
+! apt purge -y ^scratch$ 
+! apt purge -y ^libreoffice$ 
+! apt purge -y ^minecraft-pi$ 
+! apt purge -y ^python-minecraftpi$ 
+! apt purge -y ^bluej$ 
+! apt purge -y ^greenfoot$ 
+! apt purge -y ^claws-mail$ 
+! apt purge -y ^claws-mail-i18n$
+! apt purge -y ^nuscratch$
+
+apt autoremove -y --purge
+
+
+
+#The special /sketch partition is for everything that is not part of the image
+mkdir /sketch
+echo "/dev/sda3 /sketch auto defaults,noatime,fmask=077,dmask=077,umask=077 0 0" >> /etc/fstab
+mount /sketch
+
 source /common.sh
 install_cleanup_trap
 
 unpack /filesystem/home/pi /home/pi pi
 unpack /filesystem/home/root /root root
-unpack /filesystem/boot /boot
+unpack /filesystem/boot /boot root
 
 echo "This is an example module, install and set up what you need here!"
 echo "$EMBEDPI_VAR"
 
 # Unpack root at the end, so files are modified before
 unpack /filesystem/root /
+
+
+

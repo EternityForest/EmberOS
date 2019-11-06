@@ -12,9 +12,15 @@
 # k3a.me/how-to-make-raspberrypi-truly-read-only-reliable-and-trouble-free
 
 
+# Source error handling, leave this in place
+set -x
+set -e
+
+source /common.sh
+
 
 replace() {
-	grep $2 $1 >/dev/null
+	! grep $2 $1 >/dev/null
 	if [ $? -eq 0 ]; then
 		# Pattern found; replace in file
 		sed -i "s/$2/$3/g" $1 >/dev/null
@@ -24,7 +30,7 @@ replace() {
 # Given a filename, a regex pattern to match and a replacement string:
 # If found, perform replacement, else append file w/replacement on new line.
 replaceAppend() {
-	grep $2 $1 >/dev/null
+	! grep $2 $1 >/dev/null
 	if [ $? -eq 0 ]; then
 		# Pattern found; replace in file
 		sed -i "s/$2/$3/g" $1 >/dev/null
@@ -37,10 +43,10 @@ replaceAppend() {
 # Given a filename, a regex pattern to match and a string:
 # If found, no change, else append file with string on new line.
 append1() {
-	grep $2 $1 >/dev/null
+	! grep $2 $1 >/dev/null
 	if [ $? -ne 0 ]; then
 		# Not found; append on new line (silently)
-		echo $3 | sudo tee -a $1 >/dev/null
+		echo $3 | sudo tee -a $1
 	fi
 }
 
@@ -48,17 +54,14 @@ append1() {
 # If found, no change, else append space + string to last line --
 # this is used for the single-line /boot/cmdline.txt file.
 append2() {
-	grep $2 $1 >/dev/null
+	! grep $2 $1 >/dev/null
 	if [ $? -ne 0 ]; then
 		# Not found; insert in file before EOF
-		sed -i "s/\'/ $3/g" $1 >/dev/null
+		sed -i "s/\'/ $3/g" $1
 	fi
 }
 
-echo
 echo "Starting installation..."
-echo "Updating package index files..."
-apt-get update
 
 echo "Removing unwanted packages..."
 #apt-get remove -y --force-yes --purge triggerhappy dbus \
@@ -85,11 +88,6 @@ rm -f /var/lib/systemd/random-seed
 ln -s /run/random-seed /var/lib/systemd/random-seed
 fi
 
-if [ ! -h /var/lib/urandom/random-seed ] ; then
-rm -fr /var/lib/urandom/random-seed
-ln -s  /run/random-seed /var/lib/urandom/random-seed
-fi
-
 #This is a pregenerated block of randomness used to enhance the security of the randomness we generate at boot.
 #This is really not needed, we generate enough at boot, but since we don't save any randomness at shutdown anymore,
 #we might as well.
@@ -105,7 +103,7 @@ dd bs=1 count=32 if=/dev/random  of=/etc/unique-random-supplement >/dev/null
 fi
 echo "Generated random numbers"
 
-systemctl disable systemd-random-seed.service
+! systemctl disable systemd-random-seed.service
 
 
 
@@ -113,8 +111,8 @@ systemctl disable systemd-random-seed.service
 ####---------------------------Install boot script. This is our new entropy source-------------------
 
 #Installl the readonly-random-seed service in systemd
-unpack /filesystem/embedtools_service.sh /usr/bin/ root
-unpack /filesystem/embedtools.service /etc/systemd/system root
+unpack /filesystem/bin/ /usr/bin/ root
+unpack /filesystem/systemd/ /etc/systemd/system root
 
 chmod 744 /usr/bin/embedtools_service.sh
 chmod 744 /etc/systemd/system/embedtools.service
@@ -125,8 +123,8 @@ systemctl enable embedtools.service
 
 ###-----------------------------------------No systemd profiling storage stuff-----------------------
 #Disable systemd services. We can keep the random seed one because we get there first and shim it.
-systemctl disable systemd-readahead-collect.service
-systemctl disable systemd-readahead-replay.service
+! systemctl disable systemd-readahead-collect.service
+! systemctl disable systemd-readahead-replay.service
 
 
 
@@ -134,9 +132,8 @@ systemctl disable systemd-readahead-replay.service
 append2 /boot/cmdline.txt fastboot fastboot
 append2 /boot/cmdline.txt noswap noswap
 
-if [ $ACTUALLY_RO -eq 1 ]; then
 append2 /boot/cmdline.txt ro^o^t ro
-fi
+
 
 # Move /var/spool to /tmp
 rm -rf /var/spool
@@ -204,4 +201,11 @@ append1 /etc/fstab "/var/lib/sudo" "tmpfs /var/lib/sudo tmpfs defaults,noatime,n
 mkdir -p /var/lib/pulse
 append1 /etc/fstab "/var/lib/pulse" "tmpfs /var/lib/pulse tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=2M 0 0"
 
+
+
+## Boot partition is read only
+replace /etc/fstab "vfat\s*defaults\s" "vfat    defaults,ro "
+
+## Root is read only
+replace /etc/fstab "ext4\s*defaults,noatime\s" "ext4    defaults,noatime,ro "
 

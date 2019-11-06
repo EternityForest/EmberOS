@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# Source error handling, leave this in place
+set -x
+set -e
+
+
+#All this does is makes the hostname configurable via /boot
+
+source /common.sh
+
+unpack /filesystem/sketch /sketch/ root 
+rm /etc/hostname
+ln -s /sketch/hostname.txt /etc/hostname

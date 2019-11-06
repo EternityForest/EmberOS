@@ -1,0 +1,13 @@
+#!/bin/bash
+apt -y install exfat-utils avahi-daemon nano  
+apt -y install chrony
+
+
+apt -y install python3 systemd cython3 build-essential
+apt -y install mplayer pulseaudio python3-pyserial
+apt -y install python3-pytz python3-dateutil lm-sensors
+apt -y install python3-netifaces python3-jack-client
+apt -y install python3-gst-1.0 python3-libnacl jack-tools
+apt -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid
+apt -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly python3-psutil fluidsynth
+apt -y install network-manager

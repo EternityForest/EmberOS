@@ -1,0 +1,6 @@
+[submodule "embedPiOs/src/modules/kaithem/filesystem/KaithemAutomation"]
+	path = embedPiOs/src/modules/kaithem/filesystem/KaithemAutomation
+	url = git@github.com:EternityForest/KaithemAutomation.git
+[submodule "embedPiOs/CustomPiOS"]
+	path = embedPiOs/CustomPiOS
+	url = git@github.com:guysoft/CustomPiOS.git
