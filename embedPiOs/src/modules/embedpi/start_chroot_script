@@ -37,7 +37,7 @@ apt autoremove -y --purge
 
 
 #The special /sketch partition is for everything that is not part of the image
-mkdir /sketch
+! mkdir /sketch
 echo "/dev/sda3 /sketch auto defaults,noatime,fmask=077,dmask=077,umask=077 0 0" >> /etc/fstab
 mount /sketch
 

@@ -25,14 +25,16 @@ It is not encrypted though.
 * Makes a file at /sketch/hostname.txt to let you change the hostname
 * Installs chrony instead of garbage timesyncd
 * Puts a whole bumch of tmpfses on things that write to disk, so they still work
-* Generates entropy from the HW 
+* Generates entropy from the HW rnd on boot
 * Makes sure avahi, exfat-utils, and other random stuff you probably want is installed
-* Runs kaithem as root on port 8002(That's the kaithem module)
+* Runs kaithem as root on port 8002(That's the kaithem module, you can easily swap this for some other control system)
 * Makes /boot and / read-only
 
 * Does NOT make the NTFS partition /sketch read only. You have to do that one yourself if you want it.
 
 ## Building(Need linux)
+
+Clone this repo with all submodules
 
 Expand the SD cart to make room for the extra stuff we're about to install
 dd if=/dev/zero bs=1M count=7K >> IMAGEFILE
