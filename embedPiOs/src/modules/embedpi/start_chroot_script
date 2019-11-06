@@ -17,6 +17,17 @@ apt update -y --allow-releaseinfo-change
 apt update
 
 apt install -y ntfs-3g
+
+#The special /sketch partition is for everything that is not part of the image. It is made after the fact.
+! mkdir /sketch
+
+#You have to manually copy thos to the manually created sketch template after the fact
+! mkdir /sketch_template
+
+echo "/dev/sda3 /sketch auto defaults,noatime,nofail,fmask=077,dmask=077,umask=077 0 0" >> /etc/fstab
+
+
+
 #Don't try to launch graphically by default
 systemctl set-default multi-user.target
 
@@ -36,10 +47,6 @@ apt autoremove -y --purge
 
 
 
-#The special /sketch partition is for everything that is not part of the image
-! mkdir /sketch
-echo "/dev/sda3 /sketch auto defaults,noatime,fmask=077,dmask=077,umask=077 0 0" >> /etc/fstab
-mount /sketch
 
 source /common.sh
 install_cleanup_trap
