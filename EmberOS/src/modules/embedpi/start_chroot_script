@@ -10,9 +10,6 @@
 set -x
 set -e
 
-#Run apt update if it has been too long
-last_update=$(stat -c %Y /var/cache/apt/pkgcache.bin)
-now=$(date +%s)
 apt update -y --allow-releaseinfo-change
 apt update
 
