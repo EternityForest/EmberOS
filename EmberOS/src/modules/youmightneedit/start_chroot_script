@@ -4,12 +4,7 @@ apt update
 apt -y install avahi-daemon 
 apt -y install chrony
 
-apt -y install squid-deb-proxy-client
 apt -y install avahi-utils
-
-
-#Make the cache we just installed work
-! systemctl start avahi-daemon
 
 # Installs the Micro editor
 # Do this early, it can't be cached like apt
@@ -86,6 +81,10 @@ apt -y install chafa
 apt -y install nast
 ! apy -y install fatrace
 ! apy -y install neofetch
+
+#Install last so the build doesn't try using it from inside quemu
+#And slow everything down by not working
+apt -y install squid-deb-proxy-client
 
 ! ufw disable
 
