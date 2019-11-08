@@ -1,4 +1,4 @@
-# EmbedPiOS
+# EmberOS
 
 This is a customPiOs tool for setting up a pi image suitable for consumer-grade embedded use. It runs the kaithem server as root on 8002, https 8001.
 
@@ -49,7 +49,9 @@ Cd into the src/workspace folder.
 Expand the disk image by padding it with zeros:
 Example:
 `dd if=/dev/zero bs=1M count=7K >> 2019-06-20-raspbian-buster-full.img`
-Change the filenames as neccesary. Count is in blocks. This appends about 8GB of extra space.
+Change the filenames as neccesary. Count is in blocks. This appends about 8GB of extra space. You probably don't need this much.
+
+You can also just shrink / to make room for the sketch partition
 
 
 Mount the partition using `sudo udisksctl loop-setup -f 2019-06-20-raspbian-buster-full.img` 

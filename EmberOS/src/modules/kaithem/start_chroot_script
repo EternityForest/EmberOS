@@ -1,4 +1,8 @@
 #!/bin/bash
+
+set -x
+set -e
+
 source /common.sh
 
 #Make a dummy self signed certificateZ

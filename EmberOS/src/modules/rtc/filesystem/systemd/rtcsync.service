@@ -1,0 +1,9 @@
+[Unit]
+Description= Writes sys time to RTC, if we are currently synced
+
+[Service]
+Type=oneshot
+ExecStart=/bin/rtcsync.sh
+
+[Install]
+WantedBy=sysinit.target

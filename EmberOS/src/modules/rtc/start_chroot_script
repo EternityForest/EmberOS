@@ -1,6 +1,9 @@
-set -e
-set-x
+#!/bin/bash
 
+set -e
+set -x
+
+source /common.sh
 
 #Copy over the modified hwclock-set.sh
 unpack /filesystem/libudev /lib/udev/hwclock-set root
