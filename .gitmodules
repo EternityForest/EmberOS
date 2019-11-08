@@ -1,6 +1,6 @@
-[submodule "embedPiOs/src/modules/kaithem/filesystem/KaithemAutomation"]
-	path = embedPiOs/src/modules/kaithem/filesystem/KaithemAutomation
+[submodule "EmberOS/src/modules/kaithem/filesystem/KaithemAutomation"]
+	path = EmberOS/src/modules/kaithem/filesystem/KaithemAutomation
 	url = git@github.com:EternityForest/KaithemAutomation.git
-[submodule "embedPiOs/CustomPiOS"]
-	path = embedPiOs/CustomPiOS
+[submodule "EmberOS/CustomPiOS"]
+	path = EmberOS/CustomPiOS
 	url = git@github.com:guysoft/CustomPiOS.git
