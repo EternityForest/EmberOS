@@ -9,7 +9,9 @@ can tamper with the pi).
 
 THE DEFAULT PASSWORD IS USED FOR KAITHEM, which runs as root. The standard pi:raspberry password is used.
 
-Do *not* open a port to let people on the internet access this, without a firewall/nat/etc unless you change this.
+Do *not* open a port to let people on the internet access this, 
+without a firewall/nat/etc unless you change this, or disable password auth(Probably the better option)
+
 
 Think of it like the common WiFi printers and file servers that allow anyone on the network to print.
 
