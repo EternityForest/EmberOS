@@ -7,7 +7,7 @@ RestartSec=5
 
 [Service]
 TimeoutStartSec=0
-ExecStart=/boot/kaithem_install/kaithem/kaithem.py -c /boot/kaithem_sketch/config.yaml
+ExecStart=/boot/kaithem_install/kaithem/kaithem.py -c /boot/kaithem/config.yaml
 
 [Install]
 WantedBy=multi-user.target

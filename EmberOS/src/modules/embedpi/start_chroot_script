@@ -113,6 +113,13 @@ fi
 if [ ! -d /sketch/public.media ]; then
     mkdir /sketch/public.media
 fi
+
+#Generate missing SSL keys
+if [ ! -f /sketch/kaithem/ssl/certificate.key ] ; then
+    mkdir -p /sketch/kaithem/ssl/
+    #Look at this race condition here! Someone could steal that private key before we chmod it!
+    openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout /sketch/kaithem/ssl/certificate.key  -out  /sketch/kaithem/ssl/certificate.cert -subj '/CN=localhost'
+fi
 EOF
 
 chmod 744 /usr/bin/manage_sketch_folder.sh

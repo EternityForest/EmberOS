@@ -5,20 +5,16 @@ set -e
 
 source /common.sh
 
+mkdir -p /sketch_template/kaithem/
+
 unpack /filesystem/KaithemAutomation/kaithem/var /sketch_template/kaithem root
-
-
-#Make a dummy self signed certificateZ
-if [ ! -f /sketch_template/kaithem/ssl/certificate.key ] ; then
-    mkdir -p /sketch_template/kaithem/ssl/
-    #Look at this race condition here! Someone could steal that private key before we chmod it!
-    openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout /sketch_template/kaithem/ssl/certificate.key  -out  /sketch_template/kaithem/ssl/certificate.cert -subj '/CN=localhost'
-fi
-chmod -R 700 /sketch_template/kaithemssl
 
 unpack /filesystem/KaithemAutomation /sketch_template/kaithem_install/ root
 unpack /filesystem/systemd/ /usr/lib/systemd/system/ root
 unpack /filesystem/kaithem_sketch /sketch_template/kaithem root
 
+#Remove dummy keys so the user can add them if missing
+! rm /sketch_template/kaithem/ssl/certificate.key
+! rm /sketch_template/kaithem/ssl/certificate.cert
 
 systemctl enable kaithem.service

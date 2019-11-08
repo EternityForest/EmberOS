@@ -15,6 +15,10 @@ without a firewall/nat/etc unless you change this, or disable password auth(Prob
 
 Think of it like the common WiFi printers and file servers that allow anyone on the network to print.
 
+Also, the included SSL keys in /sketch/kaithem/ssl, and the SSH keys, are randomly generated on boot if missing.
+
+They are just self signed keys though, you will get a warning in your browser.
+
 ### /sketch
 
 To provide some semblance of security, umask is used to keep this from being accessed by anyone but root.
@@ -66,6 +70,8 @@ Using your favorite partition editor, add an ntfs partition called sketch just a
 in that empty space you just made.
 
 Copy everything in the root partition's sketch_template dir to the root of that partition.
+
+If your image is for systems with an RTC, see "using an RTC"
 
 ## Squid Proxy
 
@@ -218,6 +224,10 @@ You just add ro to the fstab entry for /sketch, that's the only writable part. Y
 able to save without SSHing(Or using kaithem's terminal) and running `sudo mount -o remount,rw /sketch`.
 
 NTFS is a journaling filesystem, so you may or may not actually need true read only.
+
+## Updating Kaithem
+The whole install as found in the repo is in /sketch/kaithem_install.  Just
+copy the entire contents of the repo there.
 
 
 ## Kiosk browsering
