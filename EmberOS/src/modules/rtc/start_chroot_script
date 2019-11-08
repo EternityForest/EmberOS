@@ -6,10 +6,10 @@ set -x
 source /common.sh
 
 #Copy over the modified hwclock-set.sh
-unpack /filesystem/libudev /lib/udev/hwclock-set root
+unpack /filesystem/libudev /lib/udev/ root
 unpack /filesystem/systemd /etc/systemd/system/ root
 
-
+chmod 744 /lib/udev/hwclock-set
 chmod 744 /bin/rtcsync.sh
 chmod 744 /etc/systemd/system/rtcsync.timer
 chmod 744 /etc/systemd/system/rtcsync.service
