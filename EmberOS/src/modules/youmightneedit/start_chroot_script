@@ -1,11 +1,57 @@
 #!/bin/bash
 apt update --allow-releaseinfo-change
 apt update
-apt -y install exfat-utils avahi-daemon nano  
+apt -y install avahi-daemon 
 apt -y install chrony
 
 apt -y install squid-deb-proxy-client
 apt -y install avahi-utils
+
+
+#Make the cache we just installed work
+! systemctl start avahi-daemon
+
+# Installs the Micro editor
+# Do this early, it can't be cached like apt
+cd /usr/bin/
+curl https://getmic.ro | bash
+
+
+
+apt -y install exfat-utils
+apt -y install samba samba-common-bin smbclient cifs-utils
+apt -y install minidlna
+
+#This is a public samba share. It's read only.
+cat << EOF >> /etc/fstab
+[guest]
+        # This share allows anonymous (guest) access
+        # without authentication!
+        path = /sketch/public.samba
+        read only = yes
+        guest ok = yes
+EOF
+
+mkdir -p /sketch_template/public.www/
+mkdir -p /sketch_template/public.samba/
+
+#This seems to be fairly low resource usage and thus safe to include
+echo "media_dir=/sketch/public.dlna/" >> /etc/minidlna.conf
+mkdir -p /sketch_template/public.dlna/
+
+#Add the user for minidlna to the root group.
+#TODO a solution that has less trust on it.
+! adduser minidlna root
+
+! sudo systemctl enable minidlna.service
+! sudo systemctl enable smbd.service nmbd.service
+apt -y install apache2
+
+#Best effort!
+! sudo apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,mysql,zip} && apt-get install libapache2-mod-php -y
+sudo systemctl enable apache2.service
+
+
 apt -y install python3 systemd cython3 build-essential
 apt -y install mplayer pulseaudio python3-pyserial
 apt -y install python3-pytz python3-dateutil lm-sensors
@@ -33,8 +79,4 @@ apt -y install chafa
 apt -y install nast
 
 ! ufw disable
-
-# Installs the Micro editor
-cd /usr/bin/
-curl https://getmic.ro | bash
 

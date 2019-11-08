@@ -48,3 +48,10 @@ touch /var/log/apach2e/access.log
 chmod 700 /var/log/apache2/access.log
 fi
 fi
+
+###--------------------------------Samba shimming-----------------------------
+
+mkdir /tmp/samba
+mkdir /tmp/cache
+mkdir /tmp/cache/samba
+​sudo mkdir /var/log/samba

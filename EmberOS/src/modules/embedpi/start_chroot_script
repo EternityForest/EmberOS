@@ -52,11 +52,13 @@ EOF
 #Generate an RSA key whenever it does not exist, if we can
 #Then move whatever kets we find into the SSH ramdisk.
 
-cat << EOF > /usr/bin/manage_sketch_ssh.sh
+cat << EOF > /usr/bin/manage_sketch_folder.sh
 #!/bin/bash
 
 #This script generates nonexistant keys, and
 #Also moves keys into the special tmpfs just for those keys.
+
+#It also binds apache's www stuff
 
 mkdirs -p /sketch/ssh/pi
 
@@ -82,12 +84,20 @@ fi
 
 mount --bind /sketch/ssh/ssh_conf /etc/ssh/ssh_config
 
+
+#Use what is already there as the template
+if [ ! -d /sketch/public.www ]; then
+    mkdir /sketch/public.www
+    cp -v -r /var/www/. /sketch/public.www
+fi
+
+mount --bind /sketch/public.www /var/www
 EOF
 
-chmod 744 /usr/bin/manage_sketch_ssh.sh
+chmod 744 /usr/bin/manage_sketch_folder.sh
 
 
-cat << EOF > /etc/systemd/system/manage_sketch_ssh.service
+cat << EOF > /etc/systemd/system/manage_sketch_folder.service
 [Unit]
 Description=Manage loading SSH keys into ramdisk
 After=systemd-remount-fs.service
@@ -97,15 +107,15 @@ DefaultDependencies=no
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/manage_sketch_ssh.sh
+ExecStart=/usr/bin/manage_sketch_folder.sh
 
 [Install]
 WantedBy=sysinit.target
 
 EOF
 
-chmod 744 /etc/systemd/system/manage_sketch_ssh.service
-systemctl enable /etc/systemd/system/manage_sketch_ssh.service
+chmod 744 /etc/systemd/system/manage_sketch_folder.service
+systemctl enable /etc/systemd/system/manage_sketch_folder.service
 
 
 

@@ -33,6 +33,7 @@ It is not encrypted though.
 * sets everything up for a realtime clock, just add dtoverlay
 * Enables SSH, I2C, and SPI
 * allows full configuration of SSH via the sketch partition
+* Enables Samba and DLNA
 
 * Does NOT make the NTFS partition /sketch read only. You have to do that one yourself if you want it.
 
@@ -180,6 +181,17 @@ Obviously the best console game :P
 It's fortune!
 
 
+## Serving Media
+
+One of the most common tasks for embedded devices is as a media server.
+Put whatever you want to serve in /sketch/public.dlna for DLNA,
+/sketch/public.samba for samba.
+
+Put whatever you want to serve as a standard web site in /sketch/public.www to serve
+it on port 80 with apache.
+
+Don't use the prefix public. for anything you don't want to be made public in case more
+services are added!
 
 ## Making it actually read only
 
