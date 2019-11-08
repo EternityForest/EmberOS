@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -ex
+
+if [ "$FFMPEG_CLEANUP" == "yes" ]
+    then
+    echo "cleaning up ffmpeg"
+    rm -rf /usr/src/x264
+    rm -rf /usr/src/FFmpeg
+fi

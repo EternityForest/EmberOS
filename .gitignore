@@ -1,2 +1,4 @@
-*.bin
-*.img
+*full.img
+EmberOS/src/build.log
+EmberOS/src/workspace/aptcache/
+

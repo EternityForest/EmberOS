@@ -1,0 +1,109 @@
+CONFIG_DIR=$(dirname $(realpath -s $BASH_SOURCE))
+
+export BUILD_VARIANT=default
+BUILD_FLAVOR=default
+WORKSPACE_POSTFIX=
+
+if [ "$#" -gt 0 ]; then
+  export BUILD_VARIANT=$1
+fi
+if [ "$#" -gt 1 ]; then
+  BUILD_FLAVOR=$2
+fi
+
+echo -e "--> Building VARIANT $BUILD_VARIANT, FLAVOR $BUILD_FLAVOR"
+
+# Import the local config if we have one
+
+if [ -f $CONFIG_DIR/config.local ]
+then
+  echo "Sourcing config.local..."
+  source $CONFIG_DIR/config.local
+fi
+
+source ${DIST_PATH}/config
+
+if [ $BUILD_VARIANT != 'default' ]; then
+  WORKSPACE_POSTFIX=-$BUILD_VARIANT
+  
+  if [ -d "${DIST_PATH}/variants/$BUILD_VARIANT" ]; then
+    export VARIANT_BASE="${DIST_PATH}/variants/$BUILD_VARIANT"
+  elif [ -d "${CUSTOM_OS_PATH}/variants/$BUILD_VARIANT" ]; then
+    export VARIANT_BASE="$CUSTOM_OS_PATH/variants/$BUILD_VARIANT"
+  else
+    die "Could not find Variant $BUILD_VARIANT"
+  fi
+
+  if [ $BUILD_FLAVOR == '' ] || [ $BUILD_FLAVOR == 'default' ]
+  then
+    VARIANT_CONFIG=$VARIANT_BASE/config
+    FLAVOR_CONFIG=
+  else
+    VARIANT_CONFIG=$VARIANT_BASE/config
+    FLAVOR_CONFIG=$VARIANT_BASE/config.$BUILD_FLAVOR
+  fi
+
+  if [ -n "$FLAVOR_CONFIG" ] && [ ! -f $FLAVOR_CONFIG ]
+  then
+    die "Could not find config file $FLAVOR_CONFIG"
+  fi
+fi
+
+echo Import the variant config if we have one
+if [ -n "$VARIANT_CONFIG" ] && [ -f $VARIANT_CONFIG ]
+then
+  echo "Sourcing variant config $VARIANT_CONFIG..."
+  set -a
+  source $VARIANT_CONFIG
+  set +a
+fi
+
+# Import the flavor config if we have one
+
+if [ -n "$FLAVOR_CONFIG" ] && [ -f $FLAVOR_CONFIG ]
+then
+  echo "Sourcing flavor config $FLAVOR_CONFIG..."
+  source $FLAVOR_CONFIG
+fi
+
+
+
+if [ -f ${DIST_PATH}/config.local ]
+then
+  echo "Sourcing distro config.local..."
+  source ${DIST_PATH}/config.local
+fi
+
+# Get only a list
+TMP="${MODULES//(/,}"
+TMP="${TMP// /}"
+MODULES_LIST="${TMP//)/,}"
+
+for module in $(echo "${MODULES_LIST}" | tr "," "\n")
+do
+    if [ -d "${DIST_PATH}/modules/${module}" ]; then
+        export MODULE_PATH="${DIST_PATH}/modules/${module}"
+    elif   [ -d "${CUSTOM_PI_OS_PATH}/modules/${module}" ]; then
+        export MODULE_PATH="${CUSTOM_PI_OS_PATH}/modules/${module}"
+    fi
+    
+    echo loading $module config at ${MODULE_PATH}/config
+    if [ -f ${MODULE_PATH}/config ]; then
+        source ${MODULE_PATH}/config
+    else
+        echo "WARNING: module ${module} has no config file"
+    fi
+    
+    ###############################################################################
+    # Print and export the final configuration.
+
+    echo "================================================================"
+    echo "Using the following config:"
+    module_up=${module^^} module_up=${module_up//-/_}_
+    
+    # Export variables that satisfy the $module_up prefix
+    while IFS= read -r var; do export "$var"; echo "$var"; done < <(compgen -A variable "$module_up")
+
+    echo "================================================================"
+done
+

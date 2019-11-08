@@ -1,6 +1,3 @@
 [submodule "EmberOS/src/modules/kaithem/filesystem/KaithemAutomation"]
 	path = EmberOS/src/modules/kaithem/filesystem/KaithemAutomation
 	url = git@github.com:EternityForest/KaithemAutomation.git
-[submodule "EmberOS/CustomPiOS"]
-	path = EmberOS/CustomPiOS
-	url = git@github.com:guysoft/CustomPiOS.git
