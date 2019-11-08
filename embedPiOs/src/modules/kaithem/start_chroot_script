@@ -9,10 +9,10 @@ if [ ! -f /sketch_template/kaithemssl/certificate.key] ; then
 fi
 chmod -R 700 /sketch_template/kaithemssl
 
-unpack /filesystem/KaithemAutomation /sketch_template/kaithem_install/
-unpack /filesystem/systemd/ /usr/lib/systemd/system/
-unpack /filesystem/KaithemAutomation/kaithem/var /sketch_template/kaithem
-unpack /filesystem/kaithem_sketch /sketch_template/kaithem
+unpack /filesystem/KaithemAutomation /sketch_template/kaithem_install/ root
+unpack /filesystem/systemd/ /usr/lib/systemd/system/ root
+unpack /filesystem/KaithemAutomation/kaithem/var /sketch_template/kaithem root
+unpack /filesystem/kaithem_sketch /sketch_template/kaithem root
 
 
 systemctl enable kaithem.service

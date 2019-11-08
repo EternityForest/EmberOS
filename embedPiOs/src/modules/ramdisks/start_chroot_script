@@ -20,8 +20,7 @@ source /common.sh
 
 
 replace() {
-	! grep $2 $1 >/dev/null
-	if [ $? -eq 0 ]; then
+	if grep $2 $1 >/dev/null; then
 		# Pattern found; replace in file
 		sed -i "s/$2/$3/g" $1 >/dev/null
 	fi
@@ -30,8 +29,7 @@ replace() {
 # Given a filename, a regex pattern to match and a replacement string:
 # If found, perform replacement, else append file w/replacement on new line.
 replaceAppend() {
-	! grep $2 $1 >/dev/null
-	if [ $? -eq 0 ]; then
+	if grep $2 $1 >/dev/null; then
 		# Pattern found; replace in file
 		sed -i "s/$2/$3/g" $1 >/dev/null
 	else
@@ -43,8 +41,10 @@ replaceAppend() {
 # Given a filename, a regex pattern to match and a string:
 # If found, no change, else append file with string on new line.
 append1() {
-	! grep $2 $1 >/dev/null
-	if [ $? -ne 0 ]; then
+	
+	if grep $2 $1 >/dev/null; then
+		echo
+	else
 		# Not found; append on new line (silently)
 		echo $3 | sudo tee -a $1
 	fi
@@ -54,12 +54,15 @@ append1() {
 # If found, no change, else append space + string to last line --
 # this is used for the single-line /boot/cmdline.txt file.
 append2() {
-	! grep $2 $1 >/dev/null
-	if [ $? -ne 0 ]; then
+	if grep $2 $1 >/dev/null; then
+		echo
+	else
 		# Not found; insert in file before EOF
 		sed -i "s/\'/ $3/g" $1
 	fi
 }
+
+
 
 echo "Starting installation..."
 
@@ -155,13 +158,16 @@ replaceAppend /etc/ssh/sshd_config "^.*UsePrivilegeSeparation.*$" "UsePrivilegeS
 replace /usr/lib/tmpfiles.d/var.conf "spool\s*0755" "spool 1777"
 
 # Move dhcpd.resolv.conf to tmpfs
-touch /tmp/dhcpcd.resolv.conf
-rm /etc/resolv.conf
+! rm /tmp/dhcpcd.resolv.conf
+
+mv /etc/resolv.conf /tmp/dhcpcd.resolv.conf
+
 ln -s /tmp/dhcpcd.resolv.conf /etc/resolv.conf
 
 #Set up symlinks in case we have dhcpcd5
 if [ ! -h /var/lib/dhcpcd5 ] ; then
 rm -r /var/lib/dhcpcd5
+mkdir -p /var/lib/dchp
 ln -s /var/lib/dhcp /var/lib/dhcpcd5
 fi
 
@@ -187,7 +193,7 @@ append1 /etc/fstab "\s/tmp"   "tmpfs /tmp    tmpfs nodev,nosuid,size=256M 0 0"
 mkdir -p /var/lib/ntp
 append1 /etc/fstab "/var/lib/ntp" "tmpfs /var/lib/ntp tmpfs defaults,noatime,nosuid,nodev,noexec,size=1M 0 0"
 mkdir -p /var/lib/chrony
-append1 /etc/fstab "/var/lib/chrony" "tmpfs /var/lib/ntp tmpfs defaults,noatime,nosuid,nodev,noexec,size=1M 0 0"
+append1 /etc/fstab "/var/lib/chrony" "tmpfs /var/lib/chrony tmpfs defaults,noatime,nosuid,nodev,noexec,size=1M 0 0"
 
 
 #We mayve don't need this anymore on systemD????
@@ -201,11 +207,8 @@ append1 /etc/fstab "/var/lib/sudo" "tmpfs /var/lib/sudo tmpfs defaults,noatime,n
 mkdir -p /var/lib/pulse
 append1 /etc/fstab "/var/lib/pulse" "tmpfs /var/lib/pulse tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=2M 0 0"
 
+mkdir -p /var/lib/dhcp
+append1 /etc/fstab "/var/lib/dhcp" "tmpfs /var/lib/pulse tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=2M 0 0"
 
 
-## Boot partition is read only
-replace /etc/fstab "vfat\s*defaults\s" "vfat    defaults,ro "
-
-## Root is read only
-replace /etc/fstab "ext4\s*defaults,noatime\s" "ext4    defaults,noatime,ro "
-
+#This module doesn't do the actual making it read only part

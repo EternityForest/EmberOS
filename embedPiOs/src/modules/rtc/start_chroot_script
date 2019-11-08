@@ -1,0 +1,15 @@
+set -e
+set-x
+
+
+#Copy over the modified hwclock-set.sh
+unpack /filesystem/libudev /lib/udev/hwclock-set root
+unpack /filesystem/systemd /etc/systemd/system/ root
+
+
+chmod 744 /bin/rtcsync.sh
+chmod 744 /etc/systemd/system/rtcsync.timer
+chmod 744 /etc/systemd/system/rtcsync.service
+
+systemctl enable rtcsync.timer
+systemctl enable rtcsync.service

@@ -9,6 +9,6 @@ set -e
 
 source /common.sh
 
-unpack /filesystem/sketch /sketch_template 
+unpack /filesystem/sketch /sketch_template root
 rm /etc/hostname
 ln -s /sketch/hostname.txt /etc/hostname

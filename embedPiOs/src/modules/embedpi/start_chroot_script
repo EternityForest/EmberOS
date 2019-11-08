@@ -24,26 +24,100 @@ apt install -y ntfs-3g
 #You have to manually copy thos to the manually created sketch template after the fact
 ! mkdir /sketch_template
 
-echo "/dev/sda3 /sketch auto defaults,noatime,nofail,fmask=077,dmask=077,umask=077 0 0" >> /etc/fstab
+raspi-config nonint do_ssh 0
+raspi-config nonint do_spi 0
+raspi-config nonint do_i2c 0
 
 
+#Here's what the old one was
+# proc            /proc           proc    defaults          0       0
+# PARTUUID=f7a89ab5-01  /boot           vfat    defaults          0       2
+# PARTUUID=f7a89ab5-02  /               ext4    defaults,noatime  0       1
+
+
+## Warning: This just overwrites it entirely. Future versions of raspbian
+## Might have some other system FS stuff they need here.
+
+mkdir -p /home/pi/.ssh
+
+## 
+cat << EOF > /etc/fstab
+proc            /proc           proc    defaults          0       0
+/dev/mmcblk0p1  /boot           vfat    defaults,noatime,ro          0       2
+/dev/mmcblk0p2  /               ext4    defaults,noatime,ro  0       1
+/dev/mmcblk0p3 /sketch auto defaults,noatime,nofail,fmask=077,dmask=077,umask=077 0 0
+tmpfs /home/pi/.ssh/ tmpfs nodev,nosuid,size=256M 0 0
+EOF
+
+#Generate an RSA key whenever it does not exist, if we can
+#Then move whatever kets we find into the SSH ramdisk.
+
+cat << EOF > /usr/bin/manage_sketch_ssh.sh
+#!/bin/bash
+
+#This script generates nonexistant keys, and
+#Also moves keys into the special tmpfs just for those keys.
+
+mkdirs -p /sketch/ssh/pi
+
+if [ ! -f /sketch/ssh/pi/id_rsa ]; then
+    cat /dev/zero | ssh-keygen -f /sketch/ssh/id_rsa -q -N ""
+fi
+
+if [ ! -f /sketch/ssh/pi/authorized_keys ]; then
+    touch /sketch/ssh/authorized_keys
+fi
+
+mkdir /dev/shm_unpackthekeys
+cp -v -r --preserve=mode,timestamps /sketch/ssh/pi/. /dev/shm/unpackthekeys
+chown -hR pi:pi  /dev/shm_unpackthekeys
+chmod -R 600 /dev/shm_unpackthekeys
+cp -v -r --preserve=mode,ownership,timestamps /dev/shm/unpackthekeys/. /home/pi/.ssh
+rm /dev/shm_unpackthekeys
+
+#Nonexistant ssh conf, put the default in the sketch
+if [ ! -f /sketch/ssh/ssh_conf ]; then
+    cp /etc/ssh/ssh_config /sketch/ssh/ssh_config
+fi
+
+mount --bind /sketch/ssh/ssh_conf /etc/ssh/ssh_config
+
+EOF
+
+chmod 744 /usr/bin/manage_sketch_ssh.sh
+
+
+cat << EOF > /etc/systemd/system/manage_sketch_ssh.service
+[Unit]
+Description=Manage loading SSH keys into ramdisk
+After=systemd-remount-fs.service
+Before=sysinit.target
+RequiresMountsFor=/etc/
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/manage_sketch_ssh.sh
+
+[Install]
+WantedBy=sysinit.target
+
+EOF
+
+chmod 744 /etc/systemd/system/manage_sketch_ssh.service
+systemctl enable /etc/systemd/system/manage_sketch_ssh.service
+
+
+
+#Disable serial debugging, use readonly mode, and ditch the awful resize on first boot
+#Because it won't work and who knows what it will do
+cat << EOF > /boot/cmdline.txt
+dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2  rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait quiet splash plymouth.ignore-serial-consoles ro
+EOF
+! rm etc/rc3.d/S01resize2fs_once
 
 #Don't try to launch graphically by default
 systemctl set-default multi-user.target
-
-! apt purge -y ^wolfram-engine$
-! apt purge -y ^scratch2$
-! apt purge -y ^scratch$ 
-! apt purge -y ^libreoffice$ 
-! apt purge -y ^minecraft-pi$ 
-! apt purge -y ^python-minecraftpi$ 
-! apt purge -y ^bluej$ 
-! apt purge -y ^greenfoot$ 
-! apt purge -y ^claws-mail$ 
-! apt purge -y ^claws-mail-i18n$
-! apt purge -y ^nuscratch$
-
-apt autoremove -y --purge
 
 
 

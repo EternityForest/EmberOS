@@ -29,6 +29,10 @@ It is not encrypted though.
 * Makes sure avahi, exfat-utils, and other random stuff you probably want is installed
 * Runs kaithem as root on port 8002(That's the kaithem module, you can easily swap this for some other control system)
 * Makes /boot and / read-only
+* Installs squid-deb-proxy-client to fetch updates from the LAN
+* sets everything up for a realtime clock, just add dtoverlay
+* Enables SSH, I2C, and SPI
+* allows full configuration of SSH via the sketch partition
 
 * Does NOT make the NTFS partition /sketch read only. You have to do that one yourself if you want it.
 
@@ -37,7 +41,9 @@ It is not encrypted though.
 Clone this repo with all submodules
 
 Put a fresh zipped raspbian full image in the src/images dir
-Run sudo ./build_dist in the src dir!
+
+Run sudo ./build_dist in the src dir. This may take about an hour, and 
+you need internet access the whole time.
 
 Cd into the src/workspace folder.
 Expand the disk image by padding it with zeros:
@@ -53,6 +59,49 @@ in that empty space you just made.
 
 Copy everything in the root partition's sketch_template dir to the root of that partition.
 
+## Squid Proxy
+
+Thanks to the amazing squid-deb proxy, embedPiOs autodiscovers
+package caches on the LAN!
+
+Just install squid-deb-proxy on one machine, then add
+```
+mirrordirector.raspbian.org
+archive.raspberrypi.org
+```
+to `/etc/squid-deb-proxy/mirror-dstdomain.acl`
+
+to enable the rasbpian cache.
+
+I suggest you set this up before building, as the cache should work
+even during package build.
+
+
+## Using an RTC
+Add one of these lines to /boot/config.txt
+```
+dtoverlay=i2c-rtc,ds1307
+dtoverlay=i2c-rtc,pcf8523
+dtoverlay=i2c-rtc,ds3231
+```
+
+## Securing SSH
+
+In /sketch/ssh/pi, you will find everything you might expect to see in ~/.ssh
+
+You can add authorized keys there!
+
+/sketch/ssh/ssh_config is equivalent to /etc/ssh_config.
+
+Use this to disable password auth:
+`PasswordAuthentication no`
+
+There is no way to change the password for pi via the sketch folder,
+however by disabling password auth, you can prevent anyone without physical access
+from getting the chance to even try the password.
+
+
+
 ## Using
 
 Change /sketch/hostname to the name you want to give it.  You can now access
@@ -67,6 +116,66 @@ If you need to "factory reset" an image, just delete and copy from sketch_templa
 
 If you need to update or install new software to the system itself, just SSH in and use
 `sudo mount -o remount,rw /` to remount the root as writable, do your work, and reboot.
+
+
+
+### Utils
+
+This distro includes a lot of command line utils. If you are using this
+over ssh from a windows machine, in a pinch you should be able to get whatever
+you need to done.
+
+#### ncdu
+Interactive tool for figuring out what is taking all your space
+`ncdu /folder/to/investigate`
+
+#### nmap
+
+#### micro
+Awesome command line editor: https://micro-editor.github.io/
+
+Pretty much like any normal editor, no crazy vim/emacs type
+stuff to memorize here.  Everything is discoverable. Try it!
+
+
+#### mc
+Midnight commander. File manager with no learning curve.
+Tab switches panes. The move command pops up a window
+auto-filled with the other pane. It's pretty awesome.
+
+`mc /folder/to/browse` or just `mc`
+
+#### GNU Units
+`units` to launch unit converions
+
+#### xcas
+
+Maybe controversial since it's 33MB,
+but sometimes when developing you really need to solve an equation.
+
+#### vim
+
+I don't know how this works, but I work with people who would be dissapointed
+if I didn't include it :P
+
+#### chafa
+
+`chafa FILE` views any kind of image file, in low res, in the
+console.
+
+#### git
+
+
+#### ufw
+
+Firewall. You might want this. But it is disabled by default.
+
+#### robotfindskitten
+
+Obviously the best console game :P
+
+#### fortune
+It's fortune!
 
 
 
