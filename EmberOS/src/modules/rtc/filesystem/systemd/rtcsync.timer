@@ -1,0 +1,8 @@
+[Unit]
+Description=Run rtcsync.service every 10 minutes to keep the clock synced
+
+[Timer]
+OnCalendar=*:0/10
+
+[Install]
+WantedBy=timers.target 
