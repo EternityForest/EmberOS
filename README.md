@@ -15,7 +15,8 @@ Think of it like the common WiFi printers and file servers that allow anyone on 
 
 ### /sketch
 
-To provide some semblance of security, umask is used to keep this from being read by anyone but root.
+To provide some semblance of security, umask is used to keep this from being accessed by anyone but root.
+It can be read and executed by root's group, but only written by root itself.
 
 It is not encrypted though.
 
@@ -33,7 +34,7 @@ It is not encrypted though.
 * sets everything up for a realtime clock, just add dtoverlay
 * Enables SSH, I2C, and SPI
 * allows full configuration of SSH via the sketch partition
-* Enables Samba and DLNA
+* Enables Samba and DLNA(minidlna is added to root's group to enable this)
 
 * Does NOT make the NTFS partition /sketch read only. You have to do that one yourself if you want it.
 
@@ -71,6 +72,7 @@ Just install squid-deb-proxy on one machine, then add
 ```
 mirrordirector.raspbian.org
 archive.raspberrypi.org
+mirror.web-ster.com
 ```
 to `/etc/squid-deb-proxy/mirror-dstdomain.acl`
 
@@ -92,7 +94,7 @@ dtoverlay=i2c-rtc,ds3231
 
 In /sketch/ssh/pi, you will find everything you might expect to see in ~/.ssh
 
-You can add authorized keys there!
+You can add authorized keys there, same as you would in .ssh on any machine!
 
 /sketch/ssh/ssh_config is equivalent to /etc/ssh_config.
 
@@ -103,6 +105,10 @@ There is no way to change the password for pi via the sketch folder,
 however by disabling password auth, you can prevent anyone without physical access
 from getting the chance to even try the password.
 
+If you want to allow root login(May be needed for SFTP clients), use:
+`PermitRootLogin yes`
+
+And add the keys to /sketch/ssh/root/
 
 
 ## Using
@@ -168,10 +174,22 @@ console.
 
 #### git
 
+#### nast
+
+#### fatrace
+
+#### htop
 
 #### ufw
 
 Firewall. You might want this. But it is disabled by default.
+
+
+#### neofetch
+All Arch Linux users are legally required to stare at this several times a day,
+according to reddit memes.
+
+Provides basic sys info with nice formatting.
 
 #### robotfindskitten
 
@@ -184,8 +202,8 @@ It's fortune!
 ## Serving Media
 
 One of the most common tasks for embedded devices is as a media server.
-Put whatever you want to serve in /sketch/public.dlna for DLNA,
-/sketch/public.samba for samba.
+Put whatever you want to serve in /sketch/public.media for DLNA,
+/sketch/public.files for samba.
 
 Put whatever you want to serve as a standard web site in /sketch/public.www to serve
 it on port 80 with apache.

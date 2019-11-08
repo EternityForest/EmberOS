@@ -23,21 +23,27 @@ apt -y install samba samba-common-bin smbclient cifs-utils
 apt -y install minidlna
 
 #This is a public samba share. It's read only.
-cat << EOF >> /etc/fstab
+cat << EOF >> /etc/samba/smb.conf
 [guest]
         # This share allows anonymous (guest) access
         # without authentication!
-        path = /sketch/public.samba
+        path = /sketch/public.files
+        read only = yes
+        guest ok = yes
+[media]
+        # This share allows anonymous (guest) access
+        # without authentication!
+        path = /sketch/public.media
         read only = yes
         guest ok = yes
 EOF
 
 mkdir -p /sketch_template/public.www/
-mkdir -p /sketch_template/public.samba/
+mkdir -p /sketch_template/public.files/
 
 #This seems to be fairly low resource usage and thus safe to include
-echo "media_dir=/sketch/public.dlna/" >> /etc/minidlna.conf
-mkdir -p /sketch_template/public.dlna/
+echo "media_dir=/sketch/public.media/" >> /etc/minidlna.conf
+mkdir -p /sketch_template/public.media/
 
 #Add the user for minidlna to the root group.
 #TODO a solution that has less trust on it.
@@ -48,7 +54,8 @@ mkdir -p /sketch_template/public.dlna/
 apt -y install apache2
 
 #Best effort!
-! sudo apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,mysql,zip} && apt-get install libapache2-mod-php -y
+! sudo apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,mysql,zip}
+apt-get install libapache2-mod-php -y
 sudo systemctl enable apache2.service
 
 
@@ -77,6 +84,8 @@ apt -y install lsof
 apt -y install fzf
 apt -y install chafa
 apt -y install nast
+! apy -y install fatrace
+! apy -y install neofetch
 
 ! ufw disable
 

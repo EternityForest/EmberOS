@@ -36,14 +36,17 @@ raspi-config nonint do_i2c 0
 ## Might have some other system FS stuff they need here.
 
 mkdir -p /home/pi/.ssh
+mkdir -p /root/.ssh
 
 ## 
 cat << EOF > /etc/fstab
 proc            /proc           proc    defaults          0       0
 /dev/mmcblk0p1  /boot           vfat    defaults,noatime,ro          0       2
 /dev/mmcblk0p2  /               ext4    defaults,noatime,ro  0       1
-/dev/mmcblk0p3 /sketch auto defaults,noatime,nofail,fmask=077,dmask=077,umask=077 0 0
+/dev/mmcblk0p3 /sketch auto defaults,noatime,nofail,fmask=027,dmask=027,umask=027 0 0
 tmpfs /home/pi/.ssh/ tmpfs nodev,nosuid,size=256M 0 0
+tmpfs /root/.ssh/ tmpfs nodev,nosuid,size=256M 0 0
+
 EOF
 
 #Generate an RSA key whenever it does not exist, if we can
@@ -56,30 +59,40 @@ cat << EOF > /usr/bin/manage_sketch_folder.sh
 #Also moves keys into the special tmpfs just for those keys.
 
 #It also binds apache's www stuff
+set -e
 
-mkdirs -p /sketch/ssh/pi
+mkdir -p /sketch/ssh/pi
+mkdir -p /sketch/ssh/root
 
 if [ ! -f /sketch/ssh/pi/id_rsa ]; then
     cat /dev/zero | ssh-keygen -f /sketch/ssh/id_rsa -q -N ""
 fi
 
 if [ ! -f /sketch/ssh/pi/authorized_keys ]; then
-    touch /sketch/ssh/authorized_keys
+    touch /sketch/ssh/pi/authorized_keys
 fi
 
-mkdir /dev/shm_unpackthekeys
-cp -v -r --preserve=mode,timestamps /sketch/ssh/pi/. /dev/shm/unpackthekeys
-chown -hR pi:pi  /dev/shm_unpackthekeys
-chmod -R 600 /dev/shm_unpackthekeys
+if [ ! -f /sketch/ssh/root/id_rsa ]; then
+    cat /dev/zero | ssh-keygen -f /sketch/ssh/root/id_rsa -q -N ""
+fi
+
+if [ ! -f /sketch/ssh/root/authorized_keys ]; then
+    touch /sketch/ssh/root/authorized_keys
+fi
+
+mkdir /dev/shm/unpackthekeys
+cp -v -r --preserve=mode,ownership,timestamps /sketch/ssh/pi/. /dev/shm/unpackthekeys
+chown -hR pi:pi  /dev/shm/unpackthekeys
+chmod -R 600 /dev/shm/unpackthekeys
 cp -v -r --preserve=mode,ownership,timestamps /dev/shm/unpackthekeys/. /home/pi/.ssh
-rm /dev/shm_unpackthekeys
+rm /dev/shm/unpackthekeys
 
 #Nonexistant ssh conf, put the default in the sketch
-if [ ! -f /sketch/ssh/ssh_conf ]; then
+if [ ! -f /sketch/ssh/ssh_config ]; then
     cp /etc/ssh/ssh_config /sketch/ssh/ssh_config
 fi
 
-mount --bind /sketch/ssh/ssh_conf /etc/ssh/ssh_config
+mount --bind /sketch/ssh/ssh_config /etc/ssh/ssh_config
 
 
 #Use what is already there as the template
@@ -89,6 +102,17 @@ if [ ! -d /sketch/public.www ]; then
 fi
 
 mount --bind /sketch/public.www /var/www
+
+
+#Use what is already there as the template
+if [ ! -d /sketch/public.files ]; then
+    mkdir /sketch/public.files
+fi
+
+#Use what is already there as the template
+if [ ! -d /sketch/public.media ]; then
+    mkdir /sketch/public.media
+fi
 EOF
 
 chmod 744 /usr/bin/manage_sketch_folder.sh
