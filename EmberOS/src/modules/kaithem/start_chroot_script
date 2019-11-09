@@ -6,6 +6,7 @@ set -e
 source /common.sh
 
 mkdir -p /sketch_template/kaithem/
+mkdir -p /sketch_template/kaithem_install
 
 unpack /filesystem/KaithemAutomation/kaithem/var /sketch_template/kaithem root
 
