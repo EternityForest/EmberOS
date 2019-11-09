@@ -196,9 +196,6 @@ mkdir -p /var/lib/chrony
 append1 /etc/fstab "/var/lib/chrony" "tmpfs /var/lib/chrony tmpfs defaults,noatime,nosuid,nodev,noexec,size=1M 0 0"
 
 
-#We mayve don't need this anymore on systemD????
-append1 /etc/fstab "/var/lib/urandom" "tmpfs /var/lib/urandom tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=1M 0 0"
-
 #Keep logrotate. We want to clear old logs out of RAM
 append1 /etc/fstab "/var/lib/logrotate" "tmpfs /var/lib/logrotate tmpfs defaults,noatime,nosuid,nodev,noexec,size=2M 0 0"
 
@@ -212,7 +209,7 @@ append1 /etc/fstab "/var/lib/dhcp" "tmpfs /var/lib/dhcp tmpfs defaults,noatime,n
 
 
 mkdir -p /var/cache/minidlna
-append1 /etc/fstab "/var/cache/minidlna" "tmpfs /var/lib/minidlna tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=64M 0 0"
+append1 /etc/fstab "/var/cache/minidlna" "tmpfs /var/cache/minidlna tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=64M 0 0"
 
 
 mkdir -p /var/lib/minidlna
@@ -224,6 +221,6 @@ mkdir -p /var/cache/samba
 append1 /etc/fstab "/var/cache/samba" "tmpfs /var/cache/samba tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=128M 0 0"
 
 mkdir -p /var/lib/samba
-append1 /etc/fstab "/var/lib/samba" "tmpfs /var/cache/samba tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=128M 0 0"
+append1 /etc/fstab "/var/lib/samba" "tmpfs /var/lib/samba tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=128M 0 0"
 
 #This module doesn't do the actual making it read only part

@@ -133,7 +133,7 @@ function unpack() {
   
   if [ -n "$owner" ]
   then
-    chown -hR $owner:$owner $to
+    chown -hR $owner:$owner /tmp/unpack/
   fi
 
   cp -v -r --preserve=mode,ownership,timestamps /tmp/unpack/. $to

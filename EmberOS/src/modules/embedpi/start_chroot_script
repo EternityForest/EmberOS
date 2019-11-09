@@ -65,7 +65,7 @@ mkdir -p /sketch/ssh/pi
 mkdir -p /sketch/ssh/root
 
 if [ ! -f /sketch/ssh/pi/id_rsa ]; then
-    cat /dev/zero | ssh-keygen -f /sketch/ssh/id_rsa -q -N ""
+    cat /dev/zero | ssh-keygen -f /sketch/ssh/pi/id_rsa -q -N ""
 fi
 
 if [ ! -f /sketch/ssh/pi/authorized_keys ]; then
@@ -85,7 +85,7 @@ cp -v -r --preserve=mode,ownership,timestamps /sketch/ssh/pi/. /dev/shm/unpackth
 chown -hR pi:pi  /dev/shm/unpackthekeys
 chmod -R 600 /dev/shm/unpackthekeys
 cp -v -r --preserve=mode,ownership,timestamps /dev/shm/unpackthekeys/. /home/pi/.ssh
-rm /dev/shm/unpackthekeys
+rm -r /dev/shm/unpackthekeys
 
 #Nonexistant ssh conf, put the default in the sketch
 if [ ! -f /sketch/ssh/ssh_config ]; then
@@ -120,6 +120,22 @@ if [ ! -f /sketch/kaithem/ssl/certificate.key ] ; then
     #Look at this race condition here! Someone could steal that private key before we chmod it!
     openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout /sketch/kaithem/ssl/certificate.key  -out  /sketch/kaithem/ssl/certificate.cert -subj '/CN=localhost'
 fi
+
+
+#TODO Maybe some things in the home folders should persist to the sketch or something
+
+mkdir -p /dev/shm/roothome
+mkdir -p /dev/shm/roothome_work
+
+mkdir -p /dev/shm/pihome
+mkdir -p /dev/shm/pihome_work
+
+chown pi /dev/shm/pihome
+chown pi /dev/shm/pihome_work
+
+mount -t overlay -o lowerdir=/root,upperdir=/dev/shm/roothome,workdir=/dev/shm/roothome_work overlay /root
+mount -t overlay -o lowerdir=/home/pi,upperdir=/dev/shm/pihome,workdir=/dev/shm/pihome_work overlay /home/pi
+
 EOF
 
 chmod 744 /usr/bin/manage_sketch_folder.sh
