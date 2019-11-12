@@ -79,8 +79,12 @@ apt -y install lsof
 apt -y install fzf
 apt -y install chafa
 apt -y install nast
+apt -y install xserver-xorg-legacy
+
 ! apy -y install fatrace
 ! apy -y install neofetch
+
+! apt install x11-apps
 
 #Install last so the build doesn't try using it from inside quemu
 #And slow everything down by not working

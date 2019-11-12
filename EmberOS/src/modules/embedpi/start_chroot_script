@@ -24,6 +24,13 @@ apt install -y ntfs-3g
 raspi-config nonint do_ssh 0
 raspi-config nonint do_spi 0
 raspi-config nonint do_i2c 0
+raspi-config nonint do_camera 0
+
+raspi-config nonint do_overscan 0
+
+
+#Set up for a US keyboard by default
+raspi-config nonint do_configure_keyboard us
 
 
 #Here's what the old one was
@@ -44,9 +51,6 @@ proc            /proc           proc    defaults          0       0
 /dev/mmcblk0p1  /boot           vfat    defaults,noatime,ro          0       2
 /dev/mmcblk0p2  /               ext4    defaults,noatime,ro  0       1
 /dev/mmcblk0p3 /sketch auto defaults,noatime,nofail,fmask=027,dmask=027,umask=027 0 0
-tmpfs /home/pi/.ssh/ tmpfs nodev,nosuid,size=256M 0 0
-tmpfs /root/.ssh/ tmpfs nodev,nosuid,size=256M 0 0
-
 EOF
 
 #Generate an RSA key whenever it does not exist, if we can
@@ -60,6 +64,23 @@ cat << EOF > /usr/bin/manage_sketch_folder.sh
 
 #It also binds apache's www stuff
 set -e
+
+
+#TODO Maybe some things in the home folders should persist to the sketch or something
+
+mkdir -p /dev/shm/roothome
+mkdir -p /dev/shm/roothome_work
+
+mkdir -p /dev/shm/pihome
+mkdir -p /dev/shm/pihome_work
+
+chown pi /dev/shm/pihome
+chown pi /dev/shm/pihome_work
+
+
+mount -t overlay -o lowerdir=/root,upperdir=/dev/shm/roothome,workdir=/dev/shm/roothome_work overlay /root
+mount -t overlay -o lowerdir=/home/pi,upperdir=/dev/shm/pihome,workdir=/dev/shm/pihome_work overlay /home/pi
+
 
 mkdir -p /sketch/ssh/pi
 mkdir -p /sketch/ssh/root
@@ -122,19 +143,7 @@ if [ ! -f /sketch/kaithem/ssl/certificate.key ] ; then
 fi
 
 
-#TODO Maybe some things in the home folders should persist to the sketch or something
 
-mkdir -p /dev/shm/roothome
-mkdir -p /dev/shm/roothome_work
-
-mkdir -p /dev/shm/pihome
-mkdir -p /dev/shm/pihome_work
-
-chown pi /dev/shm/pihome
-chown pi /dev/shm/pihome_work
-
-mount -t overlay -o lowerdir=/root,upperdir=/dev/shm/roothome,workdir=/dev/shm/roothome_work overlay /root
-mount -t overlay -o lowerdir=/home/pi,upperdir=/dev/shm/pihome,workdir=/dev/shm/pihome_work overlay /home/pi
 
 EOF
 

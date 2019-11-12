@@ -36,11 +36,18 @@ It is not encrypted though.
 * Makes sure avahi, exfat-utils, and other random stuff you probably want is installed
 * Runs kaithem as root on port 8002(That's the kaithem module, you can easily swap this for some other control system)
 * Makes /boot and / read-only
-* Installs squid-deb-proxy-client to fetch updates from the LAN
-* sets everything up for a realtime clock, just add dtoverlay
-* Enables SSH, I2C, and SPI
-* allows full configuration of SSH via the sketch partition
+* Installs squid-deb-proxy-client to make apt fetch updates from the LAN
+* Sets everything up for a realtime clock, just add dtoverlay
+* Enables SSH, I2C, and SPI, and the camera interface
+* Allows full configuration of SSH via the sketch partition
 * Enables Samba and DLNA(minidlna is added to root's group to enable this)
+* Puts a tmpfs over /home/pi and /root, making them volatile but writable.
+* Disables overscan. You almost certainly don't want this on a modern display.
+* Sets up a US keyboard layout(This will eventually be set through /sketch if there's interest)
+* Boots by default into a Chromium fullscreen kiosk(Exit with alt-f4) to /sketck/kiosk_startpage.html
+
+* Keeps the default customPiOs behavior of configuring WiFi in /boot, not sketch.
+
 
 * Does NOT make the NTFS partition /sketch read only. You have to do that one yourself if you want it.
 
@@ -61,7 +68,7 @@ Example:
 `dd if=/dev/zero bs=1M count=7K >> 2019-06-20-raspbian-buster-full.img`
 Change the filenames as neccesary. Count is in blocks. This appends about 8GB of extra space. You probably don't need this much.
 
-You can also just shrink / to make room for the sketch partition
+You can also just shrink / to make room for the sketch partition.  You may want to keep it small for 8GB sd cards
 
 
 Mount the partition using `sudo udisksctl loop-setup -f 2019-06-20-raspbian-buster-full.img` 

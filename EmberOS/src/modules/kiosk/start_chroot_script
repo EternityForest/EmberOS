@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -x
+set -e
+
+source /common.sh
+
+unpack /filesystem/bin /usr/bin root
+unpack /filesystem/systemd /usr/lib/systemd/system/ root
+
+chmod r+x /usr/bin/startkiosk
+
+systemctl enable chromekiosk.service

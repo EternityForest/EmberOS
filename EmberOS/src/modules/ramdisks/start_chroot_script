@@ -12,6 +12,10 @@
 # k3a.me/how-to-make-raspberrypi-truly-read-only-reliable-and-trouble-free
 
 
+#This script should set up a tmpfs over everything it can without affecting user experience
+
+
+
 # Source error handling, leave this in place
 set -x
 set -e
@@ -184,16 +188,16 @@ fi
 # and "just a few" a few others....
 
 
-append1 /etc/fstab "/var/log" "tmpfs /var/log tmpfs nodev,nosuid,size=32M 0 0"
-append1 /etc/fstab "/var/tmp" "tmpfs /var/tmp tmpfs nodev,nosuid,size=256M 0 0"
-append1 /etc/fstab "\s/tmp"   "tmpfs /tmp    tmpfs nodev,nosuid,size=256M 0 0"
+append1 /etc/fstab "/var/log" "tmpfs /var/log tmpfs nodev,nosuid,mode=775,uid=syslog,size=32M 0 0"
+append1 /etc/fstab "/var/tmp" "tmpfs /var/tmp tmpfs nodev,nosuid,mode=1777,size=256M 0 0"
+append1 /etc/fstab "\s/tmp"   "tmpfs /tmp    tmpfs nodev,nosuid,mode=1777,size=256M 0 0"
 
 
 #NTP and Chrony are both valid choices. Can't really make people pick one....
 mkdir -p /var/lib/ntp
 append1 /etc/fstab "/var/lib/ntp" "tmpfs /var/lib/ntp tmpfs defaults,noatime,nosuid,nodev,noexec,size=1M 0 0"
 mkdir -p /var/lib/chrony
-append1 /etc/fstab "/var/lib/chrony" "tmpfs /var/lib/chrony tmpfs defaults,noatime,nosuid,nodev,noexec,size=1M 0 0"
+append1 /etc/fstab "/var/lib/chrony" "tmpfs /var/lib/chrony tmpfs defaults,noatime,nosuid,nodev,noexec,uid=_chrony,size=1M 0 0"
 
 
 #Keep logrotate. We want to clear old logs out of RAM
