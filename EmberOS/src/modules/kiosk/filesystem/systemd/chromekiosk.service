@@ -4,6 +4,7 @@ After=basic.target time-sync.target
 Type=simple
 Restart=on-failure
 RestartSec=5
+User=pi
 
 [Service]
 TimeoutStartSec=0
