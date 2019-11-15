@@ -30,7 +30,7 @@ It is not encrypted though.
 
 * Adds a ntfs partition called /sketch  that is intended to be the storage location for everything except the os and libs
 * Makes a file at /sketch/hostname.txt to let you change the hostname
-* Installs chrony instead of garbage timesyncd
+* Installs ntpd instead of garbage timesyncd
 * Puts a whole bumch of tmpfses on things that write to disk, so they still work
 * Generates entropy from the HW rnd on boot
 * Makes sure avahi, exfat-utils, and other random stuff you probably want is installed
@@ -44,7 +44,7 @@ It is not encrypted though.
 * Puts a tmpfs over /home/pi and /root, making them volatile but writable.
 * Disables overscan. You almost certainly don't want this on a modern display.
 * Sets up a US keyboard layout(This will eventually be set through /sketch if there's interest)
-* Boots by default into a Chromium fullscreen kiosk(Exit with alt-f4) to /sketck/kiosk_startpage.html
+* Boots by default into a Chromium fullscreen kiosk(Exit with alt-f4) pointed at http://localhost
 
 * Keeps the default customPiOs behavior of configuring WiFi in /boot, not sketch.
 
@@ -90,11 +90,14 @@ Just install squid-deb-proxy on one machine, then add
 mirrordirector.raspbian.org
 archive.raspberrypi.org
 mirror.web-ster.com
+raspbian.raspberrypi.org
 ```
 to `/etc/squid-deb-proxy/mirror-dstdomain.acl`
 
 to enable that machine to act as a cache server.
 
+If you get weird 403 forbidden errors, just disable the cache,
+someone is probably running a conflicting one.
 
 ## Using an RTC
 Add one of these lines to /boot/config.txt
@@ -217,10 +220,10 @@ It's fortune!
 
 One of the most common tasks for embedded devices is as a media server.
 Put whatever you want to serve in /sketch/public.media for DLNA,
-/sketch/public.files for samba.
+/sketch/public.files for samba(Samba and DLNA aren't working yet)
 
 Put whatever you want to serve as a standard web site in /sketch/public.www to serve
-it on port 80 with apache.
+it on port 80 with apache. Whatever you put as index.http will be the start page for the fullscren kiosk!
 
 Don't use the prefix public. for anything you don't want to be made public in case more
 services are added!

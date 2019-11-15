@@ -31,6 +31,13 @@ dd bs=1 count=32K if=/dev/urandom of=/var/lib/urandom/random-seed > /dev/null
 touch /run/cprng-seeded
 
 
+
+
+####Permissions on tmp dirs,something seems to mess it up
+
+chmod 1777 /tmp 
+
+
 ###--------------------------------Apache shimming-----------------------------
 #Only if var log is mounted a tmpfs.
 if mount | grep "/var/log type tmpfs"; then

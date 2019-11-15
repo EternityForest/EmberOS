@@ -26,10 +26,11 @@ raspi-config nonint do_spi 0
 raspi-config nonint do_i2c 0
 raspi-config nonint do_camera 0
 
-raspi-config nonint do_overscan 0
+raspi-config nonint do_overscan 1
 
 
 #Set up for a US keyboard by default
+sudo raspi-config nonint do_change_locale en_US.UTF-8 UTF-8
 raspi-config nonint do_configure_keyboard us
 
 
@@ -45,12 +46,26 @@ raspi-config nonint do_configure_keyboard us
 mkdir -p /home/pi/.ssh
 mkdir -p /root/.ssh
 
+
 ## 
 cat << EOF > /etc/fstab
 proc            /proc           proc    defaults          0       0
 /dev/mmcblk0p1  /boot           vfat    defaults,noatime,ro          0       2
 /dev/mmcblk0p2  /               ext4    defaults,noatime,ro  0       1
 /dev/mmcblk0p3 /sketch auto defaults,noatime,nofail,fmask=027,dmask=027,umask=027 0 0
+EOF
+
+
+
+
+
+
+mkdir -p /var/www/html/
+cat << EOF > /var/www/html/index.html
+
+<h1 id="welcome-to-emberos">Welcome to EmberOS</h1>
+<p>This is the kiosk start page. It is served from /sketch/kiosk_startpage.html.</p>
+<p>You can of course exit back to the shell with Alt+F4</p>
 EOF
 
 #Generate an RSA key whenever it does not exist, if we can
@@ -119,10 +134,10 @@ mount --bind /sketch/ssh/ssh_config /etc/ssh/ssh_config
 #Use what is already there as the template
 if [ ! -d /sketch/public.www ]; then
     mkdir /sketch/public.www
-    cp -v -r /var/www/. /sketch/public.www
+    cp -v -r /var/www/html/. /sketch/public.www/
 fi
 
-mount --bind /sketch/public.www /var/www
+mount --bind /sketch/public.www /var/www/html
 
 
 #Use what is already there as the template
@@ -199,4 +214,55 @@ echo "$EMBEDPI_VAR"
 unpack /filesystem/root /
 
 
+#Allow non-console startx, needed to make kiosk browsing work
+sudo sed -i \
+    's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
 
+
+cat << EOF > /usr/bin/writable
+#!/bin/bash
+mount -o remount,rw /
+mount -o remount,rw /boot
+mount -o remount,rw /sketch
+
+#Undo the tmpfs on home pi
+umount /home/pi
+
+#Put another one so ssh keeps working as it should
+mount -t tmpfs -o size=1m tmpfs /home/pi/ssh
+
+mkdir /dev/shm/unpackthekeys
+cp -v -r --preserve=mode,ownership,timestamps /sketch/ssh/pi/. /dev/shm/unpackthekeys
+chown -hR pi:pi  /dev/shm/unpackthekeys
+chmod -R 600 /dev/shm/unpackthekeys
+cp -v -r --preserve=mode,ownership,timestamps /dev/shm/unpackthekeys/. /home/pi/.ssh
+rm -r /dev/shm/unpackthekeys
+EOF
+
+cat << EOF > /usr/bin/readonly
+#!/bin/bash
+mount -o remount,ro /
+mount -o remount,ro /boot
+mount -o remount,ro /sketch
+
+rm -r /dev/shm/pihome
+rm -r /dev/shm/pihome_work
+
+mkdir -p /dev/shm/pihome
+mkdir -p /dev/shm/pihome_work
+
+chown pi /dev/shm/pihome
+chown pi /dev/shm/pihome_work
+
+mount -t overlay -o lowerdir=/home/pi,upperdir=/dev/shm/pihome,workdir=/dev/shm/pihome_work overlay /home/pi
+
+mkdir /dev/shm/unpackthekeys
+cp -v -r --preserve=mode,ownership,timestamps /sketch/ssh/pi/. /dev/shm/unpackthekeys
+chown -hR pi:pi  /dev/shm/unpackthekeys
+chmod -R 600 /dev/shm/unpackthekeys
+cp -v -r --preserve=mode,ownership,timestamps /dev/shm/unpackthekeys/. /home/pi/.ssh
+rm -r /dev/shm/unpackthekeys
+EOF
+
+chmod 755 /usr/bin/writable
+chmod 755 /usr/bin/readonly
