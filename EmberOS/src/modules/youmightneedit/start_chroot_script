@@ -364,7 +364,14 @@ apt -y install lsof
 apt -y install fzf
 apt -y install chafa
 apt -y install nast
+
+#Without this we have all kinds of issues doing startx
 apt -y install xserver-xorg-legacy
+
+#Allow non-console startx, needed to make kiosk browsing work
+#This has to be AFTER the xserver-xorg-legacy to work
+sed -i \
+    's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
 
 apt -y install fatrace
 

@@ -11,3 +11,7 @@ https-thread-pool: 16
 https-port : 8001
 #The port on which unencrypted web pages will be served. The default port is 80, but we use 8001 in case you are running apache or something.
 http-port : 8002
+
+audio-paths:
+    - /sketch/public.media
+    - default

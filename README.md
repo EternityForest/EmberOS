@@ -220,7 +220,7 @@ It's fortune!
 
 One of the most common tasks for embedded devices is as a media server.
 Put whatever you want to serve in /sketch/public.media for DLNA,
-/sketch/public.files for samba(Samba and DLNA aren't working yet)
+/sketch/public.files for samba(Samba isn't working yet)
 
 Put whatever you want to serve as a standard web site in /sketch/public.www to serve
 it on port 80 with apache. Whatever you put as index.http will be the start page for the fullscren kiosk!

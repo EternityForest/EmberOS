@@ -214,9 +214,6 @@ echo "$EMBEDPI_VAR"
 unpack /filesystem/root /
 
 
-#Allow non-console startx, needed to make kiosk browsing work
-sudo sed -i \
-    's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
 
 
 cat << EOF > /usr/bin/writable
