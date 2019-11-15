@@ -30,7 +30,8 @@ It is not encrypted though.
 
 * Adds a ntfs partition called /sketch  that is intended to be the storage location for everything except the os and libs
 * Makes a file at /sketch/hostname.txt to let you change the hostname
-* Installs ntpd instead of garbage timesyncd
+* Installs chrony instead of garbage timesyncd
+* Uses resolvconf to ensure dns resolution works
 * Puts a whole bumch of tmpfses on things that write to disk, so they still work
 * Generates entropy from the HW rnd on boot
 * Makes sure avahi, exfat-utils, and other random stuff you probably want is installed
