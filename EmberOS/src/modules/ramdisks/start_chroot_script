@@ -202,7 +202,7 @@ append1 /etc/fstab "/var/lib/chrony" "tmpfs /var/lib/chrony tmpfs defaults,noati
 
 #General purpose 32MB public unsecured free for all for easy file sharing funtimes
 mkdir -p /publictemp
-append1 /publictemp "/publictemp" "tmpfs /publictemp tmpfs defaults,noatime,nosuid,nodev,noexec,nofail,mode=1777,size=32M 0 0"
+append1 /etc/fstab "/publictemp" "tmpfs /publictemp tmpfs defaults,noatime,nosuid,nodev,noexec,nofail,mode=1777,size=32M 0 0"
 
 
 #Keep logrotate. We want to clear old logs out of RAM
