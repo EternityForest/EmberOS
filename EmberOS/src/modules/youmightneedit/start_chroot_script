@@ -365,6 +365,9 @@ apt -y install fzf
 apt -y install chafa
 apt -y install nast
 
+#Seems to be what you need to get NTP working
+apt -y install resolvconf
+
 #Without this we have all kinds of issues doing startx
 apt -y install xserver-xorg-legacy
 
