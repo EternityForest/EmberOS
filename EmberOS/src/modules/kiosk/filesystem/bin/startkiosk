@@ -5,14 +5,7 @@ xset s noblank
 
 set -e
 
+touch /tmp/testTmpWritability
+rm /tmp/testTmpWritability
 
-if [ -f /sketch/kiosk_startpage.html ];
-then
-    touch /tmp/testTmpWritiability
-    DISPLAY=:0.0 ; export DISPLAY
-    XAUTH=$HOME/.Xauthority ; export XAUTH
-    xinit /usr/bin/fvwm &
-    /usr/bin/chromium-browser http://localhost --window-size=1920,1080 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null --autoplay-policy=no-user-gesture-required &
-    unclutter
-fi
-
+xinit /usr/bin/fvwm -f /usr/lib/chromekiosk/fvwmrc

@@ -1,14 +1,12 @@
 [Unit]
-Description=KaithemAutomation python based automation server
+Description=FVWM and Chromium based kiosk
 After=multi-user.target time-sync.target
 Type=simple
-Restart=on-failure
-RestartSec=5
-User=pi
+
 
 [Service]
 TimeoutStartSec=0
-ExecStart=/usr/bin/startkiosk
+ExecStart=su - pi -c "/usr/bin/startkiosk"
 
 [Install]
 WantedBy=multi-user.target

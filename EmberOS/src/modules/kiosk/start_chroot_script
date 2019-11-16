@@ -1,5 +1,8 @@
 #!/bin/bash
 
+
+# Must run AFTER youmightneedit 
+
 set -x
 set -e
 
@@ -7,6 +10,17 @@ source /common.sh
 
 unpack /filesystem/bin /usr/bin root
 unpack /filesystem/systemd /usr/lib/systemd/system/ root
+
+mkdir -p /usr/lib/chromekiosk
+unpack /filesystem/lib /usr/lib/chromekiosk root
+
+
+#This just makes menus work in a sane fashion
+mkdir -p /home/pi/.fvwm
+unpack /filesystem/pifvwm /home/pi/.fvwm pi
+
+#In case something messed it up and thinks it should be root owned
+! chown pi -R /home/pi/.fvwm
 
 chmod +x /usr/bin/startkiosk
 

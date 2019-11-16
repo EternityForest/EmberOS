@@ -66,7 +66,7 @@ the config file. You should say yes.
 Cd into the src/workspace folder.
 Expand the disk image by padding it with zeros:
 Example:
-`dd if=/dev/zero bs=1M count=7K >> 2019-06-20-raspbian-buster-full.img`
+`dd if=/dev/zero bs=1M count=1K >> 2019-06-20-raspbian-buster-full.img`
 Change the filenames as neccesary. Count is in blocks. This appends about 8GB of extra space. You probably don't need this much.
 
 You can also just shrink / to make room for the sketch partition.  You may want to keep it small for 8GB sd cards
