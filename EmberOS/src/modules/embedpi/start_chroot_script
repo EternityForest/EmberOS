@@ -71,7 +71,7 @@ EOF
 #Generate an RSA key whenever it does not exist, if we can
 #Then move whatever kets we find into the SSH ramdisk.
 
-cat << EOF > /usr/bin/manage_sketch_folder.sh
+cat << 'EOF' > /usr/bin/manage_sketch_folder.sh
 #!/bin/bash
 
 #This script generates nonexistant keys, and
@@ -80,6 +80,7 @@ cat << EOF > /usr/bin/manage_sketch_folder.sh
 #It also binds apache's www stuff
 set -e
 
+mkdir -p /sketch/config
 
 #TODO Maybe some things in the home folders should persist to the sketch or something
 
@@ -119,13 +120,14 @@ fi
 mkdir /dev/shm/unpackthekeys
 cp -v -r --preserve=mode,ownership,timestamps /sketch/ssh/pi/. /dev/shm/unpackthekeys
 chown -hR pi:pi  /dev/shm/unpackthekeys
-chmod -R 600 /dev/shm/unpackthekeys
+chmod -R 700 /dev/shm/unpackthekeys
 cp -v -r --preserve=mode,ownership,timestamps /dev/shm/unpackthekeys/. /home/pi/.ssh
 rm -r /dev/shm/unpackthekeys
+chmod -R 700 /home/pi/.ssh
 
 #Nonexistant ssh conf, put the default in the sketch
 if [ ! -f /sketch/ssh/ssh_config ]; then
-    cp /etc/ssh/ssh_config /sketch/ssh/ssh_config
+    cp -a /etc/ssh/ssh_config /sketch/ssh/ssh_config
 fi
 
 mount --bind /sketch/ssh/ssh_config /etc/ssh/ssh_config
@@ -134,7 +136,7 @@ mount --bind /sketch/ssh/ssh_config /etc/ssh/ssh_config
 #Use what is already there as the template
 if [ ! -d /sketch/public.www ]; then
     mkdir /sketch/public.www
-    cp -v -r /var/www/html/. /sketch/public.www/
+    cp -a /var/www/html/. /sketch/public.www/
 fi
 
 mount --bind /sketch/public.www /var/www/html
@@ -160,6 +162,68 @@ fi
 
 
 
+#And the timezones!
+if [ ! -d /sketch/timezones ]; then
+    mkdir /sketch/timezones
+    cp -a /usr/share/zoneinfo/. /sketch/timezones
+fi
+
+mkdir -p /dev/shm/zoneinfo
+mkdir -p /dev/shm/zoneinfo_work
+
+chmod 755 -R /dev/shm/zoneinfo
+chmod 755 -R /dev/shm/zoneinfo_work
+
+mount -t overlay -o lowerdir=/usr/share/zoneinfo/,upperdir=/dev/shm/zoneinfo,workdir=/dev/shm/zoneinfo_work overlay /usr/share/zoneinfo/
+
+cp -a /sketch/timezones/. /usr/share/zoneinfo
+chmod 755 -R /usr/share/zoneinfo
+
+
+
+#We're gonna make the SSL certs configurable!
+if [ ! -d /sketch/sslcerts ]; then
+    mkdir -p /sketch/sslcerts
+    cp  -a /etc/ssl/certs/. /sketch/sslcerts
+fi
+
+
+
+mkdir -p /dev/shm/etctmpssl
+mkdir -p /dev/shm/etctmpssl_work
+
+chmod 755 -R /dev/shm/etctmpssl
+chmod 755 -R /dev/shm/etctmpssl_work
+
+mount -t overlay -o lowerdir=/etc/ssl/certs,upperdir=/dev/shm/etctmpssl,workdir=/dev/shm/etctmpssl_work overlay /etc/ssl/certs
+
+#Copy everything to the tmpfs from the sketch
+cp  -a /sketch/sslcerts/. /etc/ssl/certs/
+chmod 755 -R /etc/ssl/certs/
+
+
+#Now update that cert bundle
+update-ca-certificates &
+
+
+if [ ! -d /sketch/timezone ]; then
+    cp /etc/timezone /sketch/timezone
+fi
+
+# Now set the timezone based on the sketch
+
+
+cp -L sketch/timezone /dev/shm/timezone
+mount --bind /dev/shm/timezone /etc/timezone
+chmod 755 /dev/shm/timezone
+chmod 755 /dev/shm/timezone
+
+
+#Do a lookup
+cp -L /usr/share/zoneinfo/$(cat /sketch/timezone) /dev/shm/localtime
+mount --bind /dev/shm/localtime /etc/localtime
+chmod 755 /dev/shm/localtime
+
 EOF
 
 chmod 744 /usr/bin/manage_sketch_folder.sh
@@ -170,7 +234,7 @@ cat << EOF > /etc/systemd/system/manage_sketch_folder.service
 Description=Manage loading SSH keys into ramdisk
 After=systemd-remount-fs.service
 Before=sysinit.target
-RequiresMountsFor=/etc/
+RequiresMountsFor=/etc/ /sketch/
 DefaultDependencies=no
 
 [Service]
@@ -218,22 +282,11 @@ unpack /filesystem/root /
 
 cat << EOF > /usr/bin/writable
 #!/bin/bash
+
 mount -o remount,rw /
 mount -o remount,rw /boot
 mount -o remount,rw /sketch
 
-#Undo the tmpfs on home pi
-umount /home/pi
-
-#Put another one so ssh keeps working as it should
-mount -t tmpfs -o size=1m tmpfs /home/pi/ssh
-
-mkdir /dev/shm/unpackthekeys
-cp -v -r --preserve=mode,ownership,timestamps /sketch/ssh/pi/. /dev/shm/unpackthekeys
-chown -hR pi:pi  /dev/shm/unpackthekeys
-chmod -R 600 /dev/shm/unpackthekeys
-cp -v -r --preserve=mode,ownership,timestamps /dev/shm/unpackthekeys/. /home/pi/.ssh
-rm -r /dev/shm/unpackthekeys
 EOF
 
 cat << EOF > /usr/bin/readonly
@@ -241,24 +294,6 @@ cat << EOF > /usr/bin/readonly
 mount -o remount,ro /
 mount -o remount,ro /boot
 mount -o remount,ro /sketch
-
-rm -r /dev/shm/pihome
-rm -r /dev/shm/pihome_work
-
-mkdir -p /dev/shm/pihome
-mkdir -p /dev/shm/pihome_work
-
-chown pi /dev/shm/pihome
-chown pi /dev/shm/pihome_work
-
-mount -t overlay -o lowerdir=/home/pi,upperdir=/dev/shm/pihome,workdir=/dev/shm/pihome_work overlay /home/pi
-
-mkdir /dev/shm/unpackthekeys
-cp -v -r --preserve=mode,ownership,timestamps /sketch/ssh/pi/. /dev/shm/unpackthekeys
-chown -hR pi:pi  /dev/shm/unpackthekeys
-chmod -R 600 /dev/shm/unpackthekeys
-cp -v -r --preserve=mode,ownership,timestamps /dev/shm/unpackthekeys/. /home/pi/.ssh
-rm -r /dev/shm/unpackthekeys
 EOF
 
 chmod 755 /usr/bin/writable
