@@ -47,7 +47,7 @@ It is not encrypted though.
 * Sets up a US keyboard layout(This will eventually be set through /sketch if there's interest)
 * Boots by default into a Chromium fullscreen kiosk(Exit with alt-f4) pointed at http://localhost
 
-* Keeps the default customPiOs behavior of configuring WiFi in /boot, not sketch.
+* Allows configuring NetworkManager via /sketch/networks
 
 
 * Does NOT make the NTFS partition /sketch read only. You have to do that one yourself if you want it.
@@ -77,7 +77,8 @@ Mount the partition using `sudo udisksctl loop-setup -f 2019-06-20-raspbian-bust
 Using your favorite partition editor, add an ntfs partition called sketch just after the root partition,
 in that empty space you just made.
 
-Copy everything in the root partition's sketch_template dir to the root of that partition.
+Copy everything in the root partition's sketch dir to the root of that partition.  Anything
+in the actual sketch dir is just the default, it gets covered over by the sketch partition that gets mounted there.
 
 If your image is for systems with an RTC, see "using an RTC"
 

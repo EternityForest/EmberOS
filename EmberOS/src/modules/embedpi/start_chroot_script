@@ -18,9 +18,6 @@ apt install -y ntfs-3g
 #The special /sketch partition is for everything that is not part of the image. It is made after the fact.
 ! mkdir /sketch
 
-#You have to manually copy thos to the manually created sketch template after the fact
-! mkdir /sketch_template
-
 raspi-config nonint do_ssh 0
 raspi-config nonint do_spi 0
 raspi-config nonint do_i2c 0
@@ -52,13 +49,14 @@ cat << EOF > /etc/fstab
 proc            /proc           proc    defaults          0       0
 /dev/mmcblk0p1  /boot           vfat    defaults,noatime,ro          0       2
 /dev/mmcblk0p2  /               ext4    defaults,noatime,ro  0       1
-/dev/mmcblk0p3 /sketch auto defaults,noatime,nofail,fmask=027,dmask=027,umask=027 0 0
+/dev/mmcblk0p3 /sketch auto defaults,noatime,nofail,nonempty,fmask=027,dmask=027,umask=027 0 0
 EOF
 
 
 
 
 
+cp /etc/timezone /sketch/timezone
 
 mkdir -p /var/www/html/
 cat << EOF > /var/www/html/index.html
@@ -132,6 +130,9 @@ fi
 
 mount --bind /sketch/ssh/ssh_config /etc/ssh/ssh_config
 
+
+# Use the sketch's networks
+mount --bind /sketch/networks /etc/NetworkManager/system-connections
 
 #Use what is already there as the template
 if [ ! -d /sketch/public.www ]; then
@@ -223,6 +224,9 @@ chmod 755 /dev/shm/timezone
 cp -L /usr/share/zoneinfo/$(cat /sketch/timezone) /dev/shm/localtime
 mount --bind /dev/shm/localtime /etc/localtime
 chmod 755 /dev/shm/localtime
+
+#Reload the networkmanager configs
+nmcli c reload
 
 EOF
 

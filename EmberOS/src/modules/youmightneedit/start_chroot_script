@@ -429,12 +429,14 @@ EOF
 
 mkdir -p /publictemp
 
-mkdir -p /sketch_template/public.www/
-mkdir -p /sketch_template/public.files/
+mkdir -p /sketch/public.www/
+mkdir -p /sketch/public.files/
+
+echo "Welcome! This file is /sketch/public.www/index.html"> /sketch/public.www/index.html
 
 #This seems to be fairly low resource usage and thus safe to include
 echo "media_dir=/sketch/public.media/" >> /etc/minidlna.conf
-mkdir -p /sketch_template/public.media/
+mkdir -p /sketch/public.media/
 
 #Add the user for minidlna to the root group.
 #Do the same for apache
@@ -499,3 +501,75 @@ apt -y install squid-deb-proxy-client
 
 ! ufw disable
 
+mkdir -p /sketch/networks
+
+
+# Which one? Both? Seems to work!
+! systemctl disable dhcpcd.service
+! systemctl disable dhcpcd5.service
+
+# Set it up to work with sketch, the actual bind mount is in the emberos main script
+cat << EOF > /sketch/networks/wifi
+
+#This is a standard NetworkManager profile.
+# You can put as many files like this as you want in this folder,
+# Just give them different names and UUIDs
+
+
+[connection]
+
+#You can change that name
+id=WiFi
+uuid=4d2b90d7-474b-429b-a0be-f2a291416cca
+type=wifi
+
+#Change this to true
+#To enable autoconnection to the network
+autoconnect=FALSE
+
+[wifi]
+mac-address-blacklist=
+mode=infrastructure
+
+ssid=YourWifiNameHere
+
+#Just straight up delete this whole section
+#To connect to unsecured networks
+[wifi-security]
+auth-alg=open
+key-mgmt=wpa-psk
+psk=YourWifiPasswordHere
+
+[ipv4]
+dns-search=
+method=auto
+
+[ipv6]
+addr-gen-mode=stable-privacy
+dns-search=
+method=auto
+EOF
+
+cat << EOF > /sketch/networks/ethernet
+#This is the configuration for automatically connecting to Ethernet.
+
+[connection]
+id=Ethernet
+uuid=8874a940-b7d6-3b50-9cfb-031801810ab4
+type=ethernet
+autoconnect-priority=-100
+
+[ethernet]
+duplex=half
+mac-address-blacklist=
+speed=100
+
+[ipv4]
+dns-search=
+method=auto
+
+[ipv6]
+addr-gen-mode=stable-privacy
+dns-search=
+method=auto
+EOF

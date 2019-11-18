@@ -232,5 +232,13 @@ append1 /etc/fstab "/var/cache/samba" "tmpfs /var/cache/samba tmpfs defaults,noa
 mkdir -p /var/lib/samba
 append1 /etc/fstab "/var/lib/samba" "tmpfs /var/lib/samba tmpfs defaults,noatime,nosuid,nodev,noexec,mode=770,size=128M 0 0"
 
+
+mkdir -p /var/lib/NetworkManager
+append1 /etc/fstab "/var/lib/NetworkManager" "tmpfs /var/lib/NetworkManager tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=2M 0 0"
+
+mkdir -p /var/lib/systemd/rfkill
+append1 /etc/fstab "/var/lib/systemd/rfkill" "tmpfs /var/lib/systemd/rfkill tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=2M 0 0"
+
+
 #This module doesn't do the actual making it read only part
 

@@ -5,17 +5,17 @@ set -e
 
 source /common.sh
 
-mkdir -p /sketch_template/kaithem/
-mkdir -p /sketch_template/kaithem_install
+mkdir -p /sketch/kaithem/
+mkdir -p /sketch/kaithem_install
 
-unpack /filesystem/KaithemAutomation/kaithem/var /sketch_template/kaithem root
+unpack /filesystem/KaithemAutomation/kaithem/var /sketch/kaithem root
 
-unpack /filesystem/KaithemAutomation /sketch_template/kaithem_install/ root
+unpack /filesystem/KaithemAutomation /sketch/kaithem_install/ root
 unpack /filesystem/systemd/ /usr/lib/systemd/system/ root
-unpack /filesystem/kaithem_sketch /sketch_template/kaithem root
+unpack /filesystem/kaithem_sketch /sketch/kaithem root
 
 #Remove dummy keys so the user can add them if missing
-! rm /sketch_template/kaithem/ssl/certificate.key
-! rm /sketch_template/kaithem/ssl/certificate.cert
+! rm /sketch/kaithem/ssl/certificate.key
+! rm /sketch/kaithem/ssl/certificate.cert
 
 systemctl enable kaithem.service
