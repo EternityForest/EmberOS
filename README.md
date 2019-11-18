@@ -49,6 +49,9 @@ It is not encrypted though.
 
 * Allows configuring NetworkManager via /sketch/networks
 
+* Installs Yggdrasil mesh networking, but doesn't set up any peers beyond the local autodiscovered ones.
+* Sets up the ufw firewall, but allows everything except incoming yggdrasil packets(Aside from incoming NTP requests)
+
 
 * Does NOT make the NTFS partition /sketch read only. You have to do that one yourself if you want it.
 
@@ -201,7 +204,8 @@ console.
 
 #### ufw
 
-Firewall. You might want this. But it is disabled by default.
+Firewall. You might want this. It is set to allow all packets aside from incoming
+ones from a Yggdrasil mesh, which would be a security problem.
 
 
 #### neofetch

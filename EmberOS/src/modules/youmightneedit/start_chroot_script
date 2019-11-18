@@ -1,6 +1,37 @@
 #!/bin/bash
+
+set -x
+set -e
+
 apt update --allow-releaseinfo-change
 apt update
+
+
+apt -y install ufw
+ufw reset
+ufw default allow outgoing
+ufw default allow incoming
+
+
+# VERY IMPORTANT!!!!!! Yggdrasil puts us on a public IPv6 addr.
+#This blocks all incoming traffic
+ufw deny from 200::/7
+ufw enable
+
+#Incoming time messages. Not a security
+#Issue because I don't think anyone uses broadcast ntp
+#And it doesn't work with chrony anyway.
+ufw allow 123
+
+sudo apt-get -y install dirmngr
+gpg --fetch-keys https://neilalexander.s3.dualstack.eu-west-2.amazonaws.com/deb/key.txt
+gpg --export 569130E8CA20FBC4CB3FDE555898470A764B32C9 | sudo apt-key add -
+echo 'deb http://neilalexander.s3.dualstack.eu-west-2.amazonaws.com/deb/ debian yggdrasil' | sudo tee /etc/apt/sources.list.d/yggdrasil.list
+sudo apt-get -y update
+sudo apt-get -y install yggdrasil
+sudo systemctl enable yggdrasil
+
+
 
 apt -y install unclutter
 apt -y install avahi-daemon 
@@ -17,6 +48,22 @@ curl https://getmic.ro | bash
 
 #Useful for testing
 apt -y install x11-apps
+
+
+#Update ssl certs
+apt -y install ca-certificates
+
+#Update timezones
+apt -y install tzdata
+
+#Copy to sketch folder
+mkdir -p /sketch/sslcerts
+cp  -a /etc/ssl/certs/. /sketch/sslcerts
+
+#Pre populate sketch
+mkdir -p /sketch/timezones
+cp -a /usr/share/zoneinfo/. /sketch/timezones
+
 
 apt -y install exfat-utils
 apt -y install samba samba-common-bin smbclient cifs-utils
@@ -499,7 +546,6 @@ apt -y install fatrace
 #And slow everything down by not working
 apt -y install squid-deb-proxy-client
 
-! ufw disable
 
 mkdir -p /sketch/networks
 
@@ -522,6 +568,10 @@ cat << EOF > /sketch/networks/wifi
 id=WiFi
 uuid=4d2b90d7-474b-429b-a0be-f2a291416cca
 type=wifi
+#Fake timestamp to make it think it has connected before,
+#And attemp to avoid the "only one attempt then give up" problem
+timestamp=123456
+permissions=
 
 #Change this to true
 #To enable autoconnection to the network
@@ -558,6 +608,9 @@ id=Ethernet
 uuid=8874a940-b7d6-3b50-9cfb-031801810ab4
 type=ethernet
 autoconnect-priority=-100
+
+timestamp=123456
+permissions=
 
 [ethernet]
 duplex=half

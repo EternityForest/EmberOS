@@ -130,9 +130,14 @@ fi
 
 mount --bind /sketch/ssh/ssh_config /etc/ssh/ssh_config
 
+mkdir -p /dev/shm/nmsketch
+cp -ar /sketch/networks /dev/shm/nmsketch
+
+#NM has a fit if the file is writabl by root group
+chmod -R 500 /dev/shm/nmsketch
 
 # Use the sketch's networks
-mount --bind /sketch/networks /etc/NetworkManager/system-connections
+mount --bind /dev/shm/nmsketch /etc/NetworkManager/system-connections
 
 #Use what is already there as the template
 if [ ! -d /sketch/public.www ]; then
@@ -233,11 +238,12 @@ EOF
 chmod 744 /usr/bin/manage_sketch_folder.sh
 
 
+
 cat << EOF > /etc/systemd/system/manage_sketch_folder.service
 [Unit]
 Description=Manage loading SSH keys into ramdisk
 After=systemd-remount-fs.service
-Before=sysinit.target
+Before=sysinit.target NetworkManager.service
 RequiresMountsFor=/etc/ /sketch/
 DefaultDependencies=no
 

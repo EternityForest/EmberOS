@@ -9,11 +9,56 @@ set -e
 
 source /common.sh
 
-unpack /filesystem/sketch /sketch root
-cp /etc/hosts /sketch/hosts
+echo "embedpi" > /sketch/hostname
 
 rm /etc/hostname
 ln -s /sketch/hostname.txt /etc/hostname
 
-rm /etc/hostname
-ln -s /sketch/hosts /etc/hostname
+rm /etc/hosts
+ln -s /sketch/hosts /etc/hosts
+
+
+#Put a default in the sketch folder
+cat << EOF > /sketch/hosts
+127.0.0.1   localhost
+127.0.1.1   embedpi
+::1		localhost ip6-localhost ip6-loopback
+ff02::1		ip6-allnodes
+ff02::2		ip6-allrouters
+EOF
+
+
+cat << 'EOF' > /usr/bin/manage_hostname.sh
+#!/bin/bash
+
+#This script generates nonexistant keys, and
+#Also moves keys into the special tmpfs just for those keys.
+
+#It also binds apache's www stuff
+set -e
+
+cp /sketch/hosts /dev/shm/sketch_hostsfile
+chmod 755 /dev/shm/sketch_hostsfile
+mount --bind /dev/shm/sketch_hostsfile /etc/hosts
+EOF
+
+chmod 744 /usr/bin/manage_hostname.sh
+
+
+
+cat << EOF > /etc/systemd/system/manage_hostname.service
+[Unit]
+Description=Manage hostname and the hosts file
+After=systemd-remount-fs.service
+Before=sysinit.target
+RequiresMountsFor=/etc/ /sketch/ 
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/manage_hostname.sh
+
+[Install]
+WantedBy=sysinit.target
+
+EOF
