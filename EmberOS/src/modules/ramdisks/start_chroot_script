@@ -217,20 +217,6 @@ mkdir -p /var/lib/dhcp
 append1 /etc/fstab "/var/lib/dhcp" "tmpfs /var/lib/dhcp tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=2M 0 0"
 
 
-mkdir -p /var/cache/minidlna
-append1 /etc/fstab "/var/cache/minidlna" "tmpfs /var/cache/minidlna tmpfs defaults,noatime,nosuid,nodev,noexec,mode=770,size=64M 0 0"
-
-
-mkdir -p /var/lib/minidlna
-append1 /etc/fstab "/var/lib/minidlna" "tmpfs /var/lib/minidlna tmpfs defaults,noatime,nosuid,nodev,noexec,mode=770,size=64M 0 0"
-
-
-
-mkdir -p /var/cache/samba
-append1 /etc/fstab "/var/cache/samba" "tmpfs /var/cache/samba tmpfs defaults,noatime,nosuid,nodev,noexec,mode=770,size=128M 0 0"
-
-mkdir -p /var/lib/samba
-append1 /etc/fstab "/var/lib/samba" "tmpfs /var/lib/samba tmpfs defaults,noatime,nosuid,nodev,noexec,mode=770,size=128M 0 0"
 
 
 mkdir -p /var/lib/NetworkManager
