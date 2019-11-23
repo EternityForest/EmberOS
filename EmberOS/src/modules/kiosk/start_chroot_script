@@ -23,4 +23,12 @@ unpack /filesystem/pifvwm /home/pi/.fvwm pi
 
 chmod +x /usr/bin/startkiosk
 
+
+cat << 'EOF' > /sketch/pre_gui.sh
+#!/bin/bash
+#This script runs just before the GUI loads
+EOF
+
+
+
 systemctl enable chromekiosk.service
