@@ -11,8 +11,7 @@ source /common.sh
 unpack /filesystem/bin /usr/bin root
 unpack /filesystem/systemd /usr/lib/systemd/system/ root
 
-mkdir -p /usr/lib/chromekiosk
-unpack /filesystem/lib /usr/lib/chromekiosk root
+unpack /filesystem/sketch /sketch root
 
 
 #This just makes menus work in a sane fashion

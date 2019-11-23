@@ -8,4 +8,4 @@ set -e
 touch /tmp/testTmpWritability
 rm /tmp/testTmpWritability
 
-xinit /usr/bin/fvwm -f /usr/lib/chromekiosk/fvwmrc
+xinit /usr/bin/fvwm -f /sketch/kioskUI.conf

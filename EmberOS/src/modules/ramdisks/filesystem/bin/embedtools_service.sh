@@ -51,7 +51,7 @@ fi
 
 if [ ! -d /var/log/apache2 ] ; then
 mkdir /var/log/apache2
-touch /var/log/apach2e/access.log
+touch /var/log/apache2/access.log
 chmod 700 /var/log/apache2/access.log
 fi
 fi

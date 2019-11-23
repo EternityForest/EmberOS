@@ -1,15 +1,25 @@
 #!/bin/bash
 ! apt purge -y ^wolfram-engine$
-! apt purge -y ^scratch2$
+#! apt purge -y ^scratch2$
 ! apt purge -y ^scratch$ 
-! apt purge -y ^libreoffice$ 
-! apt purge -y ^minecraft-pi$ 
+#! apt purge -y ^libreoffice$ 
+! apt purge -y ^minecraft-pi$
+! apt purge -y ^python-minecraftpi$
+
+! apt purge -y ^dillo$ 
+! apt purge -y ^idle3$ 
+! apt purge -y ^smartsim$ 
+
+! apt purge -y ^sonic-pi$ 
+
+! apt purge -y ^epiphany-browser$ 
+
 ! apt purge -y ^python-minecraftpi$ 
 ! apt purge -y ^bluej$ 
 ! apt purge -y ^greenfoot$ 
 ! apt purge -y ^claws-mail$ 
 ! apt purge -y ^claws-mail-i18n$
-! apt purge -y ^nuscratch$
+#! apt purge -y ^nuscratch$
 
 apt autoremove -y --purge
 

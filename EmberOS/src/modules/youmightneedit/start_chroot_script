@@ -6,7 +6,17 @@ set -e
 apt update --allow-releaseinfo-change
 apt update
 
+#Seems to be what you need to get NTP working
+apt -y install resolvconf
 
+#Also gets firewalld
+# apt -y install firewall-config
+
+#Batteries included, allow messing with kiosk browser media right from the device
+apt -y install gimp audacity tuxpaint
+
+#Always good to have around
+apt -y install gnome-disks
 
 apt -y install unclutter
 apt -y install avahi-daemon 
@@ -210,7 +220,13 @@ sudo systemctl enable apache2.service
 
 apt -y install mpv
 apt -y install python3 systemd cython3 build-essential
-apt -y install mplayer pulseaudio python3-serial
+apt -y install mplayer python3-serial
+
+
+apt -y install pulseaudio
+sudo adduser root pulse-access
+sudo adduser pi pulse-access
+
 apt -y install python3-tz python3-dateutil lm-sensors
 apt -y install python3-netifaces python3-jack-client
 apt -y install python3-gst-1.0 python3-libnacl jack-tools
@@ -227,7 +243,6 @@ apt -y install curl
 apt -y install vim
 apt -y install xcas
 apt -y install units
-apt -y install ufw
 apt -y install git
 apt -y install wget
 apt -y install htop
@@ -236,8 +251,7 @@ apt -y install fzf
 apt -y install chafa
 apt -y install nast
 
-#Seems to be what you need to get NTP working
-apt -y install resolvconf
+
 
 #Without this we have all kinds of issues doing startx
 apt -y install xserver-xorg-legacy

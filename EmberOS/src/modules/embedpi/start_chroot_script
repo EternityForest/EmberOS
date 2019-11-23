@@ -218,20 +218,27 @@ fi
 
 # Now set the timezone based on the sketch
 
-
-cp -L sketch/timezone /dev/shm/timezone
+cp -L /sketch/timezone /dev/shm/timezone
 mount --bind /dev/shm/timezone /etc/timezone
-chmod 755 /dev/shm/timezone
 chmod 755 /dev/shm/timezone
 
 
 #Do a lookup
-cp -L /usr/share/zoneinfo/$(cat /sketch/timezone) /dev/shm/localtime
+cp -L /usr/share/zoneinfo/$(cat /sketch/timezone|xargs) /dev/shm/localtime
 mount --bind /dev/shm/localtime /etc/localtime
 chmod 755 /dev/shm/localtime
 
 #Reload the networkmanager configs
 nmcli c reload
+
+#Check if system time is older than the newest file in /sketch. If it is, set system time to that time.
+#This allows approximately setting the time, to within a few minutes(Good enough to get SSL working),
+#By writing anything on the card
+
+set fakertc $(date -r $(find /sketch -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" "))
+if [ "$(date -d $fakertc +%s)" -gt "$(date +%s)" ]; then
+    date -s $fakertc
+fi
 
 EOF
 
@@ -243,8 +250,8 @@ cat << EOF > /etc/systemd/system/manage_sketch_folder.service
 [Unit]
 Description=Manage loading SSH keys into ramdisk
 After=systemd-remount-fs.service
-Before=sysinit.target NetworkManager.service
-RequiresMountsFor=/etc/ /sketch/
+Before=sysinit.target NetworkManager.service chronyd.service
+RequiresMountsFor=/etc/ /sketch/ /home/
 DefaultDependencies=no
 
 [Service]

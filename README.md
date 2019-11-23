@@ -133,6 +133,16 @@ If you want to allow root login(May be needed for SFTP clients), use:
 And add the keys to /sketch/ssh/root/
 
 
+## Changing the Kiosk UI
+
+Everything is defines in /sketch/kioskUI.conf, a standard FVWM config file that launches fullscreen chrome by default, but can be customized
+to do just about anything.
+
+Look at the very bottom for the lines that deal with launching apps.
+
+## Changing the timezone
+/sketch/timezone is a text file that should just contain an Olson timezone name like "Us/Pacific" without quotes.
+
 ## Using
 
 Change /sketch/hostname to the name you want to give it.  You can now access
