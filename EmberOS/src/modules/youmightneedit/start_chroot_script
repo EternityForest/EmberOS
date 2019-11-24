@@ -16,7 +16,7 @@ apt -y install resolvconf
 apt -y install gimp audacity tuxpaint
 
 #Always good to have around
-apt -y install gnome-disks
+apt -y install gnome-disk-utility
 
 apt -y install unclutter
 apt -y install avahi-daemon 
