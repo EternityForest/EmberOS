@@ -6,6 +6,10 @@ set -e
 apt update --allow-releaseinfo-change
 apt update
 
+
+apt -y install mosquitto
+systemctl enable mosquitto
+
 #Seems to be what you need to get NTP working
 apt -y install resolvconf
 
@@ -14,6 +18,10 @@ apt -y install resolvconf
 
 #Batteries included, allow messing with kiosk browser media right from the device
 apt -y install gimp audacity tuxpaint
+apt -y install transmission-cli 
+apt -y install xclip zenmap
+
+apt -y install sqlitebrowser
 
 #Always good to have around
 apt -y install gnome-disk-utility
@@ -21,6 +29,7 @@ apt -y install gnome-disk-utility
 apt -y install unclutter
 apt -y install avahi-daemon 
 apt -y install chrony
+
 
 apt -y install fvwm fvwm-icons
 
@@ -51,7 +60,6 @@ cp -a /usr/share/zoneinfo/. /sketch/timezones
 
 
 apt -y install exfat-utils
-apt -y install mosquitto
 apt -y install python3-setproctitle
 
 pip3 install yappi
@@ -348,3 +356,5 @@ addr-gen-mode=stable-privacy
 dns-search=
 method=auto
 EOF
+
+apt -y autoremove
