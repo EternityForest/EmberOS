@@ -22,6 +22,7 @@ unpack /filesystem/pifvwm /home/pi/.fvwm pi
 ! chown pi -R /home/pi/.fvwm
 
 chmod +x /usr/bin/startkiosk
+chmod +x /usr/bin/kioskwrapper
 
 
 cat << 'EOF' > /sketch/pre_gui.sh

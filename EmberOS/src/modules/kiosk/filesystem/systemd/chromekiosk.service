@@ -6,7 +6,7 @@ Type=simple
 
 [Service]
 TimeoutStartSec=0
-ExecStart=su - pi -c "/usr/bin/startkiosk"
+ExecStart=/usr/bin/kioskwrapper
 
 [Install]
 WantedBy=multi-user.target
