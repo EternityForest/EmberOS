@@ -1,0 +1,13 @@
+[Unit]
+Description=Manage mesh networking, firewalls, and decentralized stuff
+After=systemd-remount-fs.service
+Before=firewalld.service
+RequiresMountsFor=/etc/ /sketch/ 
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/emberos_netcfg.sh
+
+[Install]
+WantedBy=sysinit.target

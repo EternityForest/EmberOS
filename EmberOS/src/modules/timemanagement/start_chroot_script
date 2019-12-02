@@ -1,0 +1,125 @@
+#!/bin/bash
+
+set -x
+set -e
+
+
+
+
+cp /etc/timezone /sketch/timezone
+cp -a /usr/share/zoneinfo/. /sketch/timezones
+
+
+apt -y install chrony
+
+cat << EOF > /etc/chrony/chrony.conf
+
+# Welcome to the chrony configuration file. See chrony.conf(5) for more
+# information about usuable directives.
+pool 2.debian.pool.ntp.org iburst
+
+# This directive specify the location of the file containing ID/key pairs for
+# NTP authentication.
+keyfile /etc/chrony/chrony.keys
+
+# This directive specify the file into which chronyd will store the rate
+# information.
+driftfile /var/lib/chrony/chrony.drift
+
+# Uncomment the following line to turn logging on.
+#log tracking measurements statistics
+
+# Log files location.
+logdir /var/log/chrony
+
+# Stop bad estimates upsetting machine clock.
+maxupdateskew 100.0
+
+# This directive enables kernel synchronisation (every 11 minutes) of the
+# real-time clock. Note that it can’t be used along with the 'rtcfile' directive.
+rtcsync
+
+# Step the system clock instead of slewing it if the adjustment is larger than
+# one second, but only in the first three clock updates.
+makestep 1 3
+
+allow
+
+local stratum 14 orphan
+EOF
+
+
+cat << 'EOF' > /usr/bin/manage_timezones.sh
+#!/bin/bash
+set -e
+
+
+#
+if [ ! -d /sketch/timezones ]; then
+    mkdir /sketch/timezones
+    cp -a /usr/share/zoneinfo/. /sketch/timezones
+fi
+
+mkdir -p /dev/shm/zoneinfo
+mkdir -p /dev/shm/zoneinfo_work
+
+chmod 755 -R /dev/shm/zoneinfo
+chmod 755 -R /dev/shm/zoneinfo_work
+
+mount -t overlay -o lowerdir=/usr/share/zoneinfo/,upperdir=/dev/shm/zoneinfo,workdir=/dev/shm/zoneinfo_work overlay /usr/share/zoneinfo/
+
+cp -a /sketch/timezones/. /usr/share/zoneinfo
+chmod 755 -R /usr/share/zoneinfo
+
+
+
+if [ ! -d /sketch/timezone ]; then
+    cp /etc/timezone /sketch/timezone
+fi
+
+# Now set the timezone based on the sketch
+
+cp -L /sketch/timezone /dev/shm/timezone
+mount --bind /dev/shm/timezone /etc/timezone
+chmod 755 /dev/shm/timezone
+
+
+#Do a lookup
+cp -L /usr/share/zoneinfo/$(cat /sketch/timezone|xargs) /dev/shm/localtime
+mount --bind /dev/shm/localtime /etc/localtime
+chmod 755 /dev/shm/localtime
+
+#Check if system time is older than the newest file in /sketch. If it is, set system time to that time.
+#This allows approximately setting the time, to within a few minutes(Good enough to get SSL working),
+#By writing anything on the card
+
+set fakertc $(date -r $(find /sketch -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" "))
+if [ "$(date -d $fakertc +%s)" -gt "$(date +%s)" ]; then
+    date -s $fakertc
+fi
+
+EOF
+
+chmod 744 /usr/bin/manage_timezones.sh
+
+
+
+cat << EOF > /etc/systemd/system/manage_timezones.service
+[Unit]
+Description=Manage timezones
+After=systemd-remount-fs.service
+Before=sysinit.target chronyd.service
+RequiresMountsFor=/etc/ /sketch/
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/manage_timezones.sh
+
+[Install]
+WantedBy=sysinit.target
+
+EOF
+
+chmod 744 /etc/systemd/system/manage_timezones.service
+systemctl enable /etc/systemd/system/manage_timezones.service

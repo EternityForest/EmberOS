@@ -1,0 +1,24 @@
+#This is the configuration for automatically connecting to Ethernet.
+
+[connection]
+id=Ethernet
+uuid=8874a940-b7d6-3b50-9cfb-031801810ab4
+type=ethernet
+autoconnect-priority=-100
+
+timestamp=123456
+permissions=
+
+[ethernet]
+duplex=half
+mac-address-blacklist=
+speed=100
+
+[ipv4]
+dns-search=
+method=auto
+
+[ipv6]
+addr-gen-mode=stable-privacy
+dns-search=
+method=auto

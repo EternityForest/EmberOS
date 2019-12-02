@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+
+cp /sketch/kioskUI.conf /tmp/pi_kiosk_fvwm.conf
+cp /sketch/pre_gui.sh  /tmp/pi_kiosk_pre_gui.sh
+
+chown pi /tmp/pi_kiosk_fvwm.conf
+chown pi /tmp/pi_kiosk_pre_gui.sh
+
+chmod 770 /tmp/pi_kiosk_fvwm.conf
+chmod 770 /tmp/pi_kiosk_pre_gui.sh
+
+su - pi -c "/usr/bin/startkiosk"

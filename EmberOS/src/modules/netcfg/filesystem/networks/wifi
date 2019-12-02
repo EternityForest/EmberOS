@@ -1,0 +1,42 @@
+
+#This is a standard NetworkManager profile.
+# You can put as many files like this as you want in this folder,
+# Just give them different names and UUIDs
+
+
+[connection]
+
+#You can change that name
+id=WiFi
+uuid=4d2b90d7-474b-429b-a0be-f2a291416cca
+type=wifi
+#Fake timestamp to make it think it has connected before,
+#And attemp to avoid the "only one attempt then give up" problem
+timestamp=123456
+permissions=
+
+#Change this to TRUE
+#To enable autoconnection to the network
+autoconnect=FALSE
+
+[wifi]
+mac-address-blacklist=
+mode=infrastructure
+
+ssid=YourWifiNameHere
+
+#Just straight up delete this whole section
+#To connect to unsecured networks
+[wifi-security]
+auth-alg=open
+key-mgmt=wpa-psk
+psk=YourWifiPasswordHere
+
+[ipv4]
+dns-search=
+method=auto
+
+[ipv6]
+addr-gen-mode=stable-privacy
+dns-search=
+method=auto
