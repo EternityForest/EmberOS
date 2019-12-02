@@ -12,7 +12,7 @@ source /common.sh
 echo "embedpi" > /sketch/hostname
 
 rm /etc/hostname
-ln -s /sketch/hostname.txt /etc/hostname
+ln -s /sketch/hostname /etc/hostname
 
 rm /etc/hosts
 ln -s /sketch/hosts /etc/hosts

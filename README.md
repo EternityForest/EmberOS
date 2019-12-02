@@ -70,7 +70,7 @@ Cd into the src/workspace folder.
 Expand the disk image by padding it with zeros:
 Example:
 `dd if=/dev/zero bs=1M count=1K >> 2019-06-20-raspbian-buster-full.img`
-Change the filenames as neccesary. Count is in blocks. This appends about 8GB of extra space. You probably don't need this much.
+Change the filenames as neccesary. Count is in blocks. This appends about 1GB of extra space. You probably don't need this much.
 
 You can also just shrink / to make room for the sketch partition.  You may want to keep it small for 8GB sd cards
 
@@ -255,62 +255,3 @@ NTFS is a journaling filesystem, so you may or may not actually need true read o
 The whole install as found in the repo is in /sketch/kaithem_install.  Just
 copy the entire contents of the repo there.
 
-
-## Kiosk browsering
-
-Coming soon?
-
-Warning: This script leaves bits of itself behind!! I'm leaving it here as a note to myself for
-running chrome read only  without iverlayrooting the whole thing!!
-```
-set -x
-set -e
-
-! mkdir /dev/shm/gui_chroot 2>/dev/null
-! mkdir /dev/shm/gui_chroot_backend 2>/dev/null
-
-! umount /dev/shm/gui_chroot_backend
-! umount /dev/shm/gui_chroot
-
-mount -t tmpfs -o size=512m tmpfs /dev/shm/gui_chroot_backend
-
-mkdir /dev/shm/gui_chroot_backend/work
-mkdir /dev/shm/gui_chroot_backend/upper
-
-
-mkdir /dev/shm/gui_chroot_backend/upper/run
-mkdir /dev/shm/gui_chroot_backend/upper/dev
-mkdir /dev/shm/gui_chroot_backend/upper/var
-mkdir /dev/shm/gui_chroot_backend/upper/var/lock
-
-mount --rbind /run /dev/shm/gui_chroot_backend/upper/run
-mount --bind /dev /dev/shm/gui_chroot_backend/upper/dev
-
-mount -t overlay overlay -o rw,lowerdir=/,upperdir=/dev/shm/gui_chroot_backend/upper,workdir=/dev/shm/gui_chroot_backend/work /dev/shm/gui_chroot
-
-
-
-mount --rbind /var/lock /dev/shm/gui_chroot_backend/upper/var/lock
-
-chroot /dev/shm/gui_chroot mount -o mode=755 -t proc proc  /proc
-chroot /dev/shm/gui_chroot mount -o mode=755 -t sysfs sysfs /sys
-
-
-mount -o bind /var/run/dbus /dev/shm/gui_chroot_backend/upper/run/dbus
-
-! cp /home/daniel/.Xauthority /var/lock /dev/shm/gui_chroot_backend/upper/home/daniel/.Xauthority
-
-
-! chroot /dev/shm/gui_chroot chromium-browser --no-sandbox --bwsi
-
-
-
-umount /dev/shm/gui_chroot_backend/upper/run/dbus
-umount /dev/shm/gui_chroot/sys
-umount /dev/shm/gui_chroot/proc
-umount /dev/shm/gui_chroot_backend/upper/var/lock
-umount /dev/shm/gui_chroot
-umount  /dev/shm/gui_chroot_backend/upper/dev
-umount -lf /dev/shm/gui_chroot_backend/upper/run/
-umount /dev/shm/gui_chroot_backend
-```

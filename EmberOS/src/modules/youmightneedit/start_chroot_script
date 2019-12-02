@@ -3,15 +3,10 @@
 set -x
 set -e
 
-apt update --allow-releaseinfo-change
-apt update
-
-
 apt -y install mosquitto
 systemctl enable mosquitto
 
-#Seems to be what you need to get NTP working
-apt -y install resolvconf
+
 
 #Also gets firewalld
 # apt -y install firewall-config
@@ -27,13 +22,10 @@ apt -y install sqlitebrowser
 apt -y install gnome-disk-utility
 
 apt -y install unclutter
-apt -y install avahi-daemon 
-apt -y install chrony
 
 
 apt -y install fvwm fvwm-icons
 
-apt -y install avahi-utils
 
 # Installs the Micro editor
 # Do this early, it can't be cached like apt
@@ -44,15 +36,9 @@ curl https://getmic.ro | bash
 apt -y install x11-apps
 
 
-#Update ssl certs
-apt -y install ca-certificates
 
 #Update timezones
 apt -y install tzdata
-
-#Copy to sketch folder
-mkdir -p /sketch/sslcerts
-cp  -a /etc/ssl/certs/. /sketch/sslcerts
 
 #Pre populate sketch
 mkdir -p /sketch/timezones
@@ -65,123 +51,15 @@ apt -y install python3-setproctitle
 pip3 install yappi
 
 
-cat << EOF > /etc/chrony/chrony.conf
-
-# Welcome to the chrony configuration file. See chrony.conf(5) for more
-# information about usuable directives.
-pool 2.debian.pool.ntp.org iburst
-
-# This directive specify the location of the file containing ID/key pairs for
-# NTP authentication.
-keyfile /etc/chrony/chrony.keys
-
-# This directive specify the file into which chronyd will store the rate
-# information.
-driftfile /var/lib/chrony/chrony.drift
-
-# Uncomment the following line to turn logging on.
-#log tracking measurements statistics
-
-# Log files location.
-logdir /var/log/chrony
-
-# Stop bad estimates upsetting machine clock.
-maxupdateskew 100.0
-
-# This directive enables kernel synchronisation (every 11 minutes) of the
-# real-time clock. Note that it can’t be used along with the 'rtcfile' directive.
-rtcsync
-
-# Step the system clock instead of slewing it if the adjustment is larger than
-# one second, but only in the first three clock updates.
-makestep 1 3
-
-allow
-
-local stratum 14 orphan
-EOF
 
 
-#Explicitly specify a domain name, it seems to fix a bug where it doesn't
-#Publish on one at all
-cat << EOF > /etc/avahi/avahi-daemon.conf
-
-# This file is part of avahi.
-#
-# avahi is free software; you can redistribute it and/or modify it
-# under the terms of the GNU Lesser General Public License as
-# published by the Free Software Foundation; either version 2 of the
-# License, or (at your option) any later version.
-#
-# avahi is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public
-# License along with avahi; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
-# USA.
-
-# See avahi-daemon.conf(5) for more information on this configuration
-# file!
-
-[server]
-#host-name=foo
-domain-name=local
-#browse-domains=0pointer.de, zeroconf.org
-use-ipv4=yes
-use-ipv6=yes
-#allow-interfaces=eth0
-#deny-interfaces=eth1
-#check-response-ttl=no
-#use-iff-running=no
-enable-dbus=yes
-#disallow-other-stacks=no
-#allow-point-to-point=no
-#cache-entries-max=4096
-#clients-max=4096
-#objects-per-client-max=1024
-#entries-per-entry-group-max=32
-ratelimit-interval-usec=1000000
-ratelimit-burst=1000
-
-[wide-area]
-enable-wide-area=yes
-
-[publish]
-#disable-publishing=no
-#disable-user-service-publishing=no
-#add-service-cookie=no
-#publish-addresses=yes
-publish-hinfo=no
-publish-workstation=no
-#publish-domain=yes
-#publish-dns-servers=192.168.50.1, 192.168.50.2
-#publish-resolv-conf-dns-servers=yes
-#publish-aaaa-on-ipv4=yes
-#publish-a-on-ipv6=no
-
-[reflector]
-#enable-reflector=no
-#reflect-ipv=no
-
-[rlimits]
-#rlimit-as=
-#rlimit-core=0
-#rlimit-data=8388608
-#rlimit-fsize=0
-#rlimit-nofile=768
-#rlimit-stack=8388608
-#rlimit-nproc=3
-EOF
 
 
 mkdir -p /home/pi/.fvwm/
 
 cat << EOF > /home/pi/.fvwm/.FvwmForm-XDGMenu-Config 
-*FvwmForm-XDGMenu-ConfigDefault: MENdebian-menu on 
-*FvwmForm-XDGMenu-ConfigDefault: MENgnome-applications on 
+*FvwmForm-XDGMenu-ConfigDefault: MENdebian-menu off 
+*FvwmForm-XDGMenu-ConfigDefault: MENgnome-applications off
 *FvwmForm-XDGMenu-ConfigDefault: MENlxde-pi-applications on 
 *FvwmForm-XDGMenu-ConfigDefault: MENxfce-applications off
 *FvwmForm-XDGMenu-ConfigDefault: MENxfce-settings-manager off 
@@ -242,7 +120,6 @@ apt -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidi
 apt -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly python3-psutil
 #Don't include a giant soundfont, kaithem already has a decent one
 apt install -y --no-install-recommends  fluidsynth
-apt -y install network-manager
 
 apt -y install nmap robotfindskitten
 apt -y install ncdu
@@ -277,84 +154,5 @@ apt -y install fatrace
 apt -y install squid-deb-proxy-client
 
 
-mkdir -p /sketch/networks
-
-
-# Which one? Both? Seems to work!
-! systemctl disable dhcpcd.service
-! systemctl disable dhcpcd5.service
-
-# Set it up to work with sketch, the actual bind mount is in the emberos main script
-cat << EOF > /sketch/networks/wifi
-
-#This is a standard NetworkManager profile.
-# You can put as many files like this as you want in this folder,
-# Just give them different names and UUIDs
-
-
-[connection]
-
-#You can change that name
-id=WiFi
-uuid=4d2b90d7-474b-429b-a0be-f2a291416cca
-type=wifi
-#Fake timestamp to make it think it has connected before,
-#And attemp to avoid the "only one attempt then give up" problem
-timestamp=123456
-permissions=
-
-#Change this to true
-#To enable autoconnection to the network
-autoconnect=FALSE
-
-[wifi]
-mac-address-blacklist=
-mode=infrastructure
-
-ssid=YourWifiNameHere
-
-#Just straight up delete this whole section
-#To connect to unsecured networks
-[wifi-security]
-auth-alg=open
-key-mgmt=wpa-psk
-psk=YourWifiPasswordHere
-
-[ipv4]
-dns-search=
-method=auto
-
-[ipv6]
-addr-gen-mode=stable-privacy
-dns-search=
-method=auto
-EOF
-
-cat << EOF > /sketch/networks/ethernet
-#This is the configuration for automatically connecting to Ethernet.
-
-[connection]
-id=Ethernet
-uuid=8874a940-b7d6-3b50-9cfb-031801810ab4
-type=ethernet
-autoconnect-priority=-100
-
-timestamp=123456
-permissions=
-
-[ethernet]
-duplex=half
-mac-address-blacklist=
-speed=100
-
-[ipv4]
-dns-search=
-method=auto
-
-[ipv6]
-addr-gen-mode=stable-privacy
-dns-search=
-method=auto
-EOF
 
 apt -y autoremove

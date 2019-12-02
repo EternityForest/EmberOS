@@ -1,11 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Source error handling, leave this in place
 set -x
 set -e
 
-
-#All this does is makes the hostname configurable via /boot
 
 source /common.sh
 
@@ -19,192 +17,69 @@ source /common.sh
 # sudo apt-get -y install yggdrasil
 # sudo systemctl enable yggdrasil
 
+
+apt -y install network-manager
+systemctl enable NetworkManager.service
+
+
+
+
+
+unpack /filesystem/systemd /etc/systemd/system root
+unpack /filesystem/bin /usr/bin root
+
+chmod 744 /usr/bin/emberos_netcfg.sh
+
+systemctl enable emberos_netcfg.service
+
+
+
+
+####################### Setup the firewall ##################################
 sudo apt -y install nftables
 sudo apt -y install firewalld
+unpack /filesystem/firewalld /etc/firewalld/ root
 
 
-cat << 'EOF' > /etc/firewalld/firewalld.conf
-
-# firewalld config file
-
-# default zone
-# The default zone used if an empty zone string is used.
-# Default: public
-DefaultZone=public
-
-# Minimal mark
-# Marks up to this minimum are free for use for example in the direct 
-# interface. If more free marks are needed, increase the minimum
-# Default: 100
-MinimalMark=100
-
-# Clean up on exit
-# If set to no or false the firewall configuration will not get cleaned up
-# on exit or stop of firewalld
-# Default: yes
-CleanupOnExit=yes
-
-# Lockdown
-# If set to enabled, firewall changes with the D-Bus interface will be limited
-# to applications that are listed in the lockdown whitelist.
-# The lockdown whitelist file is lockdown-whitelist.xml
-# Default: no
-Lockdown=no
-
-# IPv6_rpfilter
-# Performs a reverse path filter test on a packet for IPv6. If a reply to the
-# packet would be sent via the same interface that the packet arrived on, the 
-# packet will match and be accepted, otherwise dropped.
-# The rp_filter for IPv4 is controlled using sysctl.
-# Default: yes
-IPv6_rpfilter=yes
-
-# IndividualCalls
-# Do not use combined -restore calls, but individual calls. This increases the
-# time that is needed to apply changes and to start the daemon, but is good for
-# debugging.
-# Default: no
-IndividualCalls=no
-
-# LogDenied
-# Add logging rules right before reject and drop rules in the INPUT, FORWARD
-# and OUTPUT chains for the default rules and also final reject and drop rules
-# in zones. Possible values are: all, unicast, broadcast, multicast and off.
-# Default: off
-LogDenied=off
-
-# AutomaticHelpers
-# For the secure use of iptables and connection tracking helpers it is
-# recommended to turn AutomaticHelpers off. But this might have side effects on
-# other services using the netfilter helpers as the sysctl setting in
-# /proc/sys/net/netfilter/nf_conntrack_helper will be changed.
-# With the system setting, the default value set in the kernel or with sysctl
-# will be used. Possible values are: yes, no and system.
-# Default: system
-AutomaticHelpers=system
-
-# FirewallBackend
-# Selects the firewall backend implementation.
-# Choices are:
-#       - nftables (default)
-#       - iptables (iptables, ip6tables, ebtables and ipset)
-FirewallBackend=iptables
-daniel@castletown ~/P/C/freesvg.org> sudo micro /etc/firewalld/firewalld.conf
-daniel@castletown ~/P/C/freesvg.org> sudo cat /etc/firewalld/firewalld.conf
-# firewalld config file
-
-# default zone
-# The default zone used if an empty zone string is used.
-# Default: public
-DefaultZone=trusted
-
-# Minimal mark
-# Marks up to this minimum are free for use for example in the direct 
-# interface. If more free marks are needed, increase the minimum
-# Default: 100
-MinimalMark=100
-
-# Clean up on exit
-# If set to no or false the firewall configuration will not get cleaned up
-# on exit or stop of firewalld
-# Default: yes
-CleanupOnExit=yes
-
-# Lockdown
-# If set to enabled, firewall changes with the D-Bus interface will be limited
-# to applications that are listed in the lockdown whitelist.
-# The lockdown whitelist file is lockdown-whitelist.xml
-# Default: no
-Lockdown=no
-
-# IPv6_rpfilter
-# Performs a reverse path filter test on a packet for IPv6. If a reply to the
-# packet would be sent via the same interface that the packet arrived on, the 
-# packet will match and be accepted, otherwise dropped.
-# The rp_filter for IPv4 is controlled using sysctl.
-# Default: yes
-IPv6_rpfilter=yes
-
-# IndividualCalls
-# Do not use combined -restore calls, but individual calls. This increases the
-# time that is needed to apply changes and to start the daemon, but is good for
-# debugging.
-# Default: no
-IndividualCalls=no
-
-# LogDenied
-# Add logging rules right before reject and drop rules in the INPUT, FORWARD
-# and OUTPUT chains for the default rules and also final reject and drop rules
-# in zones. Possible values are: all, unicast, broadcast, multicast and off.
-# Default: off
-LogDenied=off
-
-# AutomaticHelpers
-# For the secure use of iptables and connection tracking helpers it is
-# recommended to turn AutomaticHelpers off. But this might have side effects on
-# other services using the netfilter helpers as the sysctl setting in
-# /proc/sys/net/netfilter/nf_conntrack_helper will be changed.
-# With the system setting, the default value set in the kernel or with sysctl
-# will be used. Possible values are: yes, no and system.
-# Default: system
-AutomaticHelpers=system
-
-# FirewallBackend
-# Selects the firewall backend implementation.
-# Choices are:
-#       - nftables (default)
-#       - iptables (iptables, ip6tables, ebtables and ipset)
-FirewallBackend=nftables
-
-EOF
-
-# touch /etc/yggdrasil.conf
-cat << 'EOF' > /usr/bin/emberos_netcfg.sh
-#!/bin/bash
-
-#This script generates a yggdrasil config if it isn't there
-
-#It also binds apache's www stuff
-set -e
-
-# if [ ! -f /sketch/config/yggdrasil.conf]; then
-#     mkdirs -p  /sketch/config/
-#     yggdrasil -genconf -json >  /sketch/config/yggdrasil.conf
-# fi
-# mount --bind  /sketch/config/yggdrasil.conf /etc/yggdrasil.conf
-
-
-
-mkdirs -p  /sketch/firewalld/
-mount --bind  /sketch/firewalld/ /etc/firewalld/
-
-EOF 
-
-mkdirs -p  /sketch/firewalld/
+mkdir -p  /sketch/firewalld/
 cp -ar /etc/firewalld/. /sketch/firewalld
 
 systemctl enable firewalld.service
 
 
-chmod 744 /usr/bin/emberos_netcfg.sh
+
+###### Make NetworkManager sketchified
+
+
+chmod 744 /usr/bin/networkmanager_sketch.sh
+
+
+chmod 744 /etc/systemd/system/networkmanager_sketch.service
+systemctl enable /etc/systemd/system/networkmanager_sketch.service
+
+
+#Seems to be what you need to get NTP working
+apt -y install resolvconf
+apt -y install avahi-daemon 
+apt -y install avahi-utils
+
+#Update ssl certs
+apt -y install ca-certificates
+
+#Copy to sketch folder
+mkdir -p /sketch/sslcerts
+cp  -a /etc/ssl/certs/. /sketch/sslcerts
+
+unpack /filesystem/avahi /etc/avahi/ root
 
 
 
-cat << EOF > /etc/systemd/system/emberos_netcfg.service
-[Unit]
-Description=Manage mesh networking, firewalls, and decentralized stuff
-After=systemd-remount-fs.service
-Before=sysinit.target firewalld.service
-RequiresMountsFor=/etc/ /sketch/ 
-DefaultDependencies=no
 
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/emberos_netcfg.sh
+# Which one? Both? Seems to work!
+! systemctl disable dhcpcd.service
+! systemctl disable dhcpcd5.service
 
-[Install]
-WantedBy=sysinit.target
+mkdir -p /sketch/networks
+unpack /filesystem/networks /sketch/networks root
 
-EOF
 
-systemctl enable emberos_netcfg.service
