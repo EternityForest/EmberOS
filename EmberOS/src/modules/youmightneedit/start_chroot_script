@@ -4,6 +4,7 @@ set -x
 set -e
 
 apt -y install mosquitto
+echo "persistence false" > /etc/mosquitto/conf.d/emberos.conf
 systemctl enable mosquitto
 
 
@@ -22,10 +23,12 @@ apt -y install sqlitebrowser
 apt -y install gnome-disk-utility
 
 apt -y install unclutter
+apt -y install imagemagick
 
 
 apt -y install fvwm fvwm-icons
 
+update-icon-caches /usr/share/icons/*
 
 # Installs the Micro editor
 # Do this early, it can't be cached like apt
@@ -44,11 +47,16 @@ apt -y install tzdata
 mkdir -p /sketch/timezones
 cp -a /usr/share/zoneinfo/. /sketch/timezones
 
+apt -y install python3
 
 apt -y install exfat-utils
 apt -y install python3-setproctitle
+apt -y install python3-cffi
 
 pip3 install yappi
+pip3 install msgpack
+pip3 install paho-mqtt
+
 
 
 

@@ -55,9 +55,9 @@ set -e
 
 
 #
-if [ ! -d /sketch/timezones ]; then
-    mkdir /sketch/timezones
-    cp -a /usr/share/zoneinfo/. /sketch/timezones
+if [ ! -d /sketch/config/timezones ]; then
+    mkdir -p /sketch/config/timezones
+    cp -a /usr/share/zoneinfo/. /sketch/config/timezones
 fi
 
 mkdir -p /dev/shm/zoneinfo
@@ -68,24 +68,24 @@ chmod 755 -R /dev/shm/zoneinfo_work
 
 mount -t overlay -o lowerdir=/usr/share/zoneinfo/,upperdir=/dev/shm/zoneinfo,workdir=/dev/shm/zoneinfo_work overlay /usr/share/zoneinfo/
 
-cp -a /sketch/timezones/. /usr/share/zoneinfo
+cp -a /sketch/config/timezones/. /usr/share/zoneinfo
 chmod 755 -R /usr/share/zoneinfo
 
 
 
-if [ ! -d /sketch/timezone ]; then
-    cp /etc/timezone /sketch/timezone
+if [ ! -d /sketch/config/timezone ]; then
+    cp /etc/timezone /sketch/config/timezone
 fi
 
 # Now set the timezone based on the sketch
 
-cp -L /sketch/timezone /dev/shm/timezone
+cp -L /sketch/config/timezone /dev/shm/timezone
 mount --bind /dev/shm/timezone /etc/timezone
 chmod 755 /dev/shm/timezone
 
 
 #Do a lookup
-cp -L /usr/share/zoneinfo/$(cat /sketch/timezone|xargs) /dev/shm/localtime
+cp -L /usr/share/zoneinfo/$(cat /sketch/config/timezone|xargs) /dev/shm/localtime
 mount --bind /dev/shm/localtime /etc/localtime
 chmod 755 /dev/shm/localtime
 

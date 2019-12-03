@@ -61,4 +61,9 @@ fi
 mkdir /tmp/samba
 mkdir /tmp/cache
 mkdir /tmp/cache/samba
-​sudo mkdir /var/log/samba
+​mkdir /var/log/samba
+
+###-------------------------------Mosquitto shimming---------------------------
+mkdir -p /var/log/mosquitto
+#In case the user doesn't actually exist
+! chown mosquitto /var/log/mosquitto

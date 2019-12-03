@@ -161,12 +161,7 @@ replaceAppend /etc/ssh/sshd_config "^.*UsePrivilegeSeparation.*$" "UsePrivilegeS
 # Change spool permissions in var.conf (rondie/Margaret fix)
 replace /usr/lib/tmpfiles.d/var.conf "spool\s*0755" "spool 1777"
 
-# Move dhcpd.resolv.conf to tmpfs
-! rm /tmp/dhcpcd.resolv.conf
-
-mv /etc/resolv.conf /tmp/dhcpcd.resolv.conf
-
-ln -s /tmp/dhcpcd.resolv.conf /etc/resolv.conf
+# Obsolete: Move dhcpd.resolv.conf to tmpfs. Why would you not use resolvconf?
 
 #Set up symlinks in case we have dhcpcd5
 if [ ! -h /var/lib/dhcpcd5 ] ; then

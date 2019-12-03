@@ -15,7 +15,7 @@ type=wifi
 timestamp=123456
 permissions=
 
-#Change this to TRUE
+#Delete this line
 #To enable autoconnection to the network
 autoconnect=FALSE
 

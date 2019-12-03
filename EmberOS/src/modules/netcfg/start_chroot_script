@@ -18,10 +18,10 @@ source /common.sh
 # sudo systemctl enable yggdrasil
 
 
+
 apt -y install network-manager
 systemctl enable NetworkManager.service
-
-
+unpack /filesystem/networkmanager /etc/NetworkManager root
 
 
 
@@ -41,8 +41,8 @@ sudo apt -y install firewalld
 unpack /filesystem/firewalld /etc/firewalld/ root
 
 
-mkdir -p  /sketch/firewalld/
-cp -ar /etc/firewalld/. /sketch/firewalld
+mkdir -p  /sketch/config/firewalld/
+cp -ar /etc/firewalld/. /sketch/config/firewalld
 
 systemctl enable firewalld.service
 
@@ -58,8 +58,7 @@ chmod 744 /etc/systemd/system/networkmanager_sketch.service
 systemctl enable /etc/systemd/system/networkmanager_sketch.service
 
 
-#Seems to be what you need to get NTP working
-apt -y install resolvconf
+
 apt -y install avahi-daemon 
 apt -y install avahi-utils
 
@@ -67,8 +66,8 @@ apt -y install avahi-utils
 apt -y install ca-certificates
 
 #Copy to sketch folder
-mkdir -p /sketch/sslcerts
-cp  -a /etc/ssl/certs/. /sketch/sslcerts
+mkdir -p /sketch/config/sslcerts
+cp  -La /etc/ssl/certs/. /sketch/config/sslcerts
 
 unpack /filesystem/avahi /etc/avahi/ root
 

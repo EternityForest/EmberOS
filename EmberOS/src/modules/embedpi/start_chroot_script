@@ -95,27 +95,27 @@ mount -t overlay -o lowerdir=/root,upperdir=/dev/shm/roothome,workdir=/dev/shm/r
 mount -t overlay -o lowerdir=/home/pi,upperdir=/dev/shm/pihome,workdir=/dev/shm/pihome_work overlay /home/pi
 
 
-mkdir -p /sketch/ssh/pi
-mkdir -p /sketch/ssh/root
+mkdir -p  /sketch/config/ssh/pi
+mkdir -p  /sketch/config/ssh/root
 
-if [ ! -f /sketch/ssh/pi/id_rsa ]; then
-    cat /dev/zero | ssh-keygen -f /sketch/ssh/pi/id_rsa -q -N ""
+if [ ! -f  /sketch/config/ssh/pi/id_rsa ]; then
+    cat /dev/zero | ssh-keygen -f  /sketch/config/ssh/pi/id_rsa -q -N ""
 fi
 
-if [ ! -f /sketch/ssh/pi/authorized_keys ]; then
-    touch /sketch/ssh/pi/authorized_keys
+if [ ! -f  /sketch/config/ssh/pi/authorized_keys ]; then
+    touch  /sketch/config/ssh/pi/authorized_keys
 fi
 
-if [ ! -f /sketch/ssh/root/id_rsa ]; then
-    cat /dev/zero | ssh-keygen -f /sketch/ssh/root/id_rsa -q -N ""
+if [ ! -f  /sketch/config/ssh/root/id_rsa ]; then
+    cat /dev/zero | ssh-keygen -f  /sketch/config/ssh/root/id_rsa -q -N ""
 fi
 
-if [ ! -f /sketch/ssh/root/authorized_keys ]; then
-    touch /sketch/ssh/root/authorized_keys
+if [ ! -f  /sketch/config/ssh/root/authorized_keys ]; then
+    touch  /sketch/config/ssh/root/authorized_keys
 fi
 
 mkdir /dev/shm/unpackthekeys
-cp -v -r --preserve=mode,ownership,timestamps /sketch/ssh/pi/. /dev/shm/unpackthekeys
+cp -v -r --preserve=mode,ownership,timestamps  /sketch/config/ssh/pi/. /dev/shm/unpackthekeys
 chown -hR pi:pi  /dev/shm/unpackthekeys
 chmod -R 700 /dev/shm/unpackthekeys
 cp -v -r --preserve=mode,ownership,timestamps /dev/shm/unpackthekeys/. /home/pi/.ssh
@@ -123,11 +123,11 @@ rm -r /dev/shm/unpackthekeys
 chmod -R 700 /home/pi/.ssh
 
 #Nonexistant ssh conf, put the default in the sketch
-if [ ! -f /sketch/ssh/ssh_config ]; then
-    cp -a /etc/ssh/ssh_config /sketch/ssh/ssh_config
+if [ ! -f  /sketch/config/ssh/ssh_config ]; then
+    cp -a /etc/ssh/ssh_config  /sketch/config/ssh/ssh_config
 fi
 
-mount --bind /sketch/ssh/ssh_config /etc/ssh/ssh_config
+mount --bind  /sketch/config/ssh/ssh_config /etc/ssh/ssh_config
 
 
 #Use what is already there as the template
@@ -159,29 +159,7 @@ fi
 
 
 
-#We're gonna make the SSL certs configurable!
-if [ ! -d /sketch/sslcerts ]; then
-    mkdir -p /sketch/sslcerts
-    cp  -a /etc/ssl/certs/. /sketch/sslcerts
-fi
 
-
-
-mkdir -p /dev/shm/etctmpssl
-mkdir -p /dev/shm/etctmpssl_work
-
-chmod 755 -R /dev/shm/etctmpssl
-chmod 755 -R /dev/shm/etctmpssl_work
-
-mount -t overlay -o lowerdir=/etc/ssl/certs,upperdir=/dev/shm/etctmpssl,workdir=/dev/shm/etctmpssl_work overlay /etc/ssl/certs
-
-#Copy everything to the tmpfs from the sketch
-cp  -a /sketch/sslcerts/. /etc/ssl/certs/
-chmod 755 -R /etc/ssl/certs/
-
-
-#Now update that cert bundle
-update-ca-certificates &
 
 EOF
 
@@ -253,7 +231,7 @@ cat << EOF > /usr/bin/readonly
 #!/bin/bash
 mount -o remount,ro /
 mount -o remount,ro /boot
-mount -o remount,ro /sketch
+#mount -o remount,ro /sketch
 EOF
 
 chmod 755 /usr/bin/writable

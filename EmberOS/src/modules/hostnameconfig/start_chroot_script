@@ -9,16 +9,12 @@ set -e
 
 source /common.sh
 
-echo "embedpi" > /sketch/hostname
-
-rm /etc/hostname
-ln -s /sketch/hostname /etc/hostname
-
+echo "embedpi" > /sketch/config/hostname
 
 
 
 #Put a default in the sketch folder
-cat << EOF > /sketch/hosts
+cat << EOF > /sketch/config/hosts
 127.0.0.1   localhost
 127.0.1.1   embedpi
 ::1		localhost ip6-localhost ip6-loopback
@@ -36,11 +32,11 @@ cat << 'EOF' > /usr/bin/manage_hostname.sh
 #It also binds apache's www stuff
 set -e
 
-cp /sketch/hosts /tmp/sketch_hostsfile
+cp  /sketch/config/hosts /tmp/sketch_hostsfile
 chmod 755 /tmp/sketch_hostsfile
 mount --bind /tmp/sketch_hostsfile /etc/hosts
 
-cp /sketch/hostname /tmp/sketch_hostname
+cp  /sketch/config/hostname /tmp/sketch_hostname
 chmod 755 /tmp/sketch_hostname
 mount --bind /tmp/sketch_hostname /etc/hostname
 EOF

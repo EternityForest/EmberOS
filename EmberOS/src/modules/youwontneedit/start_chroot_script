@@ -17,6 +17,8 @@
 ! apt purge -y ^python-minecraftpi$ 
 ! apt purge -y ^bluej$ 
 ! apt purge -y ^greenfoot$ 
+! apt purge -y ^greenfoot-unbundled$ 
+
 ! apt purge -y ^claws-mail$ 
 ! apt purge -y ^claws-mail-i18n$
 #! apt purge -y ^nuscratch$
