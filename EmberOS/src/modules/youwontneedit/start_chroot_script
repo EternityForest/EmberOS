@@ -23,5 +23,7 @@
 ! apt purge -y ^claws-mail-i18n$
 #! apt purge -y ^nuscratch$
 
+
+
 apt autoremove -y --purge
 

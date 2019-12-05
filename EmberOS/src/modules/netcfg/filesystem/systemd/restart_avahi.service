@@ -1,0 +1,10 @@
+[Unit]
+Description=Restart avahi after it loads, which seems to make it work
+After=avahi-daemon.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/restart_avahi.sh
+
+[Install]
+WantedBy=avahi-daemon.service

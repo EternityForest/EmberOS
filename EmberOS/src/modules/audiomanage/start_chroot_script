@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# Source error handling, leave this in place
+set -x
+set -e
+
+
+source /common.sh
+
+#This is a bad thing for readonly embedded stuff. I don't know why.
+apt purge -y ^pulseaudio$ 
+
+cat << 'EOF' > /usr/bin/manage_audio.sh
+#!/bin/bash
+
+#Set card 0 volume to full.
+amixer -c 0 set PCM 0db
+EOF
+
+chmod 744 /usr/bin/manage_audio.sh
+
+
+
+cat << EOF > /etc/systemd/system/manage_audio.service
+[Unit]
+Description=Manage audio
+After=sysinit.target
+
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/manage_audio.sh
+
+[Install]
+WantedBy=sysinit.target
+
+EOF
+
+chmod 744  /etc/systemd/system/manage_audio.service
+systemctl enable manage_audio.service

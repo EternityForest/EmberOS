@@ -61,3 +61,6 @@ ExecStart=/usr/bin/manage_hostname.sh
 WantedBy=sysinit.target
 
 EOF
+
+chmod 744  /etc/systemd/system/manage_hostname.service
+systemctl enable manage_hostname.service

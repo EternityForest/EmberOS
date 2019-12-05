@@ -62,6 +62,14 @@ systemctl enable /etc/systemd/system/networkmanager_sketch.service
 apt -y install avahi-daemon 
 apt -y install avahi-utils
 
+# Try to fix the kinds of bugs that are fixable by an Avahi restart
+# https://bugs.launchpad.net/ubuntu/+source/avahi/+bug/624043
+chmod 755 /usr/bin/restart_avahi.sh
+chmod 744 /etc/systemd/system/restart_avahi.service
+systemctl enable /etc/systemd/system/restart_avahi.service
+
+
+
 #Update ssl certs
 apt -y install ca-certificates
 
