@@ -6,8 +6,8 @@ set -e
 
 
 
-cp /etc/timezone /sketch/timezone
-cp -a /usr/share/zoneinfo/. /sketch/timezones
+cp /etc/timezone /sketch/config/timezone
+cp -a /usr/share/zoneinfo/. /sketch/config/timezones
 
 
 apt -y install chrony
