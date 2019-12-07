@@ -12,6 +12,9 @@ THE DEFAULT PASSWORD IS USED FOR KAITHEM, which runs as root. The standard pi:ra
 Do *not* open a port to let people on the internet access this, 
 without a firewall/nat/etc unless you change this, or disable password auth(Probably the better option)
 
+There is also an unsecured Mosquitto MQTT server. Nothing is currently using it, but if you
+do, be sure nobody can access those ports. 
+
 
 Think of it like the common WiFi printers and file servers that allow anyone on the network to print.
 
@@ -28,8 +31,12 @@ It is not encrypted though.
 
 ## What it does
 
-* Adds a ntfs partition called /sketch  that is intended to be the storage location for everything except the os and libs
-* Makes a file at /sketch/hostname.txt to let you change the hostname
+* Adds a ntfs partition called /sketch  that is intended to be the storage location for everything except the os and libs. It is owned by root with mode 750, so not just any random
+process can access it. For this reason a lot of it's data is copied to /tmp at boot
+
+
+* Makes a file at /sketch/config/hostname to let you change the hostname
+* Hostsfile is now at /sketch/config/hosts
 * Installs chrony instead of garbage timesyncd
 * Uses resolvconf to ensure dns resolution works
 * Puts a whole bumch of tmpfses on things that write to disk, so they still work
@@ -49,11 +56,9 @@ It is not encrypted though.
 
 * Allows configuring NetworkManager via /sketch/networks
 
-* Installs Yggdrasil mesh networking, but doesn't set up any peers beyond the local autodiscovered ones.
-* Sets up the ufw firewall, but allows everything except incoming yggdrasil packets(Aside from incoming NTP requests)
-
-
 * Does NOT make the NTFS partition /sketch read only. You have to do that one yourself if you want it.
+
+* Sets up firewalld, but the default zone is trusted, so it does nothing until you configure it.
 
 ## Building(Need linux)
 
@@ -111,6 +116,9 @@ dtoverlay=i2c-rtc,ds1307
 dtoverlay=i2c-rtc,pcf8523
 dtoverlay=i2c-rtc,ds3231
 ```
+
+## Getting online
+Look in /sketch/networks, edit the wifi file as appropriate, or just connect ethernet.
 
 ## Securing SSH
 
