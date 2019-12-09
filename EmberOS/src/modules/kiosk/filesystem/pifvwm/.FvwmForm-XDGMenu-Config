@@ -1,9 +1,9 @@
 *FvwmForm-XDGMenu-ConfigDefault: MENdebian-menu off
 *FvwmForm-XDGMenu-ConfigDefault: MENgnome-applications on
-*FvwmForm-XDGMenu-ConfigDefault: MENlxde-pi-applications on
+*FvwmForm-XDGMenu-ConfigDefault: MENlxde-pi-applications off
 *FvwmForm-XDGMenu-ConfigDefault: MENxfce-applications off
 *FvwmForm-XDGMenu-ConfigDefault: MENxfce-settings-manager off
-*FvwmForm-XDGMenu-ConfigDefault: MENlxde-applications on
+*FvwmForm-XDGMenu-ConfigDefault: MENlxde-applications off
 *FvwmForm-XDGMenu-ConfigDefault: IncludeConfig
 *FvwmForm-XDGMenu-ConfigDefault: IncludeRegen
 *FvwmForm-XDGMenu-ConfigDefault: IncludeBoth  on

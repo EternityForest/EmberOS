@@ -15,12 +15,8 @@ set -e
 mkdir -p  /sketch/config/firewalld/
 mount --bind  /sketch/config/firewalld/ /etc/firewalld/
 
-if [ ! -d /sketch/config/sslcerts ]; then
-    mkdir -p /sketch/config/sslcerts
-    cp  -La /etc/ssl/certs/. /sketch/config/sslcerts
-fi
 
-
+# Keep this as is, because of the overlay, which we actually need because of dynamic regen
 mkdir -p /dev/shm/etctmpssl
 mkdir -p /dev/shm/etctmpssl_work
 
@@ -29,10 +25,17 @@ chmod 755 -R /dev/shm/etctmpssl_work
 
 mount -t overlay -o lowerdir=/etc/ssl/certs,upperdir=/dev/shm/etctmpssl,workdir=/dev/shm/etctmpssl_work overlay /etc/ssl/certs
 
-#Copy everything to the tmpfs from the sketch
-cp  -a /sketch/config/sslcerts/. /etc/ssl/certs/
-chmod 755 -R /etc/ssl/certs/
+update-ca-certificates
 
+#That should already by in a ramdisk
+mkdir -p /home/pi/.pki/nssdb
+chmod -R 755 /home/pi/.pki/nssdb
+nss-systemcerts-import -d /home/pi/.pki/nssdb
+chown -R pi /home/pi/.pki/nssdb
 
-#Now update that cert bundle
-update-ca-certificates &
+#This wipes out the system NSS config to setup the ramdisk.
+#Which is file, the system cert bundle should be good.
+mount -t tmpfs -o size=5m tmpfs /etc/pki/nssdb
+chmod -R 755 /etc/pki/nssdb
+nss-systemcerts-import -d /home/pi/.pki/nssdb
+

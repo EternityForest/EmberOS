@@ -1,6 +1,6 @@
 [Unit]
 Description=Manage mesh networking, firewalls, and decentralized stuff
-After=systemd-remount-fs.service
+After=systemd-remount-fs.service fs_bindings.service
 Before=firewalld.service
 RequiresMountsFor=/etc/ /sketch/ 
 DefaultDependencies=no

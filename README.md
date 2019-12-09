@@ -25,7 +25,7 @@ They are just self signed keys though, you will get a warning in your browser.
 ### /sketch
 
 To provide some semblance of security, umask is used to keep this from being accessed by anyone but root.
-It can be read and executed by root's group, but only written by root itself.
+It can be read and executed by root's group, but only written by root itself, aside from via BindFS.
 
 It is not encrypted though.
 
@@ -48,7 +48,7 @@ process can access it. For this reason a lot of it's data is copied to /tmp at b
 * Sets everything up for a realtime clock, just add dtoverlay
 * Enables SSH, I2C, and SPI, and the camera interface
 * Allows full configuration of SSH via the sketch partition
-* Enables Samba and DLNA(minidlna is added to root's group to enable this)
+* Enables Samba and DLNA
 * Puts a tmpfs over /home/pi and /root, making them volatile but writable.
 * Disables overscan. You almost certainly don't want this on a modern display.
 * Sets up a US keyboard layout(This will eventually be set through /sketch if there's interest)
@@ -59,6 +59,10 @@ process can access it. For this reason a lot of it's data is copied to /tmp at b
 * Does NOT make the NTFS partition /sketch read only. You have to do that one yourself if you want it.
 
 * Sets up firewalld, but the default zone is trusted, so it does nothing until you configure it.
+* Sets up /home/pi/persist as a bindFS to /sketch/home/pi
+* Symlink Documents, Downloads,Pictures, Arduino, Templates,Music, and Videos
+
+* Share /home/pi/SharedMedia via DLNA
 
 ## Prebuilt image
 

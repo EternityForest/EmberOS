@@ -54,43 +54,6 @@ pip3 install msgpack
 pip3 install paho-mqtt
 
 
-
-
-
-
-
-mkdir -p /home/pi/.fvwm/
-
-cat << EOF > /home/pi/.fvwm/.FvwmForm-XDGMenu-Config 
-*FvwmForm-XDGMenu-ConfigDefault: MENdebian-menu off 
-*FvwmForm-XDGMenu-ConfigDefault: MENgnome-applications off
-*FvwmForm-XDGMenu-ConfigDefault: MENlxde-pi-applications on 
-*FvwmForm-XDGMenu-ConfigDefault: MENxfce-applications off
-*FvwmForm-XDGMenu-ConfigDefault: MENxfce-settings-manager off 
-*FvwmForm-XDGMenu-ConfigDefault: MENlxde-applications on 
-*FvwmForm-XDGMenu-ConfigDefault: IncludeConfig  
-*FvwmForm-XDGMenu-ConfigDefault: IncludeRegen  
-*FvwmForm-XDGMenu-ConfigDefault: IncludeBoth  on 
-*FvwmForm-XDGMenu-ConfigDefault: IncludeNone   
-*FvwmForm-XDGMenu-ConfigDefault: IconsOn      on 
-*FvwmForm-XDGMenu-ConfigDefault: IconsOff      
-*FvwmForm-XDGMenu-ConfigDefault: Size          
-*FvwmForm-XDGMenu-ConfigDefault: TitlesOn     on 
-*FvwmForm-XDGMenu-ConfigDefault: TitlesOff     
-*FvwmForm-XDGMenu-ConfigDefault: Theme         
-*FvwmForm-XDGMenu-ConfigDefault: Title        XDGMenu  
-*FvwmForm-XDGMenu-ConfigDefault: InsertInto    
-*FvwmForm-XDGMenu-ConfigDefault: Path         $FVWM_USERDIR/.XDGMenu  
-*FvwmForm-XDGMenu-ConfigDefault: TermCmd      xterm -e  
-*FvwmForm-XDGMenu-ConfigDefault: IconDir      ~/.fvwm/icons  
-*FvwmForm-XDGMenu-ConfigDefault: DirIcon      gnome-fs-directory  
-*FvwmForm-XDGMenu-ConfigDefault: AppIcon      gnome-applications  
-EOF
-
-chown pi /home/pi/.fvwm/.FvwmForm-XDGMenu-Config
-
-
-
 mkdir -p /publictemp
 mkdir -p /sketch/public.www/
 mkdir -p /sketch/public.files/
