@@ -42,12 +42,6 @@ apt -y install x11-apps
 
 
 
-#Update timezones
-apt -y install tzdata
-
-#Pre populate sketch
-mkdir -p /sketch/timezones
-cp -a /usr/share/zoneinfo/. /sketch/timezones
 
 apt -y install python3
 
@@ -105,10 +99,15 @@ echo "Welcome! This file is /sketch/public.www/index.html"> /sketch/public.www/i
 
 apt -y install apache2
 
-#Add the user for apache to the root group.
-#Do the same for apache
-#TODO a solution that has less trust on it.
-! adduser www-data root
+mkdir -p /sketch/public.www
+
+#Give www-data a "window into the root filesystem"
+cat << EOF > /sketch/config/filesystem/www.yaml
+/sketch/public.www:
+    mode: '0750'
+    user:  www-data
+    bindat: /var/www/html
+EOF
 
 sudo apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,mysql,zip}
 apt-get install libapache2-mod-php -y

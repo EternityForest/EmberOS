@@ -50,14 +50,12 @@ systemctl enable firewalld.service
 
 ###### Make NetworkManager sketchified
 
-
-chmod 744 /usr/bin/networkmanager_sketch.sh
-
-
-chmod 744 /etc/systemd/system/networkmanager_sketch.service
-systemctl enable /etc/systemd/system/networkmanager_sketch.service
-
-
+cat << EOF > /sketch/config/filesystem/emberos_networks.yaml
+/sketch/networks/:
+    mode: '0600'
+    user: root
+    bindat: /etc/NetworkManager/system-connections
+EOF
 
 apt -y install avahi-daemon 
 apt -y install avahi-utils

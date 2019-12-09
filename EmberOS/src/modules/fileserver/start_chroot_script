@@ -13,8 +13,6 @@ source /common.sh
 apt -y install samba samba-common-bin smbclient cifs-utils
 apt -y install minidlna
 
-
-! adduser minidlna root
 ! sudo systemctl enable minidlna.service
 ! sudo systemctl enable smbd.service 
 ! sudo systemctl enable nmbd.service
@@ -22,8 +20,19 @@ apt -y install minidlna
 
 
 #This seems to be fairly low resource usage and thus safe to include
-echo "media_dir=/sketch/public.media/" >> /etc/minidlna.conf
+echo "media_dir=/var/public.media/" >> /etc/minidlna.conf
 mkdir -p /sketch/public.media/
+
+#The mountpoint
+mkdir -p /var/public.media/
+
+#Give www-data a "window into the root filesystem"
+cat << EOF > /sketch/config/filesystem/dlna.yaml
+/sketch/public.media:
+    mode: '0755'
+    user: minidlna
+    bindat: /var/public.media/
+EOF
 
 
 cat << 'EOF' > /usr/bin/emberos_fileserver.sh

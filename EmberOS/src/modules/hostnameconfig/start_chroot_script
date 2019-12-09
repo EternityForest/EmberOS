@@ -22,45 +22,10 @@ ff02::1		ip6-allnodes
 ff02::2		ip6-allrouters
 EOF
 
-
-cat << 'EOF' > /usr/bin/manage_hostname.sh
-#!/bin/bash
-
-#This script generates nonexistant keys, and
-#Also moves keys into the special tmpfs just for those keys.
-
-#It also binds apache's www stuff
-set -e
-
-cp  /sketch/config/hosts /tmp/sketch_hostsfile
-chmod 755 /tmp/sketch_hostsfile
-mount --bind /tmp/sketch_hostsfile /etc/hosts
-
-cp  /sketch/config/hostname /tmp/sketch_hostname
-chmod 755 /tmp/sketch_hostname
-mount --bind /tmp/sketch_hostname /etc/hostname
+cat << EOF > /sketch/config/filesystem/emberos_hosts.yaml
+#This relies on the fact that the OS already configures this to be 0755
+/sketch/config:
+    bindfiles:
+        hosts: /etc/hosts
+        hostname: /etc/hostname
 EOF
-
-chmod 744 /usr/bin/manage_hostname.sh
-
-
-
-cat << EOF > /etc/systemd/system/manage_hostname.service
-[Unit]
-Description=Manage hostname and the hosts file
-After=systemd-remount-fs.service
-Before=sysinit.target
-RequiresMountsFor=/etc/ /sketch/ 
-DefaultDependencies=no
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/manage_hostname.sh
-
-[Install]
-WantedBy=sysinit.target
-
-EOF
-
-chmod 744  /etc/systemd/system/manage_hostname.service
-systemctl enable manage_hostname.service

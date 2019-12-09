@@ -1,0 +1,15 @@
+[Unit]
+Description=Configure BindFS sketch management
+After=systemd-remount-fs.service
+#Possiblye issue here if we start *after* something important, don't forget to include things!
+Before=sysinit.target NetworkManager.service chronyd.service
+RequiresMountsFor=/etc/ /sketch/ /home/
+DefaultDependencies=no
+
+
+[Service]
+TimeoutStartSec=0
+ExecStart=/usr/bin/fs_bindings.py
+
+[Install]
+WantedBy=multi-user.target

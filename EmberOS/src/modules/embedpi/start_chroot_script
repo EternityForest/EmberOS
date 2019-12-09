@@ -13,7 +13,12 @@ set -e
 apt update -y --allow-releaseinfo-change
 apt update
 
+
 apt install -y ntfs-3g
+apt install -y bindfs
+#Needed for reading config files
+apt install -y python3-yaml
+
 
 #The special /sketch partition is for everything that is not part of the image. It is made after the fact.
 ! mkdir /sketch
@@ -136,7 +141,6 @@ if [ ! -d /sketch/public.www ]; then
     cp -a /var/www/html/. /sketch/public.www/
 fi
 
-mount --bind /sketch/public.www /var/www/html
 
 
 #Use what is already there as the template
@@ -188,7 +192,68 @@ chmod 744 /etc/systemd/system/manage_sketch_folder.service
 systemctl enable /etc/systemd/system/manage_sketch_folder.service
 
 
+unpack /filesystem/systemd /etc/systemd/system root
+unpack /filesystem/bin /usr/bin root 
 
+chmod 744 /etc/systemd/system/fs_bindings.service
+chmod 744 /usr/bin/fs_bindings.py
+
+systemctl enable /etc/systemd/system/fs_bindings.service
+
+mkdir -p /sketch/config/filesystem
+
+
+mkdir -p /home/pi/Public
+mkdir -p /home/pi/PublicMedia
+
+#General purpose private persistant area
+mkdir -p /home/pi/persistent
+
+#Give pi a place to share public stuff, if desired
+mkdir -p /sketch/public.files/pi
+mkdir -p /sketch/public.media/pi
+
+
+cat << EOF > /sketch/config/filesystem/emberos_public.yaml
+/sketch/public.files:
+    mode: '0755'
+    user: root
+/sketch/public.media:
+    mode: '0755'
+    user: root
+
+EOF
+
+cat << EOF > /sketch/config/filesystem/emberos_public_pi.yaml
+/sketch/public.files/pi:
+    mode: '0755'
+    user: pi
+    bindat:  /home/pi/Public
+
+/sketch/public.media/pi:
+    mode: '0755'
+    user: pi
+    bindat: /home/pi/PublicMedia
+
+EOF
+
+cat << EOF > /sketch/config/filesystem/emberos__pi.yaml
+/sketch/userpersist/pi:
+    mode: '0750'
+    user: pi
+    bindat: /home/pi/persist
+EOF
+
+
+mkdir -p /etc/sketchconfig
+
+#Give www-data a "window into the root filesystem"
+cat << EOF > /sketch/config/filesystem/emberos_hosts.yaml
+/sketch/config/:
+    mode: '0755'
+    user: root
+    bindat: /etc/sketchconfig
+EOF
 #Disable serial debugging, use readonly mode, and ditch the awful resize on first boot
 #Because it won't work and who knows what it will do
 cat << EOF > /boot/cmdline.txt
@@ -236,3 +301,5 @@ EOF
 
 chmod 755 /usr/bin/writable
 chmod 755 /usr/bin/readonly
+
+

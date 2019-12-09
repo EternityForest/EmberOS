@@ -4,13 +4,19 @@ set -x
 set -e
 
 
+apt -y install chrony
+
+#Update timezones
+apt -y install tzdata
+
+#Pre populate sketch
+mkdir -p /sketch/config/timezones
 
 
 cp /etc/timezone /sketch/config/timezone
 cp -a /usr/share/zoneinfo/. /sketch/config/timezones
 
 
-apt -y install chrony
 
 cat << EOF > /etc/chrony/chrony.conf
 
@@ -54,35 +60,7 @@ cat << 'EOF' > /usr/bin/manage_timezones.sh
 set -e
 
 
-#
-if [ ! -d /sketch/config/timezones ]; then
-    mkdir -p /sketch/config/timezones
-    cp -a /usr/share/zoneinfo/. /sketch/config/timezones
-fi
-
-mkdir -p /dev/shm/zoneinfo
-mkdir -p /dev/shm/zoneinfo_work
-
-chmod 755 -R /dev/shm/zoneinfo
-chmod 755 -R /dev/shm/zoneinfo_work
-
-mount -t overlay -o lowerdir=/usr/share/zoneinfo/,upperdir=/dev/shm/zoneinfo,workdir=/dev/shm/zoneinfo_work overlay /usr/share/zoneinfo/
-
-cp -a /sketch/config/timezones/. /usr/share/zoneinfo
-chmod 755 -R /usr/share/zoneinfo
-
-
-
-if [ ! -d /sketch/config/timezone ]; then
-    cp /etc/timezone /sketch/config/timezone
-fi
-
 # Now set the timezone based on the sketch
-
-cp -L /sketch/config/timezone /dev/shm/timezone
-mount --bind /dev/shm/timezone /etc/timezone
-chmod 755 /dev/shm/timezone
-
 
 #Do a lookup
 cp -L /usr/share/zoneinfo/$(cat /sketch/config/timezone|xargs) /dev/shm/localtime
@@ -102,12 +80,19 @@ EOF
 
 chmod 744 /usr/bin/manage_timezones.sh
 
+cat << EOF > /sketch/config/filesystem/emberos_time.yaml
+#This relies on the fact that the OS already configures this to be 0755
+/sketch/config:
+    bindfiles:
+        timezone: /etc/timezone
+        timezones: /usr/share/zoneinfo
 
+EOF
 
 cat << EOF > /etc/systemd/system/manage_timezones.service
 [Unit]
 Description=Manage timezones
-After=systemd-remount-fs.service
+After=systemd-remount-fs.service fs_bindings.service
 Before=sysinit.target chronyd.service
 RequiresMountsFor=/etc/ /sketch/
 DefaultDependencies=no
