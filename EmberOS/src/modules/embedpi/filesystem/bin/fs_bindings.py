@@ -21,13 +21,18 @@ and
         hosts: /etc/hosts
         hostname: /etc/hostname
 
+/sketch/config/simple: /simple
+
 and merges them together, then uses them to set up bindings.
 
 In this case we are saying: Make /sketch/config viewable at /etc/sketchconfig.
 
 in the second file, we say(Note relative paths), make /etc/sketchconfig/hosts viewable at /etc/hosts
 
-Bindfiles are relative to the main bindat location for that path
+Bindfiles are relative to the main bindat location for that path.
+
+The line /sketch/config/simple: /simple binds  /etc/sketchconfig/simple to /simple,
+because the path gets rebased on the top configured directory/
 
 All binding files lists for a path are merged together, you can specify multiple lists for one dir, in different config files.
 
@@ -46,7 +51,7 @@ import yaml, subprocess, os
 config = {}
 
 configdir = "/sketch/config/filesystem/"
-configdir = "/home/daniel/sandbox/config/"
+#configdir = "/home/daniel/sandbox/config/"
 
 for i in os.listdir(configdir):
     try:
