@@ -60,7 +60,7 @@ mkdir -p /publictemp
 mkdir -p /sketch/public.www/
 mkdir -p /sketch/public.files/
 
-echo "Welcome! This file is /sketch/public.www/index.html"> /sketch/public.www/index.html
+echo "Welcome! This file is /sketch/public.www/index.html. You can alt+f4 out to a graphical desktop."> /sketch/public.www/index.html
 
 apt -y install apache2
 
@@ -95,6 +95,7 @@ apt -y install ncdu
 apt -y install mc
 apt -y install curl
 apt -y install vim
+apt -y install emacs
 apt -y install xcas
 apt -y install units
 apt -y install git
