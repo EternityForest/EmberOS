@@ -10,6 +10,9 @@
 set -x
 set -e
 
+source /common.sh
+install_cleanup_trap
+
 apt update -y --allow-releaseinfo-change
 apt update
 
@@ -102,37 +105,26 @@ mount -t overlay -o lowerdir=/root,upperdir=/dev/shm/roothome,workdir=/dev/shm/r
 mount -t overlay -o lowerdir=/home/pi,upperdir=/dev/shm/pihome,workdir=/dev/shm/pihome_work overlay /home/pi
 
 
-mkdir -p  /sketch/config/ssh/pi
-mkdir -p  /sketch/config/ssh/root
+mkdir -p  /sketch/ssh/pi
+mkdir -p /sketch/ssh/root
 
-if [ ! -f  /sketch/config/ssh/pi/id_rsa ]; then
-    cat /dev/zero | ssh-keygen -f  /sketch/config/ssh/pi/id_rsa -q -N ""
+if [ ! -f /sketch/ssh/pi/id_rsa ]; then
+    cat /dev/zero | ssh-keygen -f /sketch/ssh/pi/id_rsa -q -N ""
 fi
 
-if [ ! -f  /sketch/config/ssh/pi/authorized_keys ]; then
-    touch  /sketch/config/ssh/pi/authorized_keys
+if [ ! -f /sketch/ssh/pi/authorized_keys ]; then
+    touch /sketch/ssh/pi/authorized_keys
 fi
 
-if [ ! -f  /sketch/config/ssh/root/id_rsa ]; then
-    cat /dev/zero | ssh-keygen -f  /sketch/config/ssh/root/id_rsa -q -N ""
+if [ ! -f /sketch/ssh/root/id_rsa ]; then
+    cat /dev/zero | ssh-keygen -f /sketch/ssh/root/id_rsa -q -N ""
 fi
 
-if [ ! -f  /sketch/config/ssh/root/authorized_keys ]; then
-    touch  /sketch/config/ssh/root/authorized_keys
+if [ ! -f /sketch/ssh/root/authorized_keys ]; then
+    touch /sketch/ssh/root/authorized_keys
 fi
 
-mkdir /dev/shm/unpackthekeys
-cp -v -r --preserve=mode,ownership,timestamps  /sketch/config/ssh/pi/. /dev/shm/unpackthekeys
-chown -hR pi:pi  /dev/shm/unpackthekeys
-chmod -R 700 /dev/shm/unpackthekeys
-cp -v -r --preserve=mode,ownership,timestamps /dev/shm/unpackthekeys/. /home/pi/.ssh
-rm -r /dev/shm/unpackthekeys
-chmod -R 700 /home/pi/.ssh
 
-#Nonexistant ssh conf, put the default in the sketch
-if [ ! -f  /sketch/config/ssh/ssh_config ]; then
-    cp -a /etc/ssh/ssh_config  /sketch/config/ssh/ssh_config
-fi
 
 mount --bind  /sketch/config/ssh/ssh_config /etc/ssh/ssh_config
 
@@ -162,11 +154,6 @@ if [ ! -f /sketch/kaithem/ssl/certificate.key ] ; then
     openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout /sketch/kaithem/ssl/certificate.key  -out  /sketch/kaithem/ssl/certificate.cert -subj '/CN=localhost'
 fi
 
-
-
-
-
-
 EOF
 
 chmod 744 /usr/bin/manage_sketch_folder.sh
@@ -194,6 +181,9 @@ chmod 744 /etc/systemd/system/manage_sketch_folder.service
 systemctl enable /etc/systemd/system/manage_sketch_folder.service
 
 
+
+
+
 unpack /filesystem/systemd /etc/systemd/system root
 unpack /filesystem/bin /usr/bin root 
 
@@ -203,7 +193,62 @@ chmod 744 /usr/bin/fs_bindings.py
 systemctl enable /etc/systemd/system/fs_bindings.service
 
 mkdir -p /sketch/config/filesystem
+mkdir -p /root/ssh
 
+mkdir -p /sketch/config/ssh
+
+cp -a /etc/ssh/ssh_config  /sketch/config/ssh/ssh_config
+
+mkdir -p  /sketch/ssh/pi
+mkdir -p /sketch/ssh/root
+
+cat << EOF > /sketch/config/filesystem/emberos_sshconf.yaml
+/sketch/config/:
+    bindfiles:
+        ssh/ssh_config: /etc/ssh/ssh_config
+
+ /sketch/ssh/pi/:
+    mode: '0700'
+    user: root
+    bindat: /home/pi/.ssh
+
+/sketch/ssh/root: /root/.ssh/
+EOF
+
+cat << EOF > /sketch/config/filesystem/readme.md
+
+The bind manager tool takes config files like
+
+
+    /sketch/config:
+        bindat: /etc/sketchconfig
+
+and 
+
+
+    /sketch/config:
+        bindfiles:
+            hosts: /etc/hosts
+            hostname: /etc/hostname
+
+    /sketch/config/simple: /simple
+
+and merges them together, then uses them to set up bindings.
+
+In this case we are saying: Make /sketch/config viewable at /etc/sketchconfig.
+
+in the second file, we say(Note relative paths), make /etc/sketchconfig/hosts viewable at /etc/hosts
+
+Bindfiles are relative to the main bindat location for that path, or the first configured parent path
+
+## Simple Bindings
+
+The line "/sketch/config/simple: /simple"
+binds  /etc/sketchconfig/simple to /simple,
+because the path gets rebased on the first configured parent.
+
+
+EOF
 
 mkdir -p /home/pi/SharedFiles
 mkdir -p /home/pi/SharedMedia
@@ -250,6 +295,8 @@ cat << EOF > /sketch/config/filesystem/emberos_public.yaml
 
 EOF
 
+
+
 cat << EOF > /sketch/config/filesystem/emberos_public_pi.yaml
 /sketch/public.files/pi:
     mode: '0755'
@@ -273,7 +320,7 @@ EOF
 
 mkdir -p /etc/sketchconfig
 
-#Give www-data a "window into the root filesystem"
+#This is what sets up the main config dir
 cat << EOF > /sketch/config/filesystem/emberos_hosts.yaml
 /sketch/config/:
     mode: '0755'
@@ -293,8 +340,7 @@ systemctl set-default multi-user.target
 
 
 
-source /common.sh
-install_cleanup_trap
+
 
 unpack /filesystem/home/pi /home/pi pi
 unpack /filesystem/home/root /root root
