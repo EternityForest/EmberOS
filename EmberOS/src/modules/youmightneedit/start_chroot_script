@@ -52,6 +52,8 @@ apt -y install python3-cffi
 pip3 install yappi
 pip3 install msgpack
 pip3 install paho-mqtt
+pip3 install smbus
+pip3 install automationhat
 
 
 mkdir -p /publictemp

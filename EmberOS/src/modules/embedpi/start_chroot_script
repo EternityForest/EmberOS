@@ -103,7 +103,7 @@ chown pi /dev/shm/pihome_work
 
 mount -t overlay -o lowerdir=/root,upperdir=/dev/shm/roothome,workdir=/dev/shm/roothome_work overlay /root
 mount -t overlay -o lowerdir=/home/pi,upperdir=/dev/shm/pihome,workdir=/dev/shm/pihome_work overlay /home/pi
-
+cp -ar /home/pi/persist/.home_template/. /home/pi
 
 mkdir -p  /sketch/ssh/pi
 mkdir -p /sketch/ssh/root
@@ -254,23 +254,35 @@ mkdir -p /home/pi/SharedFiles
 mkdir -p /home/pi/SharedMedia
 
 #General purpose private persistant area
+mkdir -p /sketch/home/pi
 mkdir -p /home/pi/persist
+
 
 #Symlink some directories that are pretty obviously useful to persist
 #But only the super obviously "Manual" ones that aren't messed with by the system
-mkdir -p /home/pi/persist/Documents
-mkdir -p /home/pi/persist/Music
-mkdir -p /home/pi/persist/Downloads
-mkdir -p /home/pi/persist/Templates
-mkdir -p /home/pi/persist/Videos
-mkdir -p /home/pi/persist/Arduino
+mkdir -p /sketch/home/pi/Documents
+mkdir -p /sketch/home/pi/Music
+mkdir -p /sketch/home/pi/Downloads
+mkdir -p /sketch/home/pi/Templates
+mkdir -p /sketch/home/pi/Videos
+mkdir -p /sketch/home/pi/Arduino
+mkdir -p /sketch/home/pi/Books
+mkdir -p /sketch/home/pi/Projects
+mkdir -p /sketch/home/pi/Misc
+mkdir -p /sketch/home/pi/Drawer
+mkdir -p /sketch/home/pi/.home_template
 
-rm -r /home/pi/Documents
-rm -r /home/pi/Music
-rm -r /home/pi/Downloads
-rm -r /home/pi/Templates
-rm -r /home/pi/Videos
-rm -r /home/pi/Arduino
+
+! rm -r /home/pi/Documents
+! rm -r /home/pi/Music
+! rm -r /home/pi/Downloads
+! rm -r /home/pi/Templates
+! rm -r /home/pi/Videos
+! rm -r /home/pi/Arduino
+! rm -r /home/pi/Books
+! rm -r /home/pi/Projects
+! rm -r /home/pi/Misc
+! rm -r /home/pi/Drawer
 
 #Note the use of symlinks, not bind, so it is clear to the user
 ln -s /home/pi/persist/Documents /home/pi/Documents
@@ -278,7 +290,12 @@ ln -s /home/pi/persist/Music /home/pi/Music
 ln -s /home/pi/persist/Downloads/home/pi/Downloads
 ln -s /home/pi/persist/Templates /home/pi/Templates
 ln -s /home/pi/persist/Videos /home/pi/Videos
-ln -s /home/pi/persist/Videos /home/pi/Arduino
+ln -s /home/pi/persist/Arduino /home/pi/Arduino
+ln -s /home/pi/persist/Books /home/pi/Books
+ln -s /home/pi/persist/Projects /home/pi/Projects
+ln -s /home/pi/persist/Misc /home/pi/Misc
+ln -s /home/pi/persist/Drawer /home/pi/Drawer
+
 
 #Give pi a place to share public stuff, if desired
 mkdir -p /sketch/public.files/pi
@@ -311,7 +328,7 @@ cat << EOF > /sketch/config/filesystem/emberos_public_pi.yaml
 EOF
 
 cat << EOF > /sketch/config/filesystem/emberos__pi.yaml
-/sketch/userpersist/pi:
+/sketch/home/pi:
     mode: '0750'
     user: pi
     bindat: /home/pi/persist

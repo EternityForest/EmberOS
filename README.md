@@ -169,15 +169,33 @@ Look at the very bottom for the lines that deal with launching apps.
 Change /sketch/hostname to the name you want to give it.  You can now access
 it as hostname.local
 
+If you need to "factory reset" an image, just delete and copy from rootfs /sketch to the sketch partition. 
+
+If you need to update or install new software to the system itself, just SSH in and use
+`sudo mount -o remount,rw /` to remount the root as writable, do your work, and reboot.
+
+Note that this won't affect home dirs, they have a separate tmpfs.
+
+### Kaithem
+
 Go to https://hostname.local:8001, and ignore the security warnings you will get(You're on a private network, right?)
 
 You can now use it as any other Kaithem instance.  Look at the example module to get started.
 Anything you create gets saved back to that /sketch partition.
 
-If you need to "factory reset" an image, just delete and copy from sketch_template. 
 
-If you need to update or install new software to the system itself, just SSH in and use
-`sudo mount -o remount,rw /` to remount the root as writable, do your work, and reboot.
+### The Home Dir
+
+/home/pi is in a tmpfs, but /home/pi/persist is bound to /sketch/home/pi.
+
+The contents of /home/pi/persist/.home_template are copied to /home/pi after the tmpfs is mounted.
+
+Folders like Downloads and Pictures are symlinked into the persist dir
+
+### Other user's home dirs
+
+Other users home dirs won't be set up like this unless you do it manually, EmberOS is mostly designed with Pi
+as the only non-system user.
 
 
 
