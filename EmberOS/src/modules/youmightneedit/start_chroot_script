@@ -146,4 +146,4 @@ apt-get -y install squid-deb-proxy-client
 
 
 
-apt-get -y autoremove
+apt-get autoremove -y --purge
