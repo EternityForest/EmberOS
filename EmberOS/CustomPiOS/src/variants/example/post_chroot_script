@@ -8,4 +8,4 @@ install_chroot_fail_on_error_trap
 unpack /filesystem/root /
 
 #cleanup
-apt-get clean
+apt-get autoclean

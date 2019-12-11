@@ -16,8 +16,6 @@ install_cleanup_trap
 apt update -y --allow-releaseinfo-change
 apt update
 
-apt install -y spacefm
-apt install -y deluge
 
 apt install -y ntfs-3g
 apt install -y bindfs

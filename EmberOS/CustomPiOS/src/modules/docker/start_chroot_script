@@ -11,5 +11,5 @@ install_cleanup_trap
 curl -sSL get.docker.com | sh && usermod pi -aG docker
 
 #cleanup
-apt-get clean
+apt-get autoclean 
 apt-get autoremove -y

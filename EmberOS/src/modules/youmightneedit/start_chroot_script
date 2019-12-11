@@ -90,6 +90,13 @@ apt -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly python3-p
 #Don't include a giant soundfont, kaithem already has a decent one
 apt install -y --no-install-recommends  fluidsynth
 
+
+apt install -y spacefm
+apt install -y deluge
+apt install -y ardour
+apt install -y krita
+
+
 apt -y install nmap robotfindskitten
 apt -y install ncdu
 apt -y install mc
