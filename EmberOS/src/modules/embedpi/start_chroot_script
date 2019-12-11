@@ -16,11 +16,13 @@ install_cleanup_trap
 apt update -y --allow-releaseinfo-change
 apt update
 
+unpack /filesystem/sketch /sketch
 
-apt install -y ntfs-3g
-apt install -y bindfs
+
+apt-get -y install -y ntfs-3g
+apt-get -y install -y bindfs
 #Needed for reading config files
-apt install -y python3-yaml
+apt-get -y install -y python3-yaml
 
 
 #The special /sketch partition is for everything that is not part of the image. It is made after the fact.
@@ -269,7 +271,7 @@ mkdir -p /sketch/home/pi/Projects
 mkdir -p /sketch/home/pi/Misc
 mkdir -p /sketch/home/pi/Drawer
 mkdir -p /sketch/home/pi/.home_template
-
+mkdir -p /sketch/home/pi/.mednafen
 
 ! rm -r /home/pi/Documents
 ! rm -r /home/pi/Music
@@ -281,6 +283,7 @@ mkdir -p /sketch/home/pi/.home_template
 ! rm -r /home/pi/Projects
 ! rm -r /home/pi/Misc
 ! rm -r /home/pi/Drawer
+! rm -r /home/pi/.mednafen
 
 #Note the use of symlinks, not bind, so it is clear to the user
 ln -s /home/pi/persist/Documents /home/pi/Documents
@@ -293,7 +296,7 @@ ln -s /home/pi/persist/Books /home/pi/Books
 ln -s /home/pi/persist/Projects /home/pi/Projects
 ln -s /home/pi/persist/Misc /home/pi/Misc
 ln -s /home/pi/persist/Drawer /home/pi/Drawer
-
+ln -s /home/pi/persist/.mednafen /home/pi/.mednafen
 
 #Give pi a place to share public stuff, if desired
 mkdir -p /sketch/public.files/pi
@@ -353,7 +356,17 @@ EOF
 systemctl set-default multi-user.target
 
 
-
+mkdir -p /sketch/cache/apt/archives
+cat << EOF > /sketch/cache/README.md
+/sketch/cache/apt/ is equivalent to /var/cache/apt/
+EOF
+#This is what sets up the main config dir
+cat << EOF > /sketch/config/filesystem/emberos_apt.yaml
+/sketch/cache/apt/:
+    mode: '0755'
+    user: root
+    bindat: /var/cache/apt/
+EOF
 
 
 

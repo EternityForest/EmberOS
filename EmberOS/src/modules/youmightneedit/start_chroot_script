@@ -3,32 +3,39 @@
 set -x
 set -e
 
-apt -y install mosquitto
+apt-get -y install mosquitto
 echo "persistence false" > /etc/mosquitto/conf.d/emberos.conf
 systemctl enable mosquitto
 
 
 
 #Also gets firewalld
-# apt -y install firewall-config
+# apt-get -y install firewall-config
 
-apt -y install python3-smbus
+apt-get -y install python3-smbus
 
 #Batteries included, allow messing with kiosk browser media right from the device
-apt -y install gimp audacity tuxpaint
-apt -y install transmission-cli 
-apt -y install xclip zenmap
+apt-get -y install gimp audacity tuxpaint
+#MP3 Export for Audacity
+apt-get install lame -y
 
-apt -y install sqlitebrowser
+apt-get -y install transmission-cli 
+apt-get -y install xclip zenmap
+
+apt-get -y install sqlitebrowser
+apt-get -y install meld
+#Nobody wants to have to develop on a pi. It happens sometimes anyway.
+apt-get -y install git-cola
 
 #Always good to have around
-apt -y install gnome-disk-utility
+apt-get -y install gnome-disk-utility
 
-apt -y install unclutter
-apt -y install imagemagick
+apt-get -y install unclutter
+apt-get -y install imagemagick
 
+apt-get -y install p7zip p7zip-full
 
-apt -y install fvwm fvwm-icons
+apt-get -y install fvwm fvwm-icons
 
 update-icon-caches /usr/share/icons/*
 
@@ -38,16 +45,16 @@ cd /usr/bin/
 curl https://getmic.ro | bash
 
 #Useful for testing
-apt -y install x11-apps
+apt-get -y install x11-apps
 
 
 
 
-apt -y install python3
+apt-get -y install python3
 
-apt -y install exfat-utils
-apt -y install python3-setproctitle
-apt -y install python3-cffi
+apt-get -y install exfat-utils
+apt-get -y install python3-setproctitle
+apt-get -y install python3-cffi
 
 pip3 install yappi
 pip3 install msgpack
@@ -62,7 +69,7 @@ mkdir -p /sketch/public.files/
 
 echo "Welcome! This file is /sketch/public.www/index.html. You can alt+f4 out to a graphical desktop."> /sketch/public.www/index.html
 
-apt -y install apache2
+apt-get -y install apache2
 
 mkdir -p /sketch/public.www
 
@@ -78,58 +85,65 @@ sudo apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,mysql,zip}
 apt-get install libapache2-mod-php -y
 sudo systemctl enable apache2.service
 
-apt -y install mpv
-apt -y install python3 systemd cython3 build-essential
-apt -y install mplayer python3-serial
+apt-get -y install mpv
+apt-get -y install python3 systemd cython3 build-essential
+apt-get -y install mplayer python3-serial
 
-apt -y install python3-tz python3-dateutil lm-sensors
-apt -y install python3-netifaces python3-jack-client
-apt -y install python3-gst-1.0 python3-libnacl jack-tools
-apt -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid
-apt -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly python3-psutil
+apt-get -y install python3-tz python3-dateutil lm-sensors
+apt-get -y install python3-netifaces python3-jack-client
+apt-get -y install python3-gst-1.0 python3-libnacl jack-tools
+apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid
+apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly python3-psutil
 #Don't include a giant soundfont, kaithem already has a decent one
-apt install -y --no-install-recommends  fluidsynth
+apt-get -y install -y --no-install-recommends  fluidsynth
 
 
-apt install -y spacefm
-apt install -y deluge
-apt install -y ardour
-apt install -y krita
+apt-get -y install -y spacefm
+apt-get -y install -y deluge
+apt-get -y install -y ardour
+#apt-get -y install -y krita
 
+apt-get -y install -y wireshark
+apt-get -y install -y ardour
 
-apt -y install nmap robotfindskitten
-apt -y install ncdu
-apt -y install mc
-apt -y install curl
-apt -y install vim
-apt -y install emacs
-apt -y install xcas
-apt -y install units
-apt -y install git
-apt -y install wget
-apt -y install htop
-apt -y install lsof
-apt -y install fzf
-apt -y install chafa
-apt -y install nast
+#Multi-emulator
+apt-get -y install mednaffe
+
+apt-get install pulseview -y
+
+apt-get -y install nmap robotfindskitten
+apt-get -y install ncdu
+apt-get -y install mc
+apt-get -y install curl
+apt-get -y install vim
+apt-get -y install emacs
+apt-get -y install xcas
+apt-get -y install units
+apt-get -y install git
+apt-get -y install wget
+apt-get -y install htop
+apt-get -y install lsof
+apt-get -y install fzf
+apt-get -y install chafa
+apt-get -y install nast
 
 
 
 #Without this we have all kinds of issues doing startx
-apt -y install xserver-xorg-legacy
+apt-get -y install xserver-xorg-legacy
 
 #Allow non-console startx, needed to make kiosk browsing work
 #This has to be AFTER the xserver-xorg-legacy to work
 sed -i \
     's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
 
-apt -y install fatrace
+apt-get -y install fatrace
 
 
 #Install last so the build doesn't try using it from inside quemu
 #And slow everything down by not working
-apt -y install squid-deb-proxy-client
+apt-get -y install squid-deb-proxy-client
 
 
 
-apt -y autoremove
+apt-get -y autoremove

@@ -121,6 +121,10 @@ for i in sorted(list(config.keys()),key=lambda x:len(x)):
         else:
             dest=i
 
+        if 'pre_cmd' in d:
+            subprocess.call(d['pre_cmd'],shell=True)
+
+
         if 'mode' in d or 'user' in d or 'bindat' in d:
             cmd = ['bindfs','-o','nonempty']
             if 'mode' in d:

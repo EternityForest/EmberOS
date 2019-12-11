@@ -4,10 +4,10 @@ set -x
 set -e
 
 
-apt -y install chrony
+apt-get -y install chrony
 
 #Update timezones
-apt -y install tzdata
+apt-get -y install tzdata
 
 #Pre populate sketch
 mkdir -p /sketch/config/timezones

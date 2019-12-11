@@ -10,8 +10,8 @@ set -e
 source /common.sh
 
 
-apt -y install samba samba-common-bin smbclient cifs-utils
-apt -y install minidlna
+apt-get -y install samba samba-common-bin smbclient cifs-utils
+apt-get -y install minidlna
 
 ! sudo systemctl enable minidlna.service
 ! sudo systemctl enable smbd.service 
@@ -25,13 +25,19 @@ mkdir -p /sketch/public.media/
 
 #The mountpoint
 mkdir -p /var/public.media/
+mkdir -p /var/public.files/
 
 #Give www-data a "window into the root filesystem"
-cat << EOF > /sketch/config/filesystem/dlna.yaml
+cat << EOF > /sketch/config/filesystem/emberos_filesharing.yaml
 /sketch/public.media:
     mode: '0755'
     user: minidlna
     bindat: /var/public.media/
+
+/sketch/public.files:
+    mode: '0755'
+    user: root
+    bindat: /var/public.files/
 EOF
 
 
@@ -320,7 +326,7 @@ cat << EOF > /sketch/config/smb.conf
 [files]
         # This share allows anonymous (guest) access
         # without authentication!
-        path = /sketch/public.files
+        path = /var/public.files
         read only = yes
         guest ok = yes
         guest account = www-data
@@ -328,7 +334,7 @@ cat << EOF > /sketch/config/smb.conf
 [media]
         # This share allows anonymous (guest) access
         # without authentication!
-        path = /sketch/public.media
+        path = /var/public.media
         read only = yes
         guest ok = yes
         guest account = www-data
@@ -363,12 +369,14 @@ append1() {
 
 #Make the appropriate tmpfses
 mkdir -p /var/cache/minidlna
-append1 /etc/fstab "/var/cache/minidlna" "tmpfs /var/cache/minidlna tmpfs defaults,noatime,nosuid,nodev,noexec,mode=770,size=64M 0 0"
+append1 /etc/fstab "/var/cache/minidlna" "tmpfs /var/cache/minidlna tmpfs defaults,noatime,nosuid,nodev,noexec,mode=775,size=64M 0 0"
 
 mkdir -p /var/lib/minidlna
-append1 /etc/fstab "/var/lib/minidlna" "tmpfs /var/lib/minidlna tmpfs defaults,noatime,nosuid,nodev,noexec,mode=770,size=64M 0 0"
+append1 /etc/fstab "/var/lib/minidlna" "tmpfs /var/lib/minidlna tmpfs defaults,noatime,nosuid,nodev,noexec,mode=775,size=64M 0 0"
 
 mkdir -p /var/cache/samba
-append1 /etc/fstab "/var/cache/samba" "tmpfs /var/cache/samba tmpfs defaults,noatime,nosuid,nodev,noexec,mode=770,size=128M 0 0"
+append1 /etc/fstab "/var/cache/samba" "tmpfs /var/cache/samba tmpfs defaults,noatime,nosuid,nodev,noexec,mode=775,size=128M 0 0"
+
+
 
 #Pretty sure /var/lib/samba doesn't want to be empty, we do that with an overlay mount that doesn't hide existing stuff
