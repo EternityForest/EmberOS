@@ -152,7 +152,13 @@ if [ ! -f /sketch/kaithem/ssl/certificate.key ] ; then
     mkdir -p /sketch/kaithem/ssl/
     #Look at this race condition here! Someone could steal that private key before we chmod it!
     openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout /sketch/kaithem/ssl/certificate.key  -out  /sketch/kaithem/ssl/certificate.cert -subj '/CN=localhost'
+    
+    #Copy it so it's trusted by browsers
+    mkdir -p /sketch/config/sslcerts.local/
+    cp /sketch/kaithem/ssl/certificate.cert /sketch/config/sslcerts.local/kaithem_localhost.cert
+
 fi
+
 
 EOF
 

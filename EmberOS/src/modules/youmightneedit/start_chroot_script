@@ -55,12 +55,17 @@ apt-get -y install python3
 apt-get -y install exfat-utils
 apt-get -y install python3-setproctitle
 apt-get -y install python3-cffi
+apt-get -y install python3-dbus
+
 
 pip3 install yappi
 pip3 install msgpack
 pip3 install paho-mqtt
 pip3 install smbus
 pip3 install automationhat
+
+pip3 install cherrypy
+
 
 
 mkdir -p /publictemp
