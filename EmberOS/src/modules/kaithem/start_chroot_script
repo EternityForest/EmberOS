@@ -19,3 +19,7 @@ unpack /filesystem/kaithem_sketch /sketch/kaithem root
 ! rm /sketch/kaithem/ssl/certificate.cert
 
 systemctl enable kaithem.service
+
+#Purely for convenience since it's already part of kaithem and it's only 3MB, make that soundfont available system wide
+mkdir -p /usr/share/sounds/sf2/
+cp /sketch/kaithem_install/kaithem/data/sounds/babyfont.sf3 /usr/share/sounds/sf2/babyfont.sf3

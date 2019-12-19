@@ -348,7 +348,11 @@ cat << EOF > /sketch/config/filesystem/emberos__pi.yaml
 /sketch/home/pi:
     mode: '0750'
     user: pi
+    #The tmpfs overlay has to be under the sketch stuff, or it seems to point at the original home dir,
+    #and cover up the sketch
     pre_cmd: mount -t overlay -o lowerdir=/home/pi,upperdir=/dev/shm/pihome,workdir=/dev/shm/pihome_work overlay /home/pi
+    
+    #Once the sketch and the bindat is there we can run this and copy anything we might need
     post_cmd: cp -ar /home/pi/persist/.home_template/. /home/pi
 
     bindat: /home/pi/persist
