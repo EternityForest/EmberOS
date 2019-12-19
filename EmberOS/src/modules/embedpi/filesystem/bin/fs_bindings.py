@@ -114,6 +114,7 @@ for i in sorted(list(config.keys()),key=lambda x:len(x)):
     try:
         d = config[i]
         if isinstance(d,str):
+            print("Simple Binding",d)
             continue
 
         if 'bindat' in d:
@@ -122,6 +123,7 @@ for i in sorted(list(config.keys()),key=lambda x:len(x)):
             dest=i
 
         if 'pre_cmd' in d:
+            print(d['pre_cmd'])
             subprocess.call(d['pre_cmd'],shell=True)
 
 
@@ -132,8 +134,8 @@ for i in sorted(list(config.keys()),key=lambda x:len(x)):
                 if len(m)==3:
                     m = '0'+m
 
-                for i in m:
-                    if not i in "01234567":
+                for c in m:
+                    if not c in "01234567":
                         raise RuntimeError("Nonsense mode"+m+" ,mode should only contain 01234567. Try using quotes in the config?")
                 cmd.extend(['-p',m])
             if 'user' in d:
@@ -142,6 +144,11 @@ for i in sorted(list(config.keys()),key=lambda x:len(x)):
             cmd.extend([i,dest])
             print(cmd)
             subprocess.call(cmd)
+        
+        if 'post_cmd' in d:
+            print(d['post_cmd'])
+            subprocess.call(d['post_cmd'],shell=True)
+
     except:
         eprint("Exception in config for: "+i+"\n\n"+traceback.format_exc())
 
@@ -188,7 +195,7 @@ for i in sorted(list(config.keys()),key=lambda x:len(x)):
             #Now rebase it on wherever the topmost configured parent dir is mounted
             x = x.replace(l,mounted)
 
-            cmd = ['mount', '--bind', '-o','nonempty',x, d]
+            cmd = ['mount', '--rbind', '-o','nonempty',x, d]
             print(cmd)
             subprocess.call(cmd)
         except:
@@ -208,8 +215,8 @@ for i in sorted(list(config.keys()),key=lambda x:len(x)):
                     mounted = mounted+'/'
 
                 x = x.replace(l,mounted)
-
-                cmd = ['mount', '--bind', '-o','nonempty',x, dest]
+                x=os.path.join(x,j)
+                cmd = ['mount', '--rbind', '-o','nonempty',x, dest]
                 
                 print(cmd)
                 subprocess.call(cmd)

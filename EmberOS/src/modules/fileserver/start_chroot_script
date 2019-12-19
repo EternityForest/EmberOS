@@ -23,22 +23,6 @@ apt-get -y install minidlna
 echo "media_dir=/var/public.media/" >> /etc/minidlna.conf
 mkdir -p /sketch/public.media/
 
-#The mountpoint
-mkdir -p /var/public.media/
-mkdir -p /var/public.files/
-
-#Give www-data a "window into the root filesystem"
-cat << EOF > /sketch/config/filesystem/emberos_filesharing.yaml
-/sketch/public.media:
-    mode: '0755'
-    user: minidlna
-    bindat: /var/public.media/
-
-/sketch/public.files:
-    mode: '0755'
-    user: root
-    bindat: /var/public.files/
-EOF
 
 
 cat << 'EOF' > /usr/bin/emberos_fileserver.sh

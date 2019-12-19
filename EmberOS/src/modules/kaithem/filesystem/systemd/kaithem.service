@@ -1,13 +1,14 @@
 [Unit]
 Description=KaithemAutomation python based automation server
-After=basic.target time-sync.target
+After=basic.target time-sync.target sysinit.service
 Type=simple
-Restart=on-failure
-RestartSec=5
+
 
 [Service]
 TimeoutStartSec=0
 ExecStart=/sketch/kaithem_install/kaithem/kaithem.py -c /sketch/kaithem/config.yaml
+Restart=on-failure
+RestartSec=15
 
 [Install]
 WantedBy=multi-user.target

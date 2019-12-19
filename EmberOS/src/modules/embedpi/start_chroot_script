@@ -101,9 +101,7 @@ chown pi /dev/shm/pihome
 chown pi /dev/shm/pihome_work
 
 
-mount -t overlay -o lowerdir=/root,upperdir=/dev/shm/roothome,workdir=/dev/shm/roothome_work overlay /root
-mount -t overlay -o lowerdir=/home/pi,upperdir=/dev/shm/pihome,workdir=/dev/shm/pihome_work overlay /home/pi
-cp -ar /home/pi/persist/.home_template/. /home/pi
+
 
 mkdir -p  /sketch/ssh/pi
 mkdir -p /sketch/ssh/root
@@ -124,9 +122,10 @@ if [ ! -f /sketch/ssh/root/authorized_keys ]; then
     touch /sketch/ssh/root/authorized_keys
 fi
 
+mount -t overlay -o lowerdir=/root,upperdir=/dev/shm/roothome,workdir=/dev/shm/roothome_work overlay /root
 
 
-mount --bind  /sketch/config/ssh/ssh_config /etc/ssh/ssh_config
+
 
 
 #Use what is already there as the template
@@ -158,8 +157,6 @@ if [ ! -f /sketch/kaithem/ssl/certificate.key ] ; then
     cp /sketch/kaithem/ssl/certificate.cert /sketch/config/sslcerts.local/kaithem_localhost.cert
 
 fi
-
-
 EOF
 
 chmod 744 /usr/bin/manage_sketch_folder.sh
@@ -169,8 +166,9 @@ chmod 744 /usr/bin/manage_sketch_folder.sh
 cat << EOF > /etc/systemd/system/manage_sketch_folder.service
 [Unit]
 Description=Manage things from sketch folder
-After=systemd-remount-fs.service
-Before=sysinit.target
+After=systemd-remount-fs.service 
+#Before fs_bindings, it sets up the stuff that we are binding.
+Before=sysinit.target fs_bindings.service
 RequiresMountsFor=/etc/ /sketch/ /home/
 DefaultDependencies=no
 
@@ -208,12 +206,18 @@ cp -a /etc/ssh/ssh_config  /sketch/config/ssh/ssh_config
 mkdir -p  /sketch/ssh/pi
 mkdir -p /sketch/ssh/root
 
+cat << EOF > /sketch/config/filesystem/emberos_cfgdir.yaml
+/sketch/config/:
+    mode: '0755'
+    user: root
+EOF
+
 cat << EOF > /sketch/config/filesystem/emberos_sshconf.yaml
 /sketch/config/:
     bindfiles:
         ssh/ssh_config: /etc/ssh/ssh_config
 
- /sketch/ssh/pi/:
+/sketch/ssh/pi/:
     mode: '0700'
     user: root
     bindat: /home/pi/.ssh
@@ -308,14 +312,20 @@ ln -s /home/pi/persist/.mednafen /home/pi/.mednafen
 mkdir -p /sketch/public.files/pi
 mkdir -p /sketch/public.media/pi
 
+#The mountpoint
+mkdir -p /var/public.media/
+mkdir -p /var/public.files/
 
 cat << EOF > /sketch/config/filesystem/emberos_public.yaml
 /sketch/public.files:
     mode: '0755'
     user: root
+    bindat: /var/public.files/
+
 /sketch/public.media:
     mode: '0755'
     user: root
+    bindat: /var/public.media
 
 EOF
 
@@ -338,6 +348,9 @@ cat << EOF > /sketch/config/filesystem/emberos__pi.yaml
 /sketch/home/pi:
     mode: '0750'
     user: pi
+    pre_cmd: mount -t overlay -o lowerdir=/home/pi,upperdir=/dev/shm/pihome,workdir=/dev/shm/pihome_work overlay /home/pi
+    post_cmd: cp -ar /home/pi/persist/.home_template/. /home/pi
+
     bindat: /home/pi/persist
 EOF
 
@@ -345,7 +358,7 @@ EOF
 mkdir -p /etc/sketchconfig
 
 #This is what sets up the main config dir
-cat << EOF > /sketch/config/filesystem/emberos_hosts.yaml
+cat << EOF > /sketch/config/filesystem/emberos_configdir.yaml
 /sketch/config/:
     mode: '0755'
     user: root
@@ -368,10 +381,10 @@ cat << EOF > /sketch/cache/README.md
 EOF
 #This is what sets up the main config dir
 cat << EOF > /sketch/config/filesystem/emberos_apt.yaml
-/sketch/cache/apt/:
+/sketch/cache/apt/archives:
     mode: '0755'
     user: root
-    bindat: /var/cache/apt/
+    bindat: /var/cache/apt/archives
 EOF
 
 
@@ -407,5 +420,4 @@ EOF
 
 chmod 755 /usr/bin/writable
 chmod 755 /usr/bin/readonly
-
 
