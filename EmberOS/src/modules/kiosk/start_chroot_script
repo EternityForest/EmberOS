@@ -30,6 +30,7 @@ chmod +x /usr/bin/kioskwrapper
 cat << 'EOF' > /sketch/pre_gui.sh
 #!/bin/bash
 #This script runs just before the GUI loads
+dbus-launch
 EOF
 
 

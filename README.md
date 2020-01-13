@@ -238,6 +238,10 @@ but sometimes when developing you really need to solve an equation.
 I don't know how this works, but I work with people who would be dissapointed
 if I didn't include it :P
 
+#### zile
+
+Very small emacs clone 
+
 #### chafa
 
 `chafa FILE` views any kind of image file, in low res, in the

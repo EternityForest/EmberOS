@@ -15,7 +15,7 @@ systemctl enable mosquitto
 apt-get -y install python3-smbus
 
 #Batteries included, allow messing with kiosk browser media right from the device
-apt-get -y install gimp audacity tuxpaint
+apt-get -y install gimp audacity
 #MP3 Export for Audacity
 apt-get install lame -y
 
@@ -46,9 +46,6 @@ curl https://getmic.ro | bash
 
 #Useful for testing
 apt-get -y install x11-apps
-
-
-
 
 apt-get -y install python3
 
@@ -91,7 +88,7 @@ apt-get install libapache2-mod-php -y
 sudo systemctl enable apache2.service
 
 apt-get -y install mpv
-
+apt-get -y install libgdk-pixbuf2.0-bin
 #All the compilerie you might want
 apt-get -y install python3-dev build-essential gcc g++ 
 
@@ -99,7 +96,7 @@ apt-get -y install python3 systemd cython3 build-essential
 apt-get -y install mplayer python3-serial
 apt-get -y install python3-pyqt5 python3-pyqt5.qtserialport python3-pyqt5.qtsvg python3-pyqt5.qtchart python3-pyqt5.qtmultimedia
 apt-get -y install python3-pyqt5.qtsql python3-pyqt5.qtwebkit python3-pyqt5.qtopengl python3-pyqt5.qtsensors
-
+apt-get -y install python3-lxml
 apt-get -y install python3-tz python3-dateutil lm-sensors
 apt-get -y install python3-netifaces python3-jack-client
 apt-get -y install python3-gst-1.0 python3-libnacl jack-tools
@@ -108,20 +105,21 @@ apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly pytho
 #Don't include a giant soundfont, kaithem already has a decent one
 apt-get -y install -y --no-install-recommends  fluidsynth
 
-#Games
-apt-get -y install berusky dreamchess ace-of-penguins ltris
+#Better shells
+apt-get -y install -y elvish fish
+
+#Coding font
+apt-get -y install -y fonts-hack
 
 
-apt-get -y install -y spacefm
+
+apt-get -y install -y spacefm fslint
 apt-get -y install -y deluge
 apt-get -y install -y ardour
 #apt-get -y install -y krita
 
 apt-get -y install -y wireshark
-apt-get -y install -y ardour
 
-#Multi-emulator
-apt-get -y install mednaffe
 
 apt-get install pulseview -y
 
@@ -130,7 +128,9 @@ apt-get -y install ncdu
 apt-get -y install mc
 apt-get -y install curl
 apt-get -y install vim
-apt-get -y install emacs
+#Emacs is huge
+#apt-get -y install emacs
+apt-get -y install zile
 apt-get -y install xcas
 apt-get -y install units
 apt-get -y install git
@@ -158,7 +158,8 @@ gtk-update-icon-cache
 
 #Install last so the build doesn't try using it from inside quemu
 #And slow everything down by not working
-apt-get -y install squid-deb-proxy-client
+#Currently removed
+#apt-get -y install squid-deb-proxy-client
 
 
 

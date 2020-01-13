@@ -206,11 +206,6 @@ cp -a /etc/ssh/ssh_config  /sketch/config/ssh/ssh_config
 mkdir -p  /sketch/ssh/pi
 mkdir -p /sketch/ssh/root
 
-cat << EOF > /sketch/config/filesystem/emberos_cfgdir.yaml
-/sketch/config/:
-    mode: '0755'
-    user: root
-EOF
 
 cat << EOF > /sketch/config/filesystem/emberos_sshconf.yaml
 /sketch/config/:

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -x
+set -e
+
+#Games
+apt-get -y install berusky dreamchess ace-of-penguins ltris
+
+#Multi-emulator
+apt-get -y install mednaffe
+
+#This seems like it belongs in games too
+apt-get -y install tuxpaint

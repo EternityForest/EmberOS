@@ -20,6 +20,7 @@ source /common.sh
 
 
 apt-get -y install network-manager
+apt-get -y install libnss3-tools
 systemctl enable NetworkManager.service
 unpack /filesystem/networkmanager /etc/NetworkManager root
 
