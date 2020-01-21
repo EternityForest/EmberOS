@@ -1,6 +1,8 @@
 [Unit]
 Description=Restart avahi after it loads, which seems to make it work
 After=avahi-daemon.service
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=oneshot
