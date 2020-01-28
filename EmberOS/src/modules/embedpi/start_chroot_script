@@ -193,8 +193,13 @@ unpack /filesystem/bin /usr/bin root
 
 chmod 744 /etc/systemd/system/fs_bindings.service
 chmod 744 /usr/bin/fs_bindings.py
-
 systemctl enable /etc/systemd/system/fs_bindings.service
+
+chmod 744 /etc/systemd/system/runprovisioning.service
+chmod 744 /usr/bin/runprovisioning.py
+systemctl enable /etc/systemd/system/runprovisioning.service
+
+
 
 mkdir -p /sketch/config/filesystem
 mkdir -p /root/ssh

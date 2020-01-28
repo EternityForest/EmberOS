@@ -8,15 +8,18 @@ set -e
 source /common.sh
 
 
+#Mesh neetworking!!!
+sudo apt-get -y install dirmngr
+#gpg --fetch-keys https://neilalexander.s3.dualstack.eu-west-2.amazonaws.com/deb/key.txt
+#gpg --export 569130E8CA20FBC4CB3FDE555898470A764B32C9 | sudo apt-key add -
+sudo apt-key add /filesystem/569130E8CA20FBC4CB3FDE555898470A764B32C9.pubkey
+echo 'deb http://neilalexander.s3.dualstack.eu-west-2.amazonaws.com/deb/ debian yggdrasil' | sudo tee /etc/apt/sources.list.d/yggdrasil.list
+sudo apt-get -y update
+sudo apt-get -y install yggdrasil
 
-# sudo apt-get -y install dirmngr
-# gpg --fetch-keys https://neilalexander.s3.dualstack.eu-west-2.amazonaws.com/deb/key.txt
-# gpg --export 569130E8CA20FBC4CB3FDE555898470A764B32C9 | sudo apt-key add -
-# echo 'deb http://neilalexander.s3.dualstack.eu-west-2.amazonaws.com/deb/ debian yggdrasil' | sudo tee /etc/apt/sources.list.d/yggdrasil.list
-# sudo apt-get -y update
-# sudo apt-get -y install yggdrasil
+# Don't even think about setting this up without
+# some serious firewalling(See below, but we still should probably not enable this by default for various reasons)
 # sudo systemctl enable yggdrasil
-
 
 
 apt-get -y install network-manager
@@ -59,6 +62,8 @@ cat << EOF > /sketch/config/filesystem/emberos_ssl.yaml
 EOF
 
 
+
+
 ####################### Setup the firewall ##################################
 sudo apt-get -y install nftables
 sudo apt-get -y install firewalld
@@ -66,11 +71,31 @@ unpack /filesystem/firewalld /etc/firewalld/ root
 
 
 mkdir -p  /sketch/config/firewalld/
-cp -ar /etc/firewalld/. /sketch/config/firewalld
 
 systemctl enable firewalld.service
 
 
+#Yggdrasil and cjdns get firewalled to public
+#SSH gets blocked from public, we don't want any hacking
+mkdir -p /etc/firewalld/zones/
+cat << EOF > /etc/firewalld/zones/public.xml
+<?xml version="1.0" encoding="utf-8"?>
+<zone>
+  <short>Public</short>
+  <description>For use in public areas. You do not trust the other computers on networks to not harm your computer. Only selected incoming connections are accepted.</description>
+  <source address="300::/8"/>
+  <source address="200::/8"/>
+  <source address="fc00::/8"/>
+  <service name="dhcpv6-client"/>
+</zone>
+EOF
+
+
+#NTP is just about the only thing that's safe to allow publically in general.
+#Even then, it's bad if you have some kind of remote admin enabled.
+#firewall-cmd --zone=public --add-port=123/udp --permanent
+
+cp -ar /etc/firewalld/. /sketch/config/firewalld
 
 ###### Make NetworkManager sketchified
 

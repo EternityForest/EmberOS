@@ -54,6 +54,9 @@ apt-get -y install python3-setproctitle
 apt-get -y install python3-cffi
 apt-get -y install python3-dbus
 
+#This language is included because of it's excellent dynamic imports in python
+apt-get -y install nim
+
 
 pip3 install yappi
 pip3 install msgpack
@@ -62,6 +65,11 @@ pip3 install smbus
 pip3 install automationhat
 
 pip3 install cherrypy
+pip3 install adafruit-blinka
+
+pip3 install nimport
+
+pip install python-can
 
 
 

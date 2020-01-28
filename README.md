@@ -176,6 +176,12 @@ If you need to update or install new software to the system itself, just SSH in 
 
 Note that this won't affect home dirs, they have a separate tmpfs.
 
+## Provisioning.sh
+
+At boot, if there is a file named /sketch/provisioning.sh, it will be ran, then renamed to /sketch/provisioning.sh.RAN, and any output logged
+to /sketch/provisioning.sh.log
+
+
 ### Kaithem
 
 Go to https://hostname.local:8001, and ignore the security warnings you will get(You're on a private network, right?)
@@ -197,6 +203,14 @@ Folders like Downloads and Pictures are symlinked into the persist dir
 Other users home dirs won't be set up like this unless you do it manually, EmberOS is mostly designed with Pi
 as the only non-system user.
 
+
+### Firewalling
+
+EmberOS uses firewalld.  The ranges used by Yggdrasil and CJDNS are mapped to the public zone which blocks almost everything incoming,
+including SSH(Some other setups default to allowing SSH, we don't, because raspbian has a default password). Everything else is trusted by default.
+
+#### Opening a port:
+ firewall-cmd --permanent --zone=public --add-port=80/tcp
 
 
 ### Utils
@@ -254,11 +268,6 @@ console.
 #### fatrace
 
 #### htop
-
-#### ufw
-
-Firewall. You might want this. It is set to allow all packets aside from incoming
-ones from a Yggdrasil mesh, which would be a security problem.
 
 
 #### neofetch
