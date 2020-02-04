@@ -13,9 +13,6 @@ source /common.sh
 apt-get -y install samba samba-common-bin smbclient cifs-utils
 apt-get -y install minidlna
 
-! sudo systemctl enable minidlna.service
-! sudo systemctl enable smbd.service 
-! sudo systemctl enable nmbd.service
 
 
 
@@ -27,19 +24,18 @@ mkdir -p /sketch/public.media/
 
 cat << 'EOF' > /usr/bin/emberos_fileserver.sh
 #!/bin/bash
+set -e
 
 mkdir -p /dev/shm/sambalib
 mkdir -p /dev/shm/sambalib_work
 
 
-chmod 770 /dev/shm/sambalib
-chown 770 /dev/shm/sambalib_work
-
+chmod 775 /dev/shm/sambalib
+chown 775 /dev/shm/sambalib_work
 
 mount -t overlay -o lowerdir=/var/lib/samba,upperdir=/dev/shm/sambalib,workdir=/dev/shm/sambalib_work overlay /var/lib/samba
 
 mount --bind /sketch/config/smb.conf /etc/samba/smb.conf
-
 
 EOF
 chmod 744 /usr/bin/emberos_fileserver.sh
@@ -50,7 +46,7 @@ cat << EOF > /etc/systemd/system/emberos_fileserver.service
 [Unit]
 Description=Manage fileservers
 After=systemd-remount-fs.service
-Before=sysinit.target
+Before=sysinit.target smbd.service nmbd.service
 RequiresMountsFor=/etc/ /sketch/ 
 DefaultDependencies=no
 
@@ -360,6 +356,9 @@ append1 /etc/fstab "/var/lib/minidlna" "tmpfs /var/lib/minidlna tmpfs defaults,n
 
 mkdir -p /var/cache/samba
 append1 /etc/fstab "/var/cache/samba" "tmpfs /var/cache/samba tmpfs defaults,noatime,nosuid,nodev,noexec,mode=775,size=128M 0 0"
+
+mkdir -p /var/spool/samba
+append1 /etc/fstab "/var/spool/samba" "tmpfs /var/spool/samba tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=128M 0 0"
 
 
 

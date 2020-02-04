@@ -11,3 +11,5 @@ apt-get -y install mednaffe
 
 #This seems like it belongs in games too
 apt-get -y install tuxpaint
+
+apt-get -y install scratch3

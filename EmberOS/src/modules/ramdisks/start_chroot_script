@@ -194,6 +194,10 @@ append1 /etc/fstab "/var/lib/ntp" "tmpfs /var/lib/ntp tmpfs defaults,noatime,nos
 mkdir -p /var/lib/chrony
 append1 /etc/fstab "/var/lib/chrony" "tmpfs /var/lib/chrony tmpfs defaults,noatime,nosuid,nodev,noexec,nofail,uid=_chrony,size=1M 0 0"
 
+#At least let's try to make this timers thing work!
+mkdir -p /var/lib/systemd/timers/
+append1 /etc/fstab "/var/lib/systemd/timers/" "tmpfs /var/lib/systemd/timers/ tmpfs defaults,noatime,nosuid,nodev,noexec,nofail,uid=_chrony,size=8M 0 0"
+
 
 #General purpose 32MB public unsecured free for all for easy file sharing funtimes
 mkdir -p /publictemp

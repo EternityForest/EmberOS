@@ -1,13 +1,33 @@
 # EmberOS
 
-This is a customPiOs tool for setting up a pi image suitable for consumer-grade embedded use. It runs the kaithem server as root on 8002, https 8001.
+This is a customPiOs tool for setting up a pi image suitable for consumer-grade embedded use. 
+
+It has a variety of preinstalled applications and can be configured almost entirely via a special windows-accessible /sketch partition.
+
+Notably, everything except /sketch boots as read-only, and there is an Apache2 server and a chromium based kiosk browser enabled by default.
+
+
+## Enabling services
+
+Instead of SSHing in(Which may not always be available), you can activate any systemd
+service by editing the config files(See /sketch/config/autostart/).
+
+They are very simple INI files.
+
+You can't disable services enabled via systemctl this way(Under the hood, a script reads the file and starts all enabled services but does not sto anything).  The intent is to use the config files for all optional or user services.
+
+## Provisioning.sh
+
+At boot, if there is a file named /sketch/provisioning.sh, it will be ran, then renamed to /sketch/provisioning.sh.RAN, and any output logged
+to /sketch/provisioning.sh.log
+
 
 ## Security
 
 This is meant for easily creating embedded systems that run on *private* networks, in physically secure places(e.g. your house, where nobody
 can tamper with the pi).
 
-THE DEFAULT PASSWORD IS USED FOR KAITHEM, which runs as root. The standard pi:raspberry password is used.
+THE DEFAULT PASSWORD IS USED FOR KAITHEM, which runs as root. The standard pi:raspberry password is used for SSH.
 
 Do *not* open a port to let people on the internet access this, 
 without a firewall/nat/etc unless you change this, or disable password auth(Probably the better option)
@@ -21,6 +41,9 @@ Think of it like the common WiFi printers and file servers that allow anyone on 
 Also, the included SSL keys in /sketch/kaithem/ssl, and the SSH keys, are randomly generated on boot if missing.
 
 They are just self signed keys though, you will get a warning in your browser.
+
+
+
 
 ### /sketch
 
@@ -38,30 +61,29 @@ process can access it. For this reason a lot of it's data is copied to /tmp at b
 * Makes a file at /sketch/config/hostname to let you change the hostname
 * Hostsfile is now at /sketch/config/hosts
 * Installs chrony instead of garbage timesyncd
-* Uses resolvconf to ensure dns resolution works
-* Puts a whole bumch of tmpfses on things that write to disk, so they still work
+* Puts a whole bunch of tmpfses on things that write to disk, so they still work
 * Generates entropy from the HW rnd on boot
 * Makes sure avahi, exfat-utils, and other random stuff you probably want is installed
-* Runs kaithem as root on port 8002(That's the kaithem module, you can easily swap this for some other control system)
+* Runs kaithem as root, if kaithem.service is enabled in the autostart config
+* Runs node-red as root, if the service is enabled in the autostart config
 * Makes /boot and / read-only
-* Installs squid-deb-proxy-client to make apt fetch updates from the LAN
 * Sets everything up for a realtime clock, just add dtoverlay
 * Enables SSH, I2C, and SPI, and the camera interface
 * Allows full configuration of SSH via the sketch partition
-* Enables Samba and DLNA
+* Installs Samba and DLNA(Not enabled by default)
 * Puts a tmpfs over /home/pi and /root, making them volatile but writable.
+* BindFS binds /home/pi/persist to the /sketch/home/pi, allowing persistent user data
 * Disables overscan. You almost certainly don't want this on a modern display.
 * Sets up a US keyboard layout(This will eventually be set through /sketch if there's interest)
 * Boots by default into a Chromium fullscreen kiosk(Exit with alt-f4) pointed at http://localhost
 
 * Allows configuring NetworkManager via /sketch/networks
 
-* Does NOT make the NTFS partition /sketch read only. You have to do that one yourself if you want it.
+* Does NOT make the NTFS partition /sketch read only. You have to do that one yourself if you want it, and some things assume it is writable.
 
-* Sets up firewalld, but the default zone is trusted, so it does nothing until you configure it.
-* Sets up /home/pi/persist as a bindFS to /sketch/home/pi
-* Symlink Documents, Downloads,Pictures, Arduino, Templates,Music, and Videos
+* Sets up firewalld, but the default zone is trusted, so it does nothing until you configure it, aside from making the Yggdrasil and CJDNS IP ranges untrusted
 
+* Symlink Documents, Downloads,Pictures, Arduino, Templates,Music, and Videos to ~/persist
 * Share /home/pi/SharedMedia via DLNA
 
 ## Prebuilt image
@@ -176,11 +198,6 @@ If you need to update or install new software to the system itself, just SSH in 
 
 Note that this won't affect home dirs, they have a separate tmpfs.
 
-## Provisioning.sh
-
-At boot, if there is a file named /sketch/provisioning.sh, it will be ran, then renamed to /sketch/provisioning.sh.RAN, and any output logged
-to /sketch/provisioning.sh.log
-
 
 ### Kaithem
 
@@ -190,13 +207,38 @@ You can now use it as any other Kaithem instance.  Look at the example module to
 Anything you create gets saved back to that /sketch partition.
 
 
-### The Home Dir
+### The Home Dir and normal desktop use
 
-/home/pi is in a tmpfs, but /home/pi/persist is bound to /sketch/home/pi.
+/home/pi is in a tmpfs, but /home/pi/persist is bound to /sketch/home/pi, and anything in there is persistant.
 
 The contents of /home/pi/persist/.home_template are copied to /home/pi after the tmpfs is mounted.
 
-Folders like Downloads and Pictures are symlinked into the persist dir
+By default, many common folders that seem logical to assume you want persistant storage for
+are symlinked to the persist folder. ALWAYS CHECK BEFORE PUTTING IMPORTANT DATA SOMEWHERE!
+
+This may change at some point to make all of /home/pi persistant aside from a few specific things, but this approach seems
+more reliable for avoiding unneccessary card wear. The main goal is preventing any odditiy from things like Chromium
+that write all sorts of things to the home dir
+
+``` bash
+ln -s /home/pi/persist/Documents /home/pi/Documents
+ln -s /home/pi/persist/Music /home/pi/Music
+ln -s /home/pi/persist/Downloads/home/pi/Downloads
+ln -s /home/pi/persist/Templates /home/pi/Templates
+ln -s /home/pi/persist/Videos /home/pi/Videos
+ln -s /home/pi/persist/Arduino /home/pi/Arduino
+ln -s /home/pi/persist/Books /home/pi/Books
+ln -s /home/pi/persist/Projects /home/pi/Projects
+ln -s /home/pi/persist/Misc /home/pi/Misc
+ln -s /home/pi/persist/Drawer /home/pi/Drawer
+ln -s /home/pi/persist/Games /home/pi/Games
+ln -s /home/pi/persist/.mednafen /home/pi/.mednafen
+ln -s /home/pi/persist/.node_red /home/pi/.node_red
+ln -s /home/pi/persist/.config/syncthing /home/pi/.config/syncthing
+ln -s /home/pi/persist/.config/syncthing-gtk /home/pi/.config/syncthing-gtk
+ln -s /home/pi/persist/.config/.npm /home/pi/.config/.npm
+```
+
 
 ### Other user's home dirs
 
@@ -211,6 +253,43 @@ including SSH(Some other setups default to allowing SSH, we don't, because raspb
 
 #### Opening a port:
  firewall-cmd --permanent --zone=public --add-port=80/tcp
+
+
+### Apps
+
+We include some useful GUI apps in addition to the raspbian stuff. Most are preconfigure
+to persist user data(This is done by making the data folder a symlink into /home/pi/persist)
+
+#### GIMP
+#### SyncThing/SyncThing GTK
+Already configured with symlinks for /home/pi, your config will
+be persistentunder the pi user.
+
+##### Remote Config:
+
+Use this command on a Linux machine:
+`ssh -L 9999:localhost:8384 HostName`
+
+Ypu will then be able to access SyncThing's web GUI on local port 9999, which
+tunnels to syncthing securely over SSH.
+
+#### Node Red
+Already configured with symlinks for /home/pi
+#### Mednafen
+Multi-emulator, already configured with symlinks for /home/pi
+
+#### Tux Paint
+Pictures folder is persistent
+#### Sqlitebrowser
+#### git-cola
+#### Audacity
+#### deluge
+BT Client, .config/deluge is persistent
+#### Ardour
+.config/ardour5 is persistent
+
+#### DosBox
+.dosbox is persistent
 
 
 ### Utils
@@ -304,6 +383,6 @@ able to save without SSHing(Or using kaithem's terminal) and running `sudo mount
 NTFS is a journaling filesystem, so you may or may not actually need true read only.
 
 ## Updating Kaithem
-The whole install as found in the repo is in /sketch/kaithem_install.  Just
+The whole install as found in the repo is in /sketch/opt/kaithem.  Just
 copy the entire contents of the repo there.
 

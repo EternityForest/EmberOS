@@ -6,11 +6,11 @@ set -e
 source /common.sh
 
 mkdir -p /sketch/kaithem/
-mkdir -p /sketch/kaithem_install
+mkdir -p /sketch/opt/kaithem
 
 unpack /filesystem/KaithemAutomation/kaithem/var /sketch/kaithem root
 
-unpack /filesystem/KaithemAutomation /sketch/kaithem_install/ root
+unpack /filesystem/KaithemAutomation /sketch/opt/kaithem/ root
 unpack /filesystem/systemd/ /usr/lib/systemd/system/ root
 unpack /filesystem/kaithem_sketch /sketch/kaithem root
 
@@ -18,12 +18,11 @@ unpack /filesystem/kaithem_sketch /sketch/kaithem root
 ! rm /sketch/kaithem/ssl/certificate.key
 ! rm /sketch/kaithem/ssl/certificate.cert
 
-! rm -rf /sketch/kaithem_install/.git
-! rm -rf /sketch/kaithem_install/screenshots
-! rm -rf /sketch/kaithem_install/imgsrc
+! rm -rf /sketch/opt/kaithem/.git
+! rm -rf /sketch/opt/kaithem/screenshots
+! rm -rf /sketch/opt/kaithem/imgsrc
 
-systemctl enable kaithem.service
 
 #Purely for convenience since it's already part of kaithem and it's only 3MB, make that soundfont available system wide
 mkdir -p /usr/share/sounds/sf2/
-cp /sketch/kaithem_install/kaithem/data/sounds/babyfont.sf3 /usr/share/sounds/sf2/babyfont.sf3
+cp /sketch/opt/kaithem/kaithem/data/sounds/babyfont.sf3 /usr/share/sounds/sf2/babyfont.sf3

@@ -12,7 +12,7 @@ source /common.sh
 sudo apt-get -y install dirmngr
 #gpg --fetch-keys https://neilalexander.s3.dualstack.eu-west-2.amazonaws.com/deb/key.txt
 #gpg --export 569130E8CA20FBC4CB3FDE555898470A764B32C9 | sudo apt-key add -
-sudo apt-key add /filesystem/569130E8CA20FBC4CB3FDE555898470A764B32C9.pubkey
+sudo cp /filesystem/569130E8CA20FBC4CB3FDE555898470A764B32C9.pubkey /etc/apt/trusted.gpg.d/yggdrasil.gpg
 echo 'deb http://neilalexander.s3.dualstack.eu-west-2.amazonaws.com/deb/ debian yggdrasil' | sudo tee /etc/apt/sources.list.d/yggdrasil.list
 sudo apt-get -y update
 sudo apt-get -y install yggdrasil
@@ -94,7 +94,6 @@ EOF
 #NTP is just about the only thing that's safe to allow publically in general.
 #Even then, it's bad if you have some kind of remote admin enabled.
 #firewall-cmd --zone=public --add-port=123/udp --permanent
-
 cp -ar /etc/firewalld/. /sketch/config/firewalld
 
 ###### Make NetworkManager sketchified

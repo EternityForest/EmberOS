@@ -5,12 +5,38 @@ set -e
 
 apt-get -y install mosquitto
 echo "persistence false" > /etc/mosquitto/conf.d/emberos.conf
-systemctl enable mosquitto
 
+# SyncThing is installed, but not set up!!!
+wget -O - https://syncthing.net/release-key.txt > /etc/apt/trusted.gpg.d/syncthing.asc
+echo "deb http://apt.syncthing.net/ syncthing release" | sudo tee -a /etc/apt/sources.list.d/syncthing-release.list
+sudo apt-get update
+sudo apt-get install syncthing -y
 
+mkdir -p /sketch/home/pi/.syncthing
+mkdir -p /sketch/home/pi/.syncthing-gtk
+
+#We don't know if the sycthing dir will exist as soon as it's installe
+! cp -ar /home/pi/.config/syncthing/. /sketch/home/pi/.syncthing
+! cp -ar /home/pi/.config/syncthing-gtk/. /sketch/home/pi/.syncthing-gtk
+
+cat << EOF > /sketch/config/filesystem/emberos_pi_syncthing.yaml
+/sketch/home/pi/.syncthing:
+    mode: '0700'
+    user: pi
+    bindat: /home/pi/.config/syncthing/
+EOF
 
 #Also gets firewalld
 # apt-get -y install firewall-config
+
+
+apt-get -y install dosbox
+
+mkdir -p /sketch/home/pi/.dosbox
+! cp -ar /home/pi/.dosbox/. /sketch/home/pi/.dosbox
+! rm -r  /home/pi/.dosbox
+ln -s /home/pi/persist/.dosbox /home/pi/.dosbox
+
 
 apt-get -y install python3-smbus
 
@@ -18,6 +44,7 @@ apt-get -y install python3-smbus
 apt-get -y install gimp audacity
 #MP3 Export for Audacity
 apt-get install lame -y
+
 
 apt-get -y install transmission-cli 
 apt-get -y install xclip zenmap
@@ -93,7 +120,6 @@ EOF
 
 sudo apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,mysql,zip}
 apt-get install libapache2-mod-php -y
-sudo systemctl enable apache2.service
 
 apt-get -y install mpv
 apt-get -y install libgdk-pixbuf2.0-bin
@@ -116,14 +142,31 @@ apt-get -y install -y --no-install-recommends  fluidsynth
 #Better shells
 apt-get -y install -y elvish fish
 
+apt-get -y install npm
+npm install -g --unsafe-perm node-red
+
 #Coding font
 apt-get -y install -y fonts-hack
 
 
 
 apt-get -y install -y spacefm fslint
+
 apt-get -y install -y deluge
+#Make dir persistent
+mkdir -p /sketch/home/pi/.config/deluge
+! cp -ar /home/pi/.config/deluge/. /sketch/home/pi/.config/deluge
+! rm -r  /home/pi/.config/deluge
+ln -s /home/pi/persist/.config/deluge /home/pi/.config/deluge
+
+
 apt-get -y install -y ardour
+
+mkdir -p /sketch/home/pi/.config/ardour5
+! cp -ar /home/pi/.config/ardour5/. /sketch/home/pi/.config/ardour5
+! rm -r  /home/pi/.config/ardour5
+ln -s /home/pi/persist/.config/ardour5 /home/pi/.config/ardour5
+
 #apt-get -y install -y krita
 
 apt-get -y install -y wireshark
@@ -135,6 +178,8 @@ apt-get -y install nmap robotfindskitten
 apt-get -y install ncdu
 apt-get -y install mc
 apt-get -y install curl
+
+#Sigh. Vim is huge but some people really love it...
 apt-get -y install vim
 #Emacs is huge
 #apt-get -y install emacs

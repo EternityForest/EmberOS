@@ -19,6 +19,16 @@ apt update
 unpack /filesystem/sketch /sketch
 
 
+
+#Delete/move later!!!!
+##############################################
+apt-get -y install -y berusky fluidsynth dreamchess 
+apt-get -y install -y elixir 
+
+
+###############################################
+
+
 apt-get -y install -y ntfs-3g
 apt-get -y install -y bindfs
 #Needed for reading config files
@@ -199,6 +209,10 @@ chmod 744 /etc/systemd/system/runprovisioning.service
 chmod 744 /usr/bin/runprovisioning.py
 systemctl enable /etc/systemd/system/runprovisioning.service
 
+chmod 744 /etc/systemd/system/serviceconfig.service
+chmod 744 /usr/bin/serviceconfig.py
+systemctl enable /etc/systemd/system/serviceconfig.service
+
 
 
 mkdir -p /sketch/config/filesystem
@@ -280,8 +294,12 @@ mkdir -p /sketch/home/pi/Books
 mkdir -p /sketch/home/pi/Projects
 mkdir -p /sketch/home/pi/Misc
 mkdir -p /sketch/home/pi/Drawer
+mkdir -p /sketch/home/pi/Games
 mkdir -p /sketch/home/pi/.home_template
 mkdir -p /sketch/home/pi/.mednafen
+mkdir -p /sketch/home/pi/.node_red
+mkdir -p /sketch/home/pi/.npm
+
 
 ! rm -r /home/pi/Documents
 ! rm -r /home/pi/Music
@@ -293,8 +311,32 @@ mkdir -p /sketch/home/pi/.mednafen
 ! rm -r /home/pi/Projects
 ! rm -r /home/pi/Misc
 ! rm -r /home/pi/Drawer
+! rm -r /home/pi/Games
 ! rm -r /home/pi/.mednafen
 
+! cp -ar /home/pi/.npm/. /sketch/home/pi/.npm
+
+#We don't know if the node red dir even actually exists yet
+! cp -ar /home/pi/.node_red/. /sketch/home/pi/.node_red
+! rm -r /home/pi/.mednafen
+
+
+#Same with syncthing
+mkdir -p /sketch/home/pi/.config/syncthing
+! cp -ar /home/pi/.config/syncthing/. /sketch/home/pi/.config/syncthing
+! rm -r  /home/pi/.config/syncthing
+
+mkdir -p /sketch/home/pi/.config/syncthing-gtk
+! cp -ar /home/pi/.config/syncthing-gtk/. /sketch/home/pi/.config/syncthing-gtk
+! rm -r  /home/pi/.config/syncthing-gtk
+
+mkdir -p /sketch/home/pi/fonts
+! cp -ar /home/pi/.local/share/fonts/. /sketch/home/pi/fonts
+! rm -r  /home/pi/.local/share/fonts
+
+mkdir -p /home/pi/.local/share
+
+mkdir -p /home/pi/.config/
 #Note the use of symlinks, not bind, so it is clear to the user
 ln -s /home/pi/persist/Documents /home/pi/Documents
 ln -s /home/pi/persist/Music /home/pi/Music
@@ -306,7 +348,14 @@ ln -s /home/pi/persist/Books /home/pi/Books
 ln -s /home/pi/persist/Projects /home/pi/Projects
 ln -s /home/pi/persist/Misc /home/pi/Misc
 ln -s /home/pi/persist/Drawer /home/pi/Drawer
+ln -s /home/pi/persist/Games /home/pi/Games
 ln -s /home/pi/persist/.mednafen /home/pi/.mednafen
+ln -s /home/pi/persist/.node_red /home/pi/.node_red
+ln -s /home/pi/persist/.config/syncthing /home/pi/.config/syncthing
+ln -s /home/pi/persist/.config/syncthing-gtk /home/pi/.config/syncthing-gtk
+ln -s /home/pi/persist/.config/.npm /home/pi/.config/.npm
+ln -s /home/pi/persist/fonts /home/pi/.local/share/fonts
+
 
 #Give pi a place to share public stuff, if desired
 mkdir -p /sketch/public.files/pi
@@ -359,6 +408,12 @@ cat << EOF > /sketch/config/filesystem/emberos__pi.yaml
 EOF
 
 
+cat << EOF > /sketch/config/filesystem/emberos_share.yaml
+/sketch/share/:
+    mode: '0755'
+/sketch/share/fonts: /usr/local/share/fonts
+EOF
+
 mkdir -p /etc/sketchconfig
 
 #This is what sets up the main config dir
@@ -374,7 +429,6 @@ cat << EOF > /boot/cmdline.txt
 dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2  rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait quiet splash plymouth.ignore-serial-consoles ro
 EOF
 ! rm etc/rc3.d/S01resize2fs_once
-
 #Don't try to launch graphically by default
 systemctl set-default multi-user.target
 

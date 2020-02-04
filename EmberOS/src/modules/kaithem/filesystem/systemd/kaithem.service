@@ -6,7 +6,7 @@ Type=simple
 
 [Service]
 TimeoutStartSec=0
-ExecStart=/sketch/kaithem_install/kaithem/kaithem.py -c /sketch/kaithem/config.yaml
+ExecStart=/sketch/opt/kaithem/kaithem/kaithem.py -c /sketch/kaithem/config.yaml
 Restart=on-failure
 RestartSec=15
 

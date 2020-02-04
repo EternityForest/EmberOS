@@ -1,6 +1,9 @@
 #!/bin/bash
 ! apt purge -y ^wolfram-engine$
-#! apt purge -y ^scratch2$
+
+#Everyhting aside from scratch3 official can go
+! apt purge -y ^nuscratch$
+! apt purge -y ^scratch2$
 ! apt purge -y ^scratch$ 
 #! apt purge -y ^libreoffice$ 
 ! apt purge -y ^minecraft-pi$
@@ -21,8 +24,6 @@
 
 ! apt purge -y ^claws-mail$ 
 ! apt purge -y ^claws-mail-i18n$
-#! apt purge -y ^nuscratch$
-
 
 
 apt autoremove -y --purge
