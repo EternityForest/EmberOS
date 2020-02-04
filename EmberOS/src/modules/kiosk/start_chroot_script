@@ -35,4 +35,4 @@ EOF
 
 
 
-systemctl enable chromekiosk.service
+systemctl enable ember-kiosk.service

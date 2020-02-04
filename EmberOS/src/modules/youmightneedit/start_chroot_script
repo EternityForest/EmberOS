@@ -3,7 +3,10 @@
 set -x
 set -e
 
-apt-get -y install mosquitto
+#Sadly this has a manual prompt
+apt-get -y install -y wireshark
+
+apt-get -y install mosquitto libpng16-16
 echo "persistence false" > /etc/mosquitto/conf.d/emberos.conf
 
 # SyncThing is installed, but not set up!!!
@@ -37,31 +40,13 @@ mkdir -p /sketch/home/pi/.dosbox
 ! rm -r  /home/pi/.dosbox
 ln -s /home/pi/persist/.dosbox /home/pi/.dosbox
 
-apt-get -y install python3-scipy python3-numpy python3-sympy
-
-apt-get -y install python3-smbus
 
 #Batteries included, allow messing with kiosk browser media right from the device
-apt-get -y install gimp audacity
-#MP3 Export for Audacity
-apt-get install lame -y
+apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full
 
 
-apt-get -y install transmission-cli 
-apt-get -y install xclip zenmap
+apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola 
 
-apt-get -y install sqlitebrowser
-apt-get -y install meld
-#Nobody wants to have to develop on a pi. It happens sometimes anyway.
-apt-get -y install git-cola
-
-#Always good to have around
-apt-get -y install gnome-disk-utility
-
-apt-get -y install unclutter
-apt-get -y install imagemagick
-
-apt-get -y install p7zip p7zip-full
 
 apt-get -y install fvwm fvwm-icons
 
@@ -77,13 +62,13 @@ apt-get -y install x11-apps
 
 apt-get -y install python3
 
-apt-get -y install exfat-utils
-apt-get -y install python3-setproctitle
-apt-get -y install python3-cffi
-apt-get -y install python3-dbus
+apt-get -y install exfat-utils python3-setproctitle python3-cffi python3-dbus python3-scipy python3-numpy python3-sympy python3-smbus
 
 #This language is included because of it's excellent dynamic imports in python
-apt-get -y install nim
+#Elixir is included because it seems to be the one most practical functional type things
+#Gforth is small and popular(For some reason)
+#Lua is even smaller and more popular
+apt-get -y install nim elixir gforth lua5.3
 
 
 pip3 install yappi
@@ -122,19 +107,15 @@ EOF
 sudo apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,mysql,zip}
 apt-get install libapache2-mod-php -y
 
-apt-get -y install mpv
-apt-get -y install libgdk-pixbuf2.0-bin
+apt-get -y install mpv libgdk-pixbuf2.0-bin
 #All the compilerie you might want
 apt-get -y install python3-dev build-essential gcc g++ 
 
-apt-get -y install python3 systemd cython3 build-essential
-apt-get -y install mplayer python3-serial
+apt-get -y install python3 systemd cython3 build-essential mplayer python3-serial
 apt-get -y install python3-pyqt5 python3-pyqt5.qtserialport python3-pyqt5.qtsvg python3-pyqt5.qtchart python3-pyqt5.qtmultimedia
 apt-get -y install python3-pyqt5.qtsql python3-pyqt5.qtwebkit python3-pyqt5.qtopengl python3-pyqt5.qtsensors
-apt-get -y install python3-lxml
-apt-get -y install python3-tz python3-dateutil lm-sensors
-apt-get -y install python3-netifaces python3-jack-client
-apt-get -y install python3-gst-1.0 python3-libnacl jack-tools
+apt-get -y install python3-tz python3-dateutil lm-sensors python3-lxml
+apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3-libnacl jack-tools
 apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid
 apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly python3-psutil
 #Don't include a giant soundfont, kaithem already has a decent one
@@ -151,17 +132,13 @@ apt-get -y install -y fonts-hack
 
 
 
-apt-get -y install -y spacefm fslint
-
-apt-get -y install -y deluge
+apt-get -y install -y spacefm fslint deluge ardour pulseview
 #Make dir persistent
 mkdir -p /sketch/home/pi/.config/deluge
 ! cp -ar /home/pi/.config/deluge/. /sketch/home/pi/.config/deluge
 ! rm -r  /home/pi/.config/deluge
 ln -s /home/pi/persist/.config/deluge /home/pi/.config/deluge
 
-
-apt-get -y install -y ardour
 
 mkdir -p /sketch/home/pi/.config/ardour5
 ! cp -ar /home/pi/.config/ardour5/. /sketch/home/pi/.config/ardour5
@@ -170,30 +147,13 @@ ln -s /home/pi/persist/.config/ardour5 /home/pi/.config/ardour5
 
 #apt-get -y install -y krita
 
-apt-get -y install -y wireshark
 
 
-apt-get install pulseview -y
 
-apt-get -y install nmap robotfindskitten
-apt-get -y install ncdu
-apt-get -y install mc
-apt-get -y install curl
+apt-get -y install nmap robotfindskitten ncdu mc curl fatrace
 
 #Sigh. Vim is huge but some people really love it...
-apt-get -y install vim
-#Emacs is huge
-#apt-get -y install emacs
-apt-get -y install zile
-apt-get -y install xcas
-apt-get -y install units
-apt-get -y install git
-apt-get -y install wget
-apt-get -y install htop
-apt-get -y install lsof
-apt-get -y install fzf
-apt-get -y install chafa
-apt-get -y install nast
+apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast
 
 
 
@@ -205,7 +165,6 @@ apt-get -y install xserver-xorg-legacy
 sed -i \
     's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
 
-apt-get -y install fatrace
 
 gtk-update-icon-cache
 
