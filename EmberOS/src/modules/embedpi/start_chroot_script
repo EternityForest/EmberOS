@@ -20,14 +20,6 @@ unpack /filesystem/sketch /sketch
 
 
 
-#Delete/move later!!!!
-##############################################
-apt-get -y install -y berusky fluidsynth dreamchess 
-apt-get -y install -y elixir 
-
-
-###############################################
-
 
 apt-get -y install -y ntfs-3g
 apt-get -y install -y bindfs

@@ -6,6 +6,12 @@ It has a variety of preinstalled applications and can be configured almost entir
 
 Notably, everything except /sketch boots as read-only, and there is an Apache2 server and a chromium based kiosk browser enabled by default.
 
+This is a "batteries included" distro, meant to be usable in odd places when you might not
+even have internet access. As such, it includes a lot of stuff and requires a 16GB card(The image is just under 9GB min, including 1024MB of free space on root.)
+
+It would be possible to remove some things and shrink it, but I don't suggest this, as 
+a 16GB card will make wear leveling more effective and give your app room to expand.
+
 
 ## Enabling services
 
@@ -275,6 +281,10 @@ tunnels to syncthing securely over SSH.
 
 #### Node Red
 Already configured with symlinks for /home/pi
+#### Kaithem
+The original purpose of the distro. /sketch/kaithem/ holds all the interesting
+mutable state for easy deployment.
+
 #### Mednafen
 Multi-emulator, already configured with symlinks for /home/pi
 
@@ -290,6 +300,31 @@ BT Client, .config/deluge is persistent
 
 #### DosBox
 .dosbox is persistent
+
+### Languages
+#### Elixir
+Erlang-based language used in high reliability applications
+
+#### Nim
+New language with excellent C and python integration(Nimport is also included, to directly import from python)
+
+#### PHP
+Apache should be set up to use this already.
+
+#### C/C++
+G++, GCC, and build-essential are included, as is python3-dev
+
+#### Elvish and Fish
+Two alternative shells
+
+#### Python3
+
+### Libraries(Not a complete list)
+
+#### Python3
+* PyQt, QtWebKit, QtSvg, QtMultimedia
+
+
 
 
 ### Utils

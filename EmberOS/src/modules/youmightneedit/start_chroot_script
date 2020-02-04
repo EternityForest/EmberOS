@@ -37,6 +37,7 @@ mkdir -p /sketch/home/pi/.dosbox
 ! rm -r  /home/pi/.dosbox
 ln -s /home/pi/persist/.dosbox /home/pi/.dosbox
 
+apt-get -y install python3-scipy python3-numpy python3-sympy
 
 apt-get -y install python3-smbus
 
