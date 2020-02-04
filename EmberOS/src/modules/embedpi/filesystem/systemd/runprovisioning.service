@@ -1,0 +1,15 @@
+[Unit]
+Description=Run provisioning.sh
+After=systemd-remount-fs.service
+#Possiblye issue here if we start *after* something important, don't forget to include things!
+After=sysinit.target NetworkManager.service chronyd.service firewalld.service
+RequiresMountsFor=/etc/ /sketch/ /home/
+
+
+[Service]
+TimeoutStartSec=0
+ExecStart=/usr/bin/runprovisioning.py
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
