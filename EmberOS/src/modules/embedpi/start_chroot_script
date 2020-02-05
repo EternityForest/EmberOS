@@ -281,7 +281,7 @@ mk_pi_persist_dir () {
   ! cp -ar /home/pi/$1/. /sketch/home/pi/$1
   ! rm -r  /home/pi/$1
   ln -s /home/pi/persist/$1 /home/pi/$1
-  chown pi /home/pi/persist/$1
+  chown pi /home/pi/$1
 }
 
 
