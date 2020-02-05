@@ -274,43 +274,36 @@ mkdir -p /sketch/home/pi
 mkdir -p /home/pi/persist
 
 
+mk_pi_persist_dir () {
+  mkdir -p /sketch/home/pi/$1 
+  mkdir -p /home/pi/$1 
+
+  ! cp -ar /home/pi/$1/. /sketch/home/pi/$1
+  ! rm -r  /home/pi/$1
+  ln -s /home/pi/persist/$1 /home/pi/$1
+  chown pi /home/pi/persist/$1
+}
+
+
 #Symlink some directories that are pretty obviously useful to persist
 #But only the super obviously "Manual" ones that aren't messed with by the system
-mkdir -p /sketch/home/pi/Documents
-mkdir -p /sketch/home/pi/Music
-mkdir -p /sketch/home/pi/Downloads
-mkdir -p /sketch/home/pi/Templates
-mkdir -p /sketch/home/pi/Videos
-mkdir -p /sketch/home/pi/Arduino
-mkdir -p /sketch/home/pi/Books
-mkdir -p /sketch/home/pi/Projects
-mkdir -p /sketch/home/pi/Misc
-mkdir -p /sketch/home/pi/Drawer
-mkdir -p /sketch/home/pi/Games
-mkdir -p /sketch/home/pi/.home_template
-mkdir -p /sketch/home/pi/.mednafen
-mkdir -p /sketch/home/pi/.node_red
-mkdir -p /sketch/home/pi/.npm
-
-
-! rm -r /home/pi/Documents
-! rm -r /home/pi/Music
-! rm -r /home/pi/Downloads
-! rm -r /home/pi/Templates
-! rm -r /home/pi/Videos
-! rm -r /home/pi/Arduino
-! rm -r /home/pi/Books
-! rm -r /home/pi/Projects
-! rm -r /home/pi/Misc
-! rm -r /home/pi/Drawer
-! rm -r /home/pi/Games
-! rm -r /home/pi/.mednafen
-
-! cp -ar /home/pi/.npm/. /sketch/home/pi/.npm
-
-#We don't know if the node red dir even actually exists yet
-! cp -ar /home/pi/.node_red/. /sketch/home/pi/.node_red
-! rm -r /home/pi/.mednafen
+mk_pi_persist_dir  Documents
+mk_pi_persist_dir  Pictures
+mk_pi_persist_dir  .fonts
+mk_pi_persist_dir  Music
+mk_pi_persist_dir  Downloads
+mk_pi_persist_dir  Templates
+mk_pi_persist_dir  Videos
+mk_pi_persist_dir  Arduino
+mk_pi_persist_dir  Books
+mk_pi_persist_dir  Projects
+mk_pi_persist_dir  Misc
+mk_pi_persist_dir  Drawer
+mk_pi_persist_dir  Games
+mk_pi_persist_dir  .home_template
+mk_pi_persist_dir  .mednafen
+mk_pi_persist_dir  .node_red
+mk_pi_persist_dir  .npm
 
 
 #Same with syncthing
@@ -327,27 +320,17 @@ mkdir -p /sketch/home/pi/fonts
 ! rm -r  /home/pi/.local/share/fonts
 
 mkdir -p /home/pi/.local/share
+chmod pi /home/pi/.local/share
+mkdir -p /home/pi/.config
+chmod pi /home/pi/.config
 
-mkdir -p /home/pi/.config/
-#Note the use of symlinks, not bind, so it is clear to the user
-ln -s /home/pi/persist/Documents /home/pi/Documents
-ln -s /home/pi/persist/Music /home/pi/Music
-ln -s /home/pi/persist/Downloads/home/pi/Downloads
-ln -s /home/pi/persist/Templates /home/pi/Templates
-ln -s /home/pi/persist/Videos /home/pi/Videos
-ln -s /home/pi/persist/Arduino /home/pi/Arduino
-ln -s /home/pi/persist/Books /home/pi/Books
-ln -s /home/pi/persist/Projects /home/pi/Projects
-ln -s /home/pi/persist/Misc /home/pi/Misc
-ln -s /home/pi/persist/Drawer /home/pi/Drawer
-ln -s /home/pi/persist/Games /home/pi/Games
-ln -s /home/pi/persist/.mednafen /home/pi/.mednafen
-ln -s /home/pi/persist/.node_red /home/pi/.node_red
+
 ln -s /home/pi/persist/.config/syncthing /home/pi/.config/syncthing
 ln -s /home/pi/persist/.config/syncthing-gtk /home/pi/.config/syncthing-gtk
-ln -s /home/pi/persist/.config/.npm /home/pi/.config/.npm
 ln -s /home/pi/persist/fonts /home/pi/.local/share/fonts
-
+chmod pi /home/pi/persist/.config/syncthing
+chmod pi /home/pi/persist/.config/syncthing-gtk
+chmod pi /home/pi/.local/share/fonts
 
 #Give pi a place to share public stuff, if desired
 mkdir -p /sketch/public.files/pi

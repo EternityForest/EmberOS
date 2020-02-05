@@ -23,11 +23,8 @@ date +%s%N > /dev/random
 
 #The RNG should already be well seeded, but the systemd thing needs to think its doing something
 touch /var/lib/systemd/random-seed
-touch /var/lib/urandom/random-seed
 chmod 700 /var/lib/systemd/random-seed
-chmod 700 /var/lib/urandom/random-seed
 dd bs=1 count=32K if=/dev/urandom of=/var/lib/systemd/random-seed > /dev/null
-dd bs=1 count=32K if=/dev/urandom of=/var/lib/urandom/random-seed > /dev/null
 touch /run/cprng-seeded
 
 
@@ -42,28 +39,29 @@ chmod 1777 /tmp
 #Only if var log is mounted a tmpfs.
 if mount | grep "/var/log type tmpfs"; then
 
-if [ ! -d /var/log/apache ] ; then
-mkdir /var/log/apache
-touch /var/log/apache/access.log
-chmod 700 /var/log/apache/access.log
+    if [ ! -d /var/log/apache ] ; then
+        mkdir -p /var/log/apache
+        touch /var/log/apache/access.log
+        chmod 700 /var/log/apache/access.log
+    fi
 
-fi
-
-if [ ! -d /var/log/apache2 ] ; then
-mkdir /var/log/apache2
-touch /var/log/apache2/access.log
-chmod 700 /var/log/apache2/access.log
-fi
+    if [ ! -d /var/log/apache2 ] ; then
+        mkdir -p /var/log/apache2
+        touch /var/log/apache2/access.log
+        chmod 700 /var/log/apache2/access.log
+    fi
 fi
 
 ###--------------------------------Samba shimming-----------------------------
 
-mkdir /tmp/samba
-mkdir /tmp/cache
-mkdir /tmp/cache/samba
-​mkdir /var/log/samba
+mkdir -p /tmp/samba
+mkdir -p /tmp/cache
+mkdir -p /tmp/cache/samba
+​mkdir -p /var/log/samba
 
 ###-------------------------------Mosquitto shimming---------------------------
 mkdir -p /var/log/mosquitto
 #In case the user doesn't actually exist
 ! chown mosquitto /var/log/mosquitto
+
+echo "Complete!"

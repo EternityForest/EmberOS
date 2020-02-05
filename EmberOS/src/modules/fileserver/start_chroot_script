@@ -10,8 +10,7 @@ set -e
 source /common.sh
 
 
-apt-get -y install samba samba-common-bin smbclient cifs-utils
-apt-get -y install minidlna
+apt-get -y install samba samba-common-bin smbclient cifs-utils minidlna
 
 
 

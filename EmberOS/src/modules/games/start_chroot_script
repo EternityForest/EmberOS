@@ -4,12 +4,10 @@ set -x
 set -e
 
 #Games
-apt-get -y install ace-of-penguins ltris
+apt-get -y install ace-of-penguins ltris mednaffe tuxpaint scratch3
 
-#Multi-emulator
-apt-get -y install mednaffe
-
-#This seems like it belongs in games too
-apt-get -y install tuxpaint
-
-apt-get -y install scratch3
+#It seems to have a rather odd save location
+mkdir -p /sketch/home/pi/.tuxpaint
+! cp -ar /home/pi/.tuxpaint/. /sketch/home/pi/.tuxpaint
+! rm -r  /home/pi/.tuxpaint
+ln -s /home/pi/persist/.tuxpaint /home/pi/.tuxpaint
