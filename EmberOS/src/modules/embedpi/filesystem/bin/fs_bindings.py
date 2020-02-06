@@ -21,7 +21,15 @@ and
         hosts: /etc/hosts
         hostname: /etc/hostname
 
+    pre_cmd:
+        - SomeCommand
+        - SomeOtherCommanda
+and:
+
 /sketch/config/simple: /simple
+
+-----------------
+
 
 and merges them together, then uses them to set up bindings.
 
@@ -42,7 +50,12 @@ Bindfiles relative paths are interpreted relative to bindat.
 
 It is an error to use an absolute path for a bindfile source.
 
-File bindings happen after the top level path bindings
+File bindings happen after the top level path bindings.
+
+
+Pre_cmd is executed before the binding happends, post_cmd comes after.
+
+pre_cmd can be a single command line, or a list of them.
 
 """
 
@@ -124,7 +137,12 @@ for i in sorted(list(config.keys()),key=lambda x:len(x)):
 
         if 'pre_cmd' in d:
             print(d['pre_cmd'])
-            subprocess.call(d['pre_cmd'],shell=True)
+            if isinstance(d['pre_cmd'], str):
+                subprocess.call(d['pre_cmd'],shell=True)
+
+            elif isinstance(d['pre_cmd'], list):
+                for command in d['pre_cmd']:
+                    subprocess.check_call(command,shell=True)
 
 
         if 'mode' in d or 'user' in d or 'bindat' in d:

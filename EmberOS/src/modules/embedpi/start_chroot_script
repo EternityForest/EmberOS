@@ -91,18 +91,12 @@ set -e
 
 mkdir -p /sketch/config
 
-#TODO Maybe some things in the home folders should persist to the sketch or something
-
 mkdir -p /dev/shm/roothome
 mkdir -p /dev/shm/roothome_work
 
-mkdir -p /dev/shm/pihome
-mkdir -p /dev/shm/pihome_work
 
-chown pi /dev/shm/pihome
-chown pi /dev/shm/pihome_work
-
-
+chmod 700 /dev/shm/roothome
+chmod 700 /dev/shm/roothome_work
 
 
 mkdir -p  /sketch/ssh/pi
@@ -125,8 +119,6 @@ if [ ! -f /sketch/ssh/root/authorized_keys ]; then
 fi
 
 mount -t overlay -o lowerdir=/root,upperdir=/dev/shm/roothome,workdir=/dev/shm/roothome_work overlay /root
-
-
 
 
 
@@ -157,7 +149,6 @@ if [ ! -f /sketch/kaithem/ssl/certificate.key ] ; then
     #Copy it so it's trusted by browsers
     mkdir -p /sketch/config/sslcerts.local/
     cp /sketch/kaithem/ssl/certificate.cert /sketch/config/sslcerts.local/kaithem_localhost.cert
-
 fi
 EOF
 
@@ -225,7 +216,7 @@ cat << EOF > /sketch/config/filesystem/emberos_sshconf.yaml
 
 /sketch/ssh/pi/:
     mode: '0700'
-    user: root
+    user: pi
     bindat: /home/pi/.ssh
 
 /sketch/ssh/root: /root/.ssh/
@@ -281,7 +272,6 @@ mk_pi_persist_dir () {
   ! cp -ar /home/pi/$1/. /sketch/home/pi/$1
   ! rm -r  /home/pi/$1
   ln -s /home/pi/persist/$1 /home/pi/$1
-  chown pi /home/pi/$1
 }
 
 
@@ -320,17 +310,14 @@ mkdir -p /sketch/home/pi/fonts
 ! rm -r  /home/pi/.local/share/fonts
 
 mkdir -p /home/pi/.local/share
-chmod pi /home/pi/.local/share
+chown pi /home/pi/.local/share
 mkdir -p /home/pi/.config
-chmod pi /home/pi/.config
+chown pi /home/pi/.config
 
 
 ln -s /home/pi/persist/.config/syncthing /home/pi/.config/syncthing
 ln -s /home/pi/persist/.config/syncthing-gtk /home/pi/.config/syncthing-gtk
 ln -s /home/pi/persist/fonts /home/pi/.local/share/fonts
-chmod pi /home/pi/persist/.config/syncthing
-chmod pi /home/pi/persist/.config/syncthing-gtk
-chmod pi /home/pi/.local/share/fonts
 
 #Give pi a place to share public stuff, if desired
 mkdir -p /sketch/public.files/pi
@@ -365,16 +352,31 @@ cat << EOF > /sketch/config/filesystem/emberos_public_pi.yaml
     mode: '0755'
     user: pi
     bindat: /home/pi/SharedMedia
+mkdir -p /dev/shm/pihome
+mkdir -p /dev/shm/pihome_work
+
+chown pi /dev/shm/pihome
+chown pi /dev/shm/pihome_work
+
+chmod 750 /dev/shm/pihome
+chmod 750 /dev/shm/pihome_work
 
 EOF
 
-cat << EOF > /sketch/config/filesystem/emberos__pi.yaml
+cat << EOF > /sketch/config/filesystem/emberos_pi.yaml
 /sketch/home/pi:
     mode: '0750'
     user: pi
     #The tmpfs overlay has to be under the sketch stuff, or it seems to point at the original home dir,
     #and cover up the sketch
-    pre_cmd: mount -t overlay -o lowerdir=/home/pi,upperdir=/dev/shm/pihome,workdir=/dev/shm/pihome_work overlay /home/pi
+    pre_cmd: 
+        - mkdir -p /dev/shm/pihome
+        - mkdir -p /dev/shm/pihome_work
+        - chown pi /dev/shm/pihome
+        - chown pi /dev/shm/pihome_work
+        - chmod 750 /dev/shm/pihome
+        - chmod 750 /dev/shm/pihome_work
+        - mount -t overlay -o lowerdir=/home/pi,upperdir=/dev/shm/pihome,workdir=/dev/shm/pihome_work overlay /home/pi
     
     #Once the sketch and the bindat is there we can run this and copy anything we might need
     post_cmd: cp -ar /home/pi/persist/.home_template/. /home/pi
@@ -434,21 +436,19 @@ unpack /filesystem/root /
 
 
 
-
+#These depend on the fact that remounting seems to leave things
+#In their place in the layering of mounts
 cat << EOF > /usr/bin/writable
 #!/bin/bash
-
 mount -o remount,rw /
 mount -o remount,rw /boot
 mount -o remount,rw /sketch
-
 EOF
 
 cat << EOF > /usr/bin/readonly
 #!/bin/bash
 mount -o remount,ro /
 mount -o remount,ro /boot
-#mount -o remount,ro /sketch
 EOF
 
 chmod 755 /usr/bin/writable
