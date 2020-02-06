@@ -10,10 +10,6 @@ set -e
 source /common.sh
 
 
-apt-get -y install samba samba-common-bin smbclient cifs-utils minidlna
-
-
-
 
 #This seems to be fairly low resource usage and thus safe to include
 echo "media_dir=/var/public.media/" >> /etc/minidlna.conf

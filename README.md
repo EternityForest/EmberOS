@@ -1,4 +1,4 @@
-# EmberOS
+![EmberOS](img/logo.webp)
 
 This is a customPiOs tool for setting up a pi image suitable for consumer-grade embedded use. 
 

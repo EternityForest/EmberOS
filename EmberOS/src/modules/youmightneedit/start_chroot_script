@@ -3,8 +3,15 @@
 set -x
 set -e
 
+
+
+#Things with manual prompts should happen early and close together
 #Sadly this has a manual prompt
 apt-get -y install -y wireshark
+#Also sometimes SMB does too
+apt-get -y install smbclient samba samba-common-bin cifs-utils minidlna
+
+
 
 apt-get -y install mosquitto libpng16-16 chromium-browser rpi-chromium-mods
 echo "persistence false" > /etc/mosquitto/conf.d/emberos.conf
@@ -45,7 +52,7 @@ ln -s /home/pi/persist/.dosbox /home/pi/.dosbox
 apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full
 
 
-apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola 
+apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola audacious audacious-plugins gwenview
 
 apt-get -y install fvwm fvwm-icons mpv libgdk-pixbuf2.0-bin
 
