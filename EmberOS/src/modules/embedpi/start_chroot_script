@@ -292,7 +292,7 @@ mk_pi_persist_dir  Drawer
 mk_pi_persist_dir  Games
 mk_pi_persist_dir  .home_template
 mk_pi_persist_dir  .mednafen
-mk_pi_persist_dir  .node_red
+mk_pi_persist_dir  .node-red
 mk_pi_persist_dir  .npm
 
 
