@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -x
+set -e
+
+source /common.sh
+
+mkdir -p /usr/share/genfortune
+cp /filesystem/GenFortune/Fortune\ Files/*.frtn /usr/share/genfortune
+cp /filesystem/GenFortune/genfortune.py /usr/bin/genfortune
+chmod -R 755 /usr/share/genfortune
+chmod 755 /usr/bin/genfortune

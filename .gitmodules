@@ -1,3 +1,6 @@
 [submodule "EmberOS/src/modules/kaithem/filesystem/KaithemAutomation"]
 	path = EmberOS/src/modules/kaithem/filesystem/KaithemAutomation
 	url = git@github.com:EternityForest/KaithemAutomation.git
+[submodule "EmberOS/src/modules/genfortune/filesystem/GenFortune"]
+	path = EmberOS/src/modules/genfortune/filesystem/GenFortune
+	url = https://github.com/EternityForest/GenFortune.git

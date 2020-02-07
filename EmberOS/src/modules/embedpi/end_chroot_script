@@ -8,3 +8,4 @@
 set -x
 set -e
 
+sh /filesystem/mimefix.sh

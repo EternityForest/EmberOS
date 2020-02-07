@@ -14,4 +14,4 @@ http-port : 8002
 
 audio-paths:
     - /sketch/public.media
-    - default
+    - __default__
