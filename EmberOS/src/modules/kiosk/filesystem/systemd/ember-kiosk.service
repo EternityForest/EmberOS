@@ -1,6 +1,6 @@
 [Unit]
 Description=FVWM based kiosk
-After=multi-user.target time-sync.target emberos_netcfg.service
+After=multi-user.target time-sync.target emberos_netcfg.service fs_bindings.service embedtools.service yggdrasil.service sysinit.service
 Type=simple
 
 

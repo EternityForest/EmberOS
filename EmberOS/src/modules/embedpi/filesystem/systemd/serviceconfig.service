@@ -7,7 +7,7 @@ RequiresMountsFor=/etc/ /sketch/
 [Service]
 TimeoutStartSec=0
 ExecStart=/usr/bin/serviceconfig.py
-Type=oneshot
+Type=simple
 
 [Install]
 WantedBy=multi-user.target
