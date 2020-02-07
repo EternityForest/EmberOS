@@ -280,7 +280,6 @@ mk_pi_persist_dir () {
 #But only the super obviously "Manual" ones that aren't messed with by the system
 mk_pi_persist_dir  Documents
 mk_pi_persist_dir  Pictures
-mk_pi_persist_dir  .fonts
 mk_pi_persist_dir  Music
 mk_pi_persist_dir  Downloads
 mk_pi_persist_dir  Templates
@@ -291,6 +290,9 @@ mk_pi_persist_dir  Projects
 mk_pi_persist_dir  Misc
 mk_pi_persist_dir  Drawer
 mk_pi_persist_dir  Games
+mk_pi_persist_dir  Sync
+
+mk_pi_persist_dir  .fonts
 mk_pi_persist_dir  .home_template
 mk_pi_persist_dir  .mednafen
 mk_pi_persist_dir  .node-red

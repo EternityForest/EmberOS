@@ -131,25 +131,6 @@ in the actual sketch dir is just the default, it gets covered over by the sketch
 
 If your image is for systems with an RTC, see "using an RTC"
 
-## Squid Proxy
-
-Thanks to the amazing squid-deb proxy, embedPiOs autodiscovers
-package caches on the LAN!
-
-Just install squid-deb-proxy on one machine, then add
-```
-mirrordirector.raspbian.org
-archive.raspberrypi.org
-mirror.web-ster.com
-raspbian.raspberrypi.org
-```
-to `/etc/squid-deb-proxy/mirror-dstdomain.acl`
-
-to enable that machine to act as a cache server.
-
-If you get weird 403 forbidden errors, just disable the cache,
-someone is probably running a conflicting one.
-
 ## Using an RTC
 Add one of these lines to /boot/config.txt
 ```
@@ -222,34 +203,21 @@ The contents of /home/pi/persist/.home_template are copied to /home/pi after the
 By default, many common folders that seem logical to assume you want persistant storage for
 are symlinked to the persist folder. ALWAYS CHECK BEFORE PUTTING IMPORTANT DATA SOMEWHERE!
 
-This may change at some point to make all of /home/pi persistant aside from a few specific things, but this approach seems
-more reliable for avoiding unneccessary card wear. The main goal is preventing any odditiy from things like Chromium
-that write all sorts of things to the home dir
+#### Adding a persisant directory/customizing the home dir
+```
+#Create the actual persistant directory
+mkdir persist/foo
 
-``` bash
-ln -s /home/pi/persist/Documents /home/pi/Documents
-ln -s /home/pi/persist/Music /home/pi/Music
-ln -s /home/pi/persist/Downloads/home/pi/Downloads
-ln -s /home/pi/persist/Templates /home/pi/Templates
-ln -s /home/pi/persist/Videos /home/pi/Videos
-ln -s /home/pi/persist/Arduino /home/pi/Arduino
-ln -s /home/pi/persist/Books /home/pi/Books
-ln -s /home/pi/persist/Projects /home/pi/Projects
-ln -s /home/pi/persist/Misc /home/pi/Misc
-ln -s /home/pi/persist/Drawer /home/pi/Drawer
-ln -s /home/pi/persist/Games /home/pi/Games
-ln -s /home/pi/persist/.mednafen /home/pi/.mednafen
-ln -s /home/pi/persist/.node_red /home/pi/.node_red
-ln -s /home/pi/persist/.config/syncthing /home/pi/.config/syncthing
-ln -s /home/pi/persist/.config/syncthing-gtk /home/pi/.config/syncthing-gtk
-ln -s /home/pi/persist/.config/.npm /home/pi/.config/.npm
+#Now create a link to it. You can't just put it in the home dir directly,
+#As that is just a tmpfs
+
+#So you add it to the .home_template, which is copied to home on boot.
+ln -s persist/foo .home_template/foo
 ```
 
+#### Other user's home dirs
 
-### Other user's home dirs
-
-Other users home dirs won't be set up like this unless you do it manually, EmberOS is mostly designed with Pi
-as the only non-system user.
+Other users home dirs won't be set up like this unless you do it manually, EmberOS is mostly assuming  with Pi as the only non-system user.
 
 
 ### Firewalling
@@ -269,147 +237,13 @@ just edit /sketch/config/sound.ini, and change the output option to "hdmi" or "a
 We default to "auto", which is probably not what you want if using an HDMI monitor and 3.5mm speakers.
 
 ### Apps
-
-We include some useful GUI apps in addition to the raspbian stuff. Most are preconfigure
-to persist user data(This is done by making the data folder a symlink into /home/pi/persist)
-
-#### GIMP
-#### SyncThing/SyncThing GTK
-Already configured with symlinks for /home/pi, your config will
-be persistentunder the pi user.
-
-##### Remote Config:
-
-Use this command on a Linux machine:
-`ssh -L 9999:localhost:8384 HostName`
-
-Ypu will then be able to access SyncThing's web GUI on local port 9999, which
-tunnels to syncthing securely over SSH.
-
-#### Node Red
-Already configured with symlinks for /home/pi
-#### Kaithem
-The original purpose of the distro. /sketch/kaithem/ holds all the interesting
-mutable state for easy deployment.
-
-#### Mednafen
-Multi-emulator, already configured with symlinks for /home/pi
-
-#### Tux Paint
-Pictures folder is persistent
-#### Sqlitebrowser
-#### git-cola
-#### Audacity
-#### deluge
-BT Client, .config/deluge is persistent
-#### Ardour
-.config/ardour5 is persistent
-
-#### DosBox
-.dosbox is persistent
-
-### Languages
-#### Elixir
-Erlang-based language used in high reliability applications
-
-#### Nim
-New language with excellent C and python integration(Nimport is also included, to directly import from python)
-
-#### PHP
-Apache should be set up to use this already.
-
-#### C/C++
-G++, GCC, and build-essential are included, as is python3-dev
-
-#### Elvish and Fish
-Two alternative shells
-
-#### Python3
-
-### Libraries(Not a complete list)
-
-#### Python3
-* PyQt, QtWebKit, QtSvg, QtMultimedia
-
-
-
-
-### Utils
-
-This distro includes a lot of command line utils. If you are using this
-over ssh from a windows machine, in a pinch you should be able to get whatever
-you need to done.
-
-#### ncdu
-Interactive tool for figuring out what is taking all your space
-`ncdu /folder/to/investigate`
-
-#### nmap
-
-#### micro
-Awesome command line editor: https://micro-editor.github.io/
-
-Pretty much like any normal editor, no crazy vim/emacs type
-stuff to memorize here.  Everything is discoverable. Try it!
-
-
-#### mc
-Midnight commander. File manager with no learning curve.
-Tab switches panes. The move command pops up a window
-auto-filled with the other pane. It's pretty awesome.
-
-`mc /folder/to/browse` or just `mc`
-
-#### GNU Units
-`units` to launch unit converions
-
-#### xcas
-
-Maybe controversial since it's 33MB,
-but sometimes when developing you really need to solve an equation.
-
-#### vim
-
-I don't know how this works, but I work with people who would be dissapointed
-if I didn't include it :P
-
-#### zile
-
-Very small emacs clone 
-
-#### chafa
-
-`chafa FILE` views any kind of image file, in low res, in the
-console.
-
-#### git
-
-#### nast
-
-#### fatrace
-
-#### htop
-
-
-#### neofetch
-All Arch Linux users are legally required to stare at this several times a day,
-according to reddit memes.
-
-Provides basic sys info with nice formatting.
-
-#### robotfindskitten
-
-Obviously the best console game :P
-
-#### fortune
-It's fortune!
-
+(See apps listing)[docs/IncludedApps.md]
 
 ## Serving Media
 
 One of the most common tasks for embedded devices is as a media server.
 Put whatever you want to serve in /sketch/public.media for DLNA,
-/sketch/public.files for samba(Samba isn't working yet)
+/sketch/public.files for samba.
 
 Put whatever you want to serve as a standard web site in /sketch/public.www to serve
 it on port 80 with apache. Whatever you put as index.http will be the start page for the fullscren kiosk!
