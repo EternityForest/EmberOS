@@ -32,7 +32,3 @@ cat << 'EOF' > /sketch/pre_gui.sh
 #This script runs just before the GUI loads
 dbus-launch
 EOF
-
-
-
-systemctl enable ember-kiosk.service

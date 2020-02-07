@@ -51,13 +51,21 @@ cp  -La /usr/local/share/ca-certificates /sketch/config/sslcerts.local
 
 cp  /etc/ca-certificates.conf /sketch/config/ca-certificates.conf
 
+
+mkdir -p  /sketch/config/firewalld/
+
 #Bind to /etc
-cat << EOF > /sketch/config/filesystem/emberos_ssl.yaml
+cat << EOF > /sketch/config/filesystem/emberos-netcfg.yaml
 /sketch/config/:
    bindfiles:
-    /sketch/config/sslcerts: /usr/share/ca-certificates/
-    /sketch/config/sslcerts.local: /usr/local/share/ca-certificates
-    /sketch/config/ca-certificates.conf: /etc/ca-certificates.conf
+    sslcerts: /usr/share/ca-certificates/
+    sslcerts.local: /usr/local/share/ca-certificates
+    ca-certificates.conf: /etc/ca-certificates.conf
+
+/sketch/config/firewalld/: /etc/firewalld/
+
+__tmpfsoverlay__SSLCERTS:
+  bindat: /etc/ssl/certs
 EOF
 
 

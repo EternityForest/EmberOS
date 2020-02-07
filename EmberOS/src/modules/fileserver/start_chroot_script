@@ -17,42 +17,17 @@ mkdir -p /sketch/public.media/
 
 
 
-cat << 'EOF' > /usr/bin/emberos_fileserver.sh
-#!/bin/bash
-set -e
+#Bind to /etc
+cat << EOF > /sketch/config/filesystem/emberos-netcfg.yaml
+/sketch/config/:
+   bindfiles:
+      smb.conf: /etc/samba/smb.conf
 
-mkdir -p /dev/shm/sambalib
-mkdir -p /dev/shm/sambalib_work
-
-
-chmod 775 /dev/shm/sambalib
-chown 775 /dev/shm/sambalib_work
-
-mount -t overlay -o lowerdir=/var/lib/samba,upperdir=/dev/shm/sambalib,workdir=/dev/shm/sambalib_work overlay /var/lib/samba
-
-mount --bind /sketch/config/smb.conf /etc/samba/smb.conf
-
+__tmpfsoverlay__SAMBA:
+  bindat: /var/lib/samba
 EOF
-chmod 744 /usr/bin/emberos_fileserver.sh
 
 
-
-cat << EOF > /etc/systemd/system/emberos_fileserver.service
-[Unit]
-Description=Manage fileservers
-After=systemd-remount-fs.service
-Before=sysinit.target smbd.service nmbd.service
-RequiresMountsFor=/etc/ /sketch/ 
-DefaultDependencies=no
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/emberos_fileserver.sh
-
-[Install]
-WantedBy=sysinit.target
-
-EOF
 
 mkdir -p /publictemp
 mkdir -p /sketch/public.www/

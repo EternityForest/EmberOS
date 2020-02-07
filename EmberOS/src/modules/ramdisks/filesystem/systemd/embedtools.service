@@ -1,8 +1,8 @@
 [Unit]
 Description=make systemd random seeding work, and whatever else needs to happen at boot for RO systems.
 After=systemd-remount-fs.service
-Before=sysinit.target nmbd.service
-RequiresMountsFor=/etc/
+Before=sysinit.target nmbd.service smbd.service apache2.service
+RequiresMountsFor=/etc/ /var/log/
 DefaultDependencies=no
 
 [Service]

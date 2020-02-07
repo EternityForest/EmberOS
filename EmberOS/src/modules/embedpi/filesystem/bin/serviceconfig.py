@@ -4,7 +4,7 @@
 SYSTEMD_DEST = "/run/systemd/transient"
 SKETCH_UNITS = "/sketch/config/systemd"
 
-SKETCH_CONFIG = "/sketch/config/startup"
+SKETCH_CONFIG = "/sketch/config/autostart"
 
 import os,shutil,configparser,subprocess
 
@@ -28,8 +28,8 @@ if 'units' in config:
     for i in config['units']:
         if config['units'][i].lower() in ("enable","true","yes","enabled"):
             try:
-                for i in sorted(list(os.listdir(SKETCH_CONFIG))):
-                    subprocess.call("systemctl","start",i)
+                print(i)
+                subprocess.call(["systemctl","start",i])
             except:
                 print(traceback.format_exc())
             

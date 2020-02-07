@@ -12,19 +12,6 @@ set -e
 # mount --bind  /sketch/config/yggdrasil.conf /etc/yggdrasil.conf
 
 
-mkdir -p  /sketch/config/firewalld/
-mount --bind  /sketch/config/firewalld/ /etc/firewalld/
-
-
-# Keep this as is, because of the overlay, which we actually need because of dynamic regen
-mkdir -p /dev/shm/etctmpssl
-mkdir -p /dev/shm/etctmpssl_work
-
-chmod 755 -R /dev/shm/etctmpssl
-chmod 755 -R /dev/shm/etctmpssl_work
-
-mount -t overlay -o lowerdir=/etc/ssl/certs,upperdir=/dev/shm/etctmpssl,workdir=/dev/shm/etctmpssl_work overlay /etc/ssl/certs
-
 update-ca-certificates
 
 #That should already by in a ramdisk
@@ -37,5 +24,5 @@ chown -R pi /home/pi/.pki/nssdb
 #Which is file, the system cert bundle should be good.
 mount -t tmpfs -o size=5m tmpfs /etc/pki/nssdb
 chmod -R 755 /etc/pki/nssdb
-nss-systemcerts-import -d /home/pi/.pki/nssdb
+nss-systemcerts-import -d /etc/pki/nssdb
 

@@ -13,7 +13,7 @@ source /common.sh
 cat << 'EOF' > /usr/bin/ember-manage-audio.py
 #!/usr/bin/python3
 import subprocess,configparser
-
+config = configparser.ConfigParser()
 config.read('/sketch/config/sound.ini')
 
 vol = config['Onboard']['volume']
@@ -25,11 +25,11 @@ interfaces={
     "hdmi": 2
 }
 
-interface= interfaces(interface)
+interface= interfaces[interface]
 
-subprocess.check_call("amixer", "cset", "numid=3", str(interface))
+subprocess.check_call(["amixer", "cset", "numid=3", str(interface)])
 #Expects a value in db, like "0db"
-subprocess.check_call("amixer","-c","0", "set", "PCM", vol)
+subprocess.check_call(["amixer","-c","0", "set", "PCM", vol])
 EOF
 
 chmod 744 /usr/bin/ember-manage-audio.py
