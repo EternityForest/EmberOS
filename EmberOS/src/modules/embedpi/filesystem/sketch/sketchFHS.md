@@ -56,14 +56,14 @@ Things to DLNA share with the local network
 Bound to /var/public.media 755
 
 #### /sketch/public.media/pi
-Bound to /home/pi/PublicMedia
+Bound to /home/pi/public.media
 
 ### /sketch/public.files
 Files to samba, etc share
 Bound to /var/public.files
 
 #### /sketch/public.files/pi
-Bound to /home/pi/PublicFiles
+Bound to /home/pi/public.files
 
 ### /sketch/public.www
 The Apache webserver. It's 755 owned by www-data.

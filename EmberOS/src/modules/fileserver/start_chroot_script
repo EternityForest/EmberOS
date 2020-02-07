@@ -25,17 +25,19 @@ cat << EOF > /sketch/config/filesystem/emberos-netcfg.yaml
 
 __tmpfsoverlay__SAMBA:
   bindat: /var/lib/samba
+  user: root
+  mode: "0700"
 EOF
 
 
 
-mkdir -p /publictemp
+mkdir -p /public.temp
 mkdir -p /sketch/public.www/
 mkdir -p /sketch/public.files/
 
 mkdir -p /sketch/config/
 
-#This is a public samba share. It's read only except the tmpfs at /publictemp
+#This is a public samba share. It's read only except the tmpfs at /public.temp
 cat << EOF > /sketch/config/smb.conf
 #
 # Sample configuration file for the Samba suite for Debian GNU/Linux.
@@ -292,7 +294,7 @@ cat << EOF > /sketch/config/smb.conf
 [temp]
         # This share allows anonymous (guest) access
         # without authentication!
-        path = /publictemp
+        path = /public.temp
         read only = no
         guest ok = yes
         guest account = pi

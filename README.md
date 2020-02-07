@@ -76,7 +76,6 @@ process can access it. For this reason a lot of it's data is copied to /tmp at b
 * Sets everything up for a realtime clock, just add dtoverlay
 * Enables SSH, I2C, and SPI, and the camera interface
 * Allows full configuration of SSH via the sketch partition
-* Installs Samba and DLNA(Not enabled by default)
 * Puts a tmpfs over /home/pi and /root, making them volatile but writable.
 * BindFS binds /home/pi/persist to the /sketch/home/pi, allowing persistent user data
 * Disables overscan. You almost certainly don't want this on a modern display.
@@ -108,8 +107,7 @@ Clone this repo with all submodules
 Put a fresh zipped raspbian full image in the src/images dir
 
 Run sudo ./build_dist in the src dir. This may take about an hour, and 
-you need internet access the whole time. It is not fully scripted, at one point samba will ask to modify
-the config file. You should say yes.
+you need internet access the whole time. It is not fully scripted, at one point samba will ask to modify the config file. You should say yes. Say no when wireshark asks about non superusers sniffing traffic.
 
 
 Cd into the src/workspace folder.
@@ -141,6 +139,32 @@ dtoverlay=i2c-rtc,ds3231
 
 ## Getting online
 Look in /sketch/networks, edit the wifi file as appropriate, or just connect ethernet.
+
+
+## Sharing Files
+
+Samba is enabled by default and exposes three shares. You can change any of this in
+/sketch/config/smb.conf, which is just a standard samba config file.
+
+### temp
+
+This is readable and writable by anyone, however, it is a very small TMPFS, only useful
+for quick and dirty sharing of non-private stuff under 32MB.  It is backed by the folder 
+/public.temp, also readable by anyone.
+
+
+### media
+
+Used for media sharing, not writable from the network. Backed by /sketch/public.media(Bound to /var/public/media, which is readable by all and only writable by root).
+
+There is a special subfolder called pi, which is bound to /home/pi/public.media, owned by pi, and readable to any.
+
+### media
+
+Used for general sharing, not writable from the network. Backed by /sketch/public.files(Bound to /var/public/files, which is readable by all and only writable by root).
+
+There is a special subfolder called pi, which is bound to /home/pi/public.files, owned by pi, and readable to any.
+
 
 ## Securing SSH
 

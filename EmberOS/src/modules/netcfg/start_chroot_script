@@ -19,7 +19,7 @@ sudo apt-get -y install yggdrasil
 
 # Don't even think about setting this up without
 # some serious firewalling(See below, but we still should probably not enable this by default for various reasons)
-# sudo systemctl enable yggdrasil
+! systemctl disable yggdrasil
 
 
 apt-get -y install network-manager libnss3-tools ca-certificates nftables firewalld avahi-daemon avahi-utils
@@ -68,6 +68,12 @@ __tmpfsoverlay__SSLCERTS:
   bindat: /etc/ssl/certs
 EOF
 
+
+cat << EOF > /sketch/config/filesystem/emberos-yggdrasil.yaml
+/sketch/config.private:
+   bindfiles:
+    yggdrasil.conf: /etc/yggdrasil.conf
+EOF
 
 
 

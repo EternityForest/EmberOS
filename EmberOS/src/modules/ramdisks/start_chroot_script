@@ -200,8 +200,8 @@ append1 /etc/fstab "/var/lib/systemd/timers/" "tmpfs /var/lib/systemd/timers/ tm
 
 
 #General purpose 32MB public unsecured free for all for easy file sharing funtimes
-mkdir -p /publictemp
-append1 /etc/fstab "/publictemp" "tmpfs /publictemp tmpfs defaults,noatime,nosuid,nodev,noexec,nofail,mode=1777,size=32M 0 0"
+mkdir -p /public.temp
+append1 /etc/fstab "/public.temp" "tmpfs /public.temp tmpfs defaults,noatime,nosuid,nodev,noexec,nofail,mode=1777,size=32M 0 0"
 
 
 #Keep logrotate. We want to clear old logs out of RAM

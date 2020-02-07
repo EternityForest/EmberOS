@@ -98,7 +98,7 @@ pip install python-can
 
 
 
-mkdir -p /publictemp
+mkdir -p /public.temp
 mkdir -p /sketch/public.www/
 mkdir -p /sketch/public.files/
 

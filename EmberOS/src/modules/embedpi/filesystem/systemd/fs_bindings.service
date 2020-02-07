@@ -2,14 +2,14 @@
 Description=Configure BindFS sketch management
 After=systemd-remount-fs.service
 #Possiblye issue here if we start *after* something important, don't forget to include things!
-Before=sysinit.target NetworkManager.service chronyd.service kaithem.service firewalld.service regenerate_ssh_host_keys.service smbd.service nmbd.service console-setup.service
+Before=sysinit.target NetworkManager.service chronyd.service kaithem.service firewalld.service regenerate_ssh_host_keys.service smbd.service nmbd.service console-setup.service yggdrasil.service nodered.service
 RequiresMountsFor=/etc/ /sketch/ /home/
 DefaultDependencies=no
 
 
 [Service]
 TimeoutStartSec=0
-ExecStart=/usr/bin/fs_bindings.py
+ExecStart=/usr/bin/fs_bindings.py > /var/log/fs_bindings
 #We don't want syste
 KillMode=process
 Type=oneshot
