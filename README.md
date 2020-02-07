@@ -261,6 +261,13 @@ including SSH(Some other setups default to allowing SSH, we don't, because raspb
  firewall-cmd --permanent --zone=public --add-port=80/tcp
 
 
+### Configuring Audio
+
+If you need to force HDMI or Analog output, or change the ALSA volume of the onboard card,
+just edit /sketch/config/sound.ini, and change the output option to "hdmi" or "analog" as desired.
+
+We default to "auto", which is probably not what you want if using an HDMI monitor and 3.5mm speakers.
+
 ### Apps
 
 We include some useful GUI apps in addition to the raspbian stuff. Most are preconfigure

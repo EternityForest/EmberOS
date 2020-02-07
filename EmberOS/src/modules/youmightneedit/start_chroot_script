@@ -131,7 +131,7 @@ apt-get -y install python3-tz python3-dateutil lm-sensors python3-lxml
 apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3-libnacl jack-tools
 apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid
 apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly python3-psutil
-apt-get -y install -y fluidsynth
+apt-get -y install -y fluidsynth pulseaudio-module-jack pulseaudio-module-bluetooth pulseaudio-module-zeroconf pulsemixer
 
 #Better shells
 apt-get -y install -y elvish fish
@@ -162,7 +162,7 @@ ln -s /home/pi/persist/.config/ardour5 /home/pi/.config/ardour5
 
 
 
-apt-get -y install nmap robotfindskitten ncdu mc curl fatrace
+apt-get -y install nmap robotfindskitten ncdu mc curl fatrace gstreamer1.0-tools pavucontrol
 
 #Sigh. Vim is huge but some people really love it...
 apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast

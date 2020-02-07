@@ -7,21 +7,36 @@ set -e
 
 source /common.sh
 
-#This is a bad thing for readonly embedded stuff. I don't know why.
-apt purge -y ^pulseaudio$ 
+#Formerly pulseaudio was not used here. However, the new config file
+#mostly gets rid of any issues relating to the use of it. I am happy to say it is usable again!
 
-cat << 'EOF' > /usr/bin/manage_audio.sh
-#!/bin/bash
+cat << 'EOF' > /usr/bin/ember-manage-audio.py
+#!/usr/bin/python3
+import subprocess,configparser
 
-#Set card 0 volume to full.
-amixer -c 0 set PCM 0db
+config.read('/sketch/config/sound.ini')
+
+vol = config['Onboard']['volume']
+interface = config['Onboard']['output'].lower()
+
+interfaces={
+    "auto": 0,
+    "analog": 1,
+    "hdmi": 2
+}
+
+interface= interfaces(interface)
+
+subprocess.check_call("amixer", "cset", "numid=3", str(interface))
+#Expects a value in db, like "0db"
+subprocess.check_call("amixer","-c","0", "set", "PCM", vol)
 EOF
 
-chmod 744 /usr/bin/manage_audio.sh
+chmod 744 /usr/bin/ember-manage-audio.py
 
 
 
-cat << EOF > /etc/systemd/system/manage_audio.service
+cat << EOF > /etc/systemd/system/ember-manage-audio.service
 [Unit]
 Description=Manage audio
 After=sysinit.target
@@ -29,12 +44,12 @@ After=sysinit.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/manage_audio.sh
+ExecStart=/usr/bin/ember-manage-audio.py
 
 [Install]
 WantedBy=sysinit.target
 
 EOF
 
-chmod 744  /etc/systemd/system/manage_audio.service
-systemctl enable manage_audio.service
+chmod 744  /etc/systemd/system/ember-manage-audio.service
+systemctl enable ember-manage-audio.service
