@@ -266,14 +266,37 @@ We default to "auto", which is probably not what you want if using an HDMI monit
 ## Serving Media
 
 One of the most common tasks for embedded devices is as a media server.
-Put whatever you want to serve in /sketch/public.media for DLNA,
-/sketch/public.files for samba.
+Put whatever you want to serve in /sketch/public.media for DLNA.
+
+You will need to enable minidlna in /sketch/config/autostart
 
 Put whatever you want to serve as a standard web site in /sketch/public.www to serve
 it on port 80 with apache. Whatever you put as index.http will be the start page for the fullscren kiosk!
 
-Don't use the prefix public. for anything you don't want to be made public in case more
+Don't use the prefix "public." for anything you don't want to be made public, in case more
 services are added!
+
+## Adding programs to the sketch
+
+The goal here is to be mostly batteries included, with a clean separation between your actual
+application and the base image+packages, and usually you would just use "writable"
+and then apt-get as normal if you need to install something.
+
+However, /sketch/opt is bound to /sketch.opt, and /sketch/bin is bound to /usr/sketch.bin.
+
+Both mapped views are mode 755 and root-owned.
+
+Should you need something added to your path, and want to include it in the sketch, it is possible.
+
+
+## Downloading/watching videos
+
+Youtube-dl cannot be included, as APIs change so frequently that it would not do anyone any good.  However, you can use "sudo get-youtube-dl" to automatically get the latest version.
+
+It will be stored in /sketch/bin, due ti the need for frequent easy updates(We consider it more like dynamic data than a real program, because of how often it updates)
+
+Tartube is also included, which is a noce graphical YT client. It is installed in the normal setup.py way and can be updated.
+
 
 ## Making it actually read only
 

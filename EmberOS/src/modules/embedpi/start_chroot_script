@@ -297,6 +297,9 @@ mk_pi_persist_dir  Drawer
 mk_pi_persist_dir  Games
 mk_pi_persist_dir  Sync
 
+#Youtube client
+mk_pi_persist_dir  tartube_data
+
 mk_pi_persist_dir  .fonts
 mk_pi_persist_dir  .home_template
 mk_pi_persist_dir  .mednafen
@@ -381,7 +384,12 @@ __tmpfsoverlay__HOMEPI:
 EOF
 
 mkdir -p /sketch/share
-mkdir -p /sketchopt
+
+mkdir -p /sketch.opt
+mkdir -p /usr/sketch.bin
+
+mkdir -p /sketch/opt
+mkdir -p /sketch/bin
 
 cat << EOF > /sketch/config/filesystem/emberos_share.yaml
 /sketch/share/:
@@ -389,11 +397,29 @@ cat << EOF > /sketch/config/filesystem/emberos_share.yaml
 /sketch/share/fonts: /usr/local/share/fonts
 EOF
 
-cat << EOF > /sketch/config/filesystem/emberos_opt.yaml
+cat << EOF > /sketch/config/filesystem/emberos_opt_bin.yaml
 /sketch/opt/:
     mode: '0755'
-    bindat: /sketchopt
+    bindat: /sketch.opt
+/sketch/bin/:
+    mode: '0755'
+    bindat: /usr/sketch.bin
 EOF
+
+cat << EOF > /sketch/config/filesystem/emberos_opt_bin.yaml
+/sketch/opt/:
+    mode: '0755'
+    bindat: /sketch.opt
+/sketch/bin/:
+    mode: '0755'
+    bindat: /usr/sketch.bin
+EOF
+
+#Allow the /sketch/bin to work
+cat << EOF > /usr/lib/environment.d/98-ember-sketch-bin.conf 
+PATH=/usr/sketch.bin:$PATH
+EOF
+
 
 mkdir -p /sketch/config.private
 mkdir -p /etc/sketchconfig.private

@@ -4,3 +4,6 @@
 [submodule "EmberOS/src/modules/genfortune/filesystem/GenFortune"]
 	path = EmberOS/src/modules/genfortune/filesystem/GenFortune
 	url = https://github.com/EternityForest/GenFortune.git
+[submodule "EmberOS/src/modules/youmightneedit/filesystem/tartube"]
+	path = EmberOS/src/modules/youmightneedit/filesystem/tartube
+	url = https://github.com/axcore/tartube.git
