@@ -272,12 +272,12 @@ mkdir -p /home/pi/persist
 
 
 mk_pi_persist_dir () {
-  mkdir -p /sketch/home/pi/$1 
-  mkdir -p /home/pi/$1 
+  mkdir -p "/sketch/home/pi/$1"
+  mkdir -p "/home/pi/$1"
 
-  ! cp -ar /home/pi/$1/. /sketch/home/pi/$1
-  ! rm -r  /home/pi/$1
-  ln -s /home/pi/persist/$1 /home/pi/$1
+  ! cp -ar "/home/pi/$1/." "/sketch/home/pi/$1"
+  ! rm -r  "/home/pi/$1"
+  ln -s "/home/pi/persist/$1" "/home/pi/$1"
 }
 
 
@@ -296,9 +296,14 @@ mk_pi_persist_dir  Misc
 mk_pi_persist_dir  Drawer
 mk_pi_persist_dir  Games
 mk_pi_persist_dir  Sync
+mk_pi_persist_dir  "Calibre Library"
+mk_pi_persist_dir  ~/.config/calibre
+mk_pi_persist_dir  ~/.config/Zeal
+
+mk_pi_persist_dir .local/share/Zeal
 
 #Youtube client
-mk_pi_persist_dir  tartube_data
+mk_pi_persist_dir tartube_data
 
 mk_pi_persist_dir  .fonts
 mk_pi_persist_dir  .home_template

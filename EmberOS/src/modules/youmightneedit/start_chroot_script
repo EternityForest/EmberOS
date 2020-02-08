@@ -66,7 +66,7 @@ ln -s /home/pi/persist/.dosbox /home/pi/.dosbox
 apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full
 
 
-apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola audacious audacious-plugins gwenview
+apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola audacious audacious-plugins gwenview calibre zeal
 
 apt-get -y install fvwm fvwm-icons mpv libgdk-pixbuf2.0-bin
 

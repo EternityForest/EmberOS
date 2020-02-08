@@ -13,6 +13,21 @@ It would be possible to remove some things and shrink it, but I don't suggest th
 a 16GB card will make wear leveling more effective and give your app room to expand.
 
 
+### Goals
+
+* Reliable embedded control and digital signage
+* Do almost anything offline once you have the image, most common tools included
+* Usable for basic desktop tasks, if you're careful not to save stuff to volatile folders
+* Declaratively configurable, you should be able to do almost everything just by editing files in /sketch
+* As little configuration as possible for common tasks, everything should just work.
+* Convenient platform for experimenting with your setup, includes all tools for minor tweaks to just about everything without needing a desktop computer.
+
+
+#### Semi read only
+ Read only root filesystem, and mostly read only /home/pi, with carefully controlled symlinks to persistent folders to make apps work as they should, while keeping everything
+ else read only, or purely volatile, so things like chromium's absurd disk writes can't cause trouble.
+
+ 
 ## Enabling services
 
 Instead of SSHing in(Which may not always be available), you can activate any systemd
@@ -140,6 +155,7 @@ dtoverlay=i2c-rtc,ds3231
 ## Getting online
 Look in /sketch/networks, edit the wifi file as appropriate, or just connect ethernet.
 
+These are NetworkManager files, so wifi will automatically reconnect for you.
 
 ## Sharing Files
 
@@ -293,7 +309,7 @@ Should you need something added to your path, and want to include it in the sket
 
 Youtube-dl cannot be included, as APIs change so frequently that it would not do anyone any good.  However, you can use "sudo get-youtube-dl" to automatically get the latest version.
 
-It will be stored in /sketch/bin, due ti the need for frequent easy updates(We consider it more like dynamic data than a real program, because of how often it updates)
+It will be stored in /sketch/bin, due ti the need for frequent easy updates(We consider it more like dynamic data than a real program, because of how often it updates).
 
 Tartube is also included, which is a noce graphical YT client. It is installed in the normal setup.py way and can be updated.
 

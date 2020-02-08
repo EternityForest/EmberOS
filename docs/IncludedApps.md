@@ -55,6 +55,13 @@ The suggested media player
 #### Gnome Disk Util
 The best partition manager, imager, and loop mounter. Run with gnome-disks
 
+#### Calibre
+EBook reader, server, and editor. Already set up with symlinks to /home/pi/persist
+
+#### Zeal
+
+Offline developer documentation browser. Docsets not included, but it's set up with symlinks to make them persistent.
+
 
 ### Languages
 #### Elixir
