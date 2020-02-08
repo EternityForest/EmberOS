@@ -34,16 +34,19 @@ cat << EOF > /usr/bin/get-youtube-dl
 #This CD trick lets us avoid an unneccessary download
 cd /sketch/bin/
 wget -N -S --backups=1 https://yt-dl.org/downloads/latest/youtube-dl
+chmod 755 youtube-dl
 EOF
 chmod 755 /usr/bin/get-youtube-dl
 
-#Add the YT client
-cd /filesystem/tartube
-python3 setup.py install
 
-#Hack-around for something setup.py should have beed doing for us
-mkdir -p /usr/share/tartube/icons
-cp -ar icons/. /usr/share/tartube/icons
+##This is currently not included, it has some challenges getting install to work
+#Add the YT client
+# cd /filesystem/tartube
+# python3 setup.py install
+
+# #Hack-around for something setup.py should have beed doing for us
+# mkdir -p /usr/share/tartube/icons
+# cp -ar icons/. /usr/share/tartube/icons
 
 
 cat << EOF > /sketch/config/filesystem/emberos_pi_syncthing.yaml
@@ -71,7 +74,7 @@ apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p
 
 apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola audacious audacious-plugins gwenview calibre zeal
 
-apt-get -y install fvwm fvwm-icons mpv libgdk-pixbuf2.0-bin
+apt-get -y install fvwm fvwm-icons mpv libgdk-pixbuf2.0-bin gpsd gpsd-clients viking
 
 update-icon-caches /usr/share/icons/*
 
