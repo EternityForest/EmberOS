@@ -41,6 +41,9 @@ chmod 755 /usr/bin/get-youtube-dl
 cd /filesystem/tartube
 python3 setup.py install
 
+#Hack-around for something setup.py should have beed doing for us
+mkdir -p /usr/share/tartube/icons
+cp -ar icons/. /usr/share/tartube/icons
 
 
 cat << EOF > /sketch/config/filesystem/emberos_pi_syncthing.yaml
