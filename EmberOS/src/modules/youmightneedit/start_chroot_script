@@ -62,7 +62,7 @@ EOF
 
 
 #Batteries included, allow messing with kiosk browser media right from the device
-apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full testdisk baobab kalgebra fldigi flrig flmsg flamp
+apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full testdisk baobab fldigi flrig flmsg flamp
 
 
 apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola audacious audacious-plugins gwenview calibre zeal convertall

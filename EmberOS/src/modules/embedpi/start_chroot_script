@@ -13,6 +13,9 @@ set -e
 source /common.sh
 install_cleanup_trap
 
+#Force IPv4 for apt updates until such a time as ipv6 is supported everywhere.
+echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99-force-ipv4
+
 apt update -y --allow-releaseinfo-change
 apt update
 
