@@ -240,8 +240,10 @@ Anything you create gets saved back to that /sketch partition.
 
 The contents of /home/pi/persist/.home_template are copied to /home/pi after the tmpfs is mounted.
 
-By default, many common folders that seem logical to assume you want persistant storage for
-are symlinked to the persist folder. ALWAYS CHECK BEFORE PUTTING IMPORTANT DATA SOMEWHERE!
+By default, many common folders that seem logical to assume you want persistant storage for are symlinked to the persist folder. ALWAYS CHECK BEFORE PUTTING IMPORTANT DATA SOMEWHERE!
+
+DO NOT PUT ANYTHING YOU WANT TO KEEP IN THE ROOT OF THE HOME DIR!!!
+
 
 #### Adding a persisant directory/customizing the home dir
 ```
@@ -275,6 +277,36 @@ If you need to force HDMI or Analog output, or change the ALSA volume of the onb
 just edit /sketch/config/sound.ini, and change the output option to "hdmi" or "analog" as desired.
 
 We default to "auto", which is probably not what you want if using an HDMI monitor and 3.5mm speakers.
+
+
+### The Bindings Manager
+
+More documentation to come, but basically, everything is managed via
+a "bind engine" that takes config files and uses them to set up bindings
+between /sketch and other places.
+
+BindFS allows permission-transformed views, which is how other users can write to selected dirs in /sketch, which is normally owned by root with mode 700.
+
+The binding manager runs once at boot.
+
+This is what config files look like:
+
+```yaml
+cat << EOF > /sketch/config/filesystem/some_directory.yaml
+/sketch/foo:
+    #Mode must be quoted
+    mode: '0755'
+    #/var/lib/someApplication and all files under
+    #it appear to be owned by root
+    user: root
+    #Binds /sketch/home/foo to /var/lib/someApplication
+    bindat: /var/lib/someApplication
+    pre_cmd: echo beforemainbindmount
+    post_cmd: echo aftermainbindmount
+    #This binds /var/lib/someApplication/foo to /etc/foo
+    bindfiles:
+        foo: /etc/foo
+```
 
 ### Apps
 (See apps listing)[docs/IncludedApps.md]
