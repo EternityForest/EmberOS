@@ -60,21 +60,14 @@ EOF
 # apt-get -y install firewall-config
 
 
-apt-get -y install dosbox
-
-mkdir -p /sketch/home/pi/.dosbox
-! cp -ar /home/pi/.dosbox/. /sketch/home/pi/.dosbox
-! rm -r  /home/pi/.dosbox
-ln -s /home/pi/persist/.dosbox /home/pi/.dosbox
-
 
 #Batteries included, allow messing with kiosk browser media right from the device
-apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full
+apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full testdisk baobab kalgebra fldigi flrig flmsg flamp
 
 
 apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola audacious audacious-plugins gwenview calibre zeal
 
-apt-get -y install fvwm fvwm-icons mpv libgdk-pixbuf2.0-bin gpsd gpsd-clients viking
+apt-get -y install fvwm fvwm-icons mpv libgdk-pixbuf2.0-bin gpsd gpsd-clients marble-qt marble-maps marble-plugins dosbox wxhexeditor d-feet
 
 update-icon-caches /usr/share/icons/*
 
@@ -165,17 +158,6 @@ apt-get -y install -y fonts-hack
 
 
 apt-get -y install -y spacefm fslint deluge ardour pulseview
-#Make dir persistent
-mkdir -p /sketch/home/pi/.config/deluge
-! cp -ar /home/pi/.config/deluge/. /sketch/home/pi/.config/deluge
-! rm -r  /home/pi/.config/deluge
-ln -s /home/pi/persist/.config/deluge /home/pi/.config/deluge
-
-
-mkdir -p /sketch/home/pi/.config/ardour5
-! cp -ar /home/pi/.config/ardour5/. /sketch/home/pi/.config/ardour5
-! rm -r  /home/pi/.config/ardour5
-ln -s /home/pi/persist/.config/ardour5 /home/pi/.config/ardour5
 
 #apt-get -y install -y krita
 

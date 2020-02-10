@@ -22,7 +22,7 @@ sudo apt-get -y install yggdrasil
 ! systemctl disable yggdrasil
 
 
-apt-get -y install network-manager libnss3-tools ca-certificates nftables firewalld avahi-daemon avahi-utils
+apt-get -y install network-manager libnss3-tools ca-certificates nftables firewalld avahi-daemon avahi-utils radvd
 
 systemctl enable NetworkManager.service
 unpack /filesystem/networkmanager /etc/NetworkManager root
@@ -38,7 +38,6 @@ chmod 755 /usr/bin/nss-systemcerts-import
 mkdir -p /etc/pki/nssdb
 
 systemctl enable emberos_netcfg.service
-
 
 
 #Copy to sketch folder

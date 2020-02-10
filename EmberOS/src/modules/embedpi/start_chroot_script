@@ -212,16 +212,18 @@ mkdir -p /root/ssh
 
 mkdir -p /sketch/config/ssh
 
-cp -a /etc/ssh/ssh_config  /sketch/config/ssh/ssh_config
+cp -a /etc/ssh/ssh_config  /sketch/config/ssh/etc.ssh/ssh_config
 
 mkdir -p  /sketch/ssh/pi
 mkdir -p /sketch/ssh/root
 
+mkdir -p /sketch/ssh/etc.ssh
 
 cat << EOF > /sketch/config/filesystem/emberos_sshconf.yaml
-/sketch/config/:
-    bindfiles:
-        ssh/ssh_config: /etc/ssh/ssh_config
+/sketch/ssh/etch.ssh:
+    mode: '0700'
+    user: root
+    bindat: /etc/ssh
 
 /sketch/ssh/pi/:
     mode: '0700'
@@ -274,15 +276,35 @@ mkdir -p /sketch/home/pi
 mkdir -p /home/pi/persist
 
 
+cat << EOF > /home/pi/KIOSK_INFO_README_IMPORTANT.txt
+This is a kiosk UI! For reliability, almost everything in the home dir starts fresh when rebooting.
+
+Anything saved in this home dir, except the persist, public.files, and public.media folders,
+will disappear when the device is powered off!!
+
+For convenience, many things are just shortcuts to these directories, and many programs
+have been preconfigured to safe important data there, but you should not trust any folder you
+did not verify for yourself.
+
+Also note that public.* folders are truly public. Anyone on the local network may be able to read
+them.
+EOF
+
 mk_pi_persist_dir () {
   mkdir -p "/sketch/home/pi/$1"
   mkdir -p "/home/pi/$1"
 
+  #Move to sketch, delete original
   ! cp -ar "/home/pi/$1/." "/sketch/home/pi/$1"
   ! rm -r  "/home/pi/$1"
   ln -s "/home/pi/persist/$1" "/home/pi/$1"
 }
 
+
+mkdir -p /home/pi/.local/share
+chown pi /home/pi/.local/share
+mkdir -p /home/pi/.config
+chown pi /home/pi/.config
 
 #Symlink some directories that are pretty obviously useful to persist
 #But only the super obviously "Manual" ones that aren't messed with by the system
@@ -301,10 +323,12 @@ mk_pi_persist_dir  Drawer
 mk_pi_persist_dir  Games
 mk_pi_persist_dir  Sync
 mk_pi_persist_dir  "Calibre Library"
-mk_pi_persist_dir  ~/.config/calibre
-mk_pi_persist_dir  ~/.config/Zeal
-
+mk_pi_persist_dir  .config/calibre
+mk_pi_persist_dir  .config/Zeal
+mk_pi_persist_dir .local/share/marble
 mk_pi_persist_dir .local/share/Zeal
+mk_pi_persist_dir .config/deluge
+mk_pi_persist_dir .config/ardour5
 
 #Youtube client
 mk_pi_persist_dir tartube_data
@@ -317,29 +341,14 @@ mk_pi_persist_dir  .npm
 mk_pi_persist_dir  .nimble
 mk_pi_persist_dir  .viking
 mk_pi_persist_dir  .viking_maps
-
-#Same with syncthing
-mkdir -p /sketch/home/pi/.config/syncthing
-! cp -ar /home/pi/.config/syncthing/. /sketch/home/pi/.config/syncthing
-! rm -r  /home/pi/.config/syncthing
-
-mkdir -p /sketch/home/pi/.config/syncthing-gtk
-! cp -ar /home/pi/.config/syncthing-gtk/. /sketch/home/pi/.config/syncthing-gtk
-! rm -r  /home/pi/.config/syncthing-gtk
-
-mkdir -p /sketch/home/pi/fonts
-! cp -ar /home/pi/.local/share/fonts/. /sketch/home/pi/fonts
-! rm -r  /home/pi/.local/share/fonts
-
-mkdir -p /home/pi/.local/share
-chown pi /home/pi/.local/share
-mkdir -p /home/pi/.config
-chown pi /home/pi/.config
-
-
-ln -s /home/pi/persist/.config/syncthing /home/pi/.config/syncthing
-ln -s /home/pi/persist/.config/syncthing-gtk /home/pi/.config/syncthing-gtk
-ln -s /home/pi/persist/fonts /home/pi/.local/share/fonts
+mk_pi_persist_dir  .fldigi
+mk_pi_persist_dir  .flrig
+mk_pi_persist_dir  .flmsg
+mk_pi_persist_dir  .flamp
+#Very important .syncthing itself is handled separately, it has a private key
+#That needs to be mode 700
+mk_pi_persist_dir  .syncthing-gtk
+mk_pi_persist_dir .local/share/fonts
 
 #Give pi a place to share public stuff, if desired
 mkdir -p /sketch/public.files/pi

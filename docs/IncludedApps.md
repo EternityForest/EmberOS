@@ -62,6 +62,20 @@ EBook reader, server, and editor. Already set up with symlinks to /home/pi/persi
 
 Offline developer documentation browser. Docsets not included, but it's set up with symlinks to make them persistent.
 
+#### Marble
+GPS/Mapping
+
+#### fldigi et al
+HAM radio, including digital modes.
+
+#### Baobab
+Disk usage explore utility
+
+#### d-feet
+DBus inspector
+
+### wxHexEditor
+A hex editor
 
 ### Languages
 #### Elixir
@@ -158,3 +172,11 @@ Obviously the best console game :P
 
 #### fortune
 It's fortune!
+
+#### GenFortune
+It's like fortune, but it generates things on-the-fly.
+
+#### gpsd
+
+#### yggdrasil
+Mesh Networking
