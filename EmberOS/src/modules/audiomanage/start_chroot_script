@@ -7,8 +7,16 @@ set -e
 
 source /common.sh
 
-#Formerly pulseaudio was not used here. However, the new config file
-#mostly gets rid of any issues relating to the use of it. I am happy to say it is usable again!
+
+cat << 'EOF' > /sketch/config/sound.ini
+#This section configures the pi's onboard audio
+#It does not set which card is the default, it configures the device itself.
+[Onboard]
+volume=0db
+#Controls where the onboard analog device routes sound.
+#Available options: auto, analog, hdmi
+output=auto
+EOF
 
 cat << 'EOF' > /usr/bin/ember-manage-audio.py
 #!/usr/bin/python3

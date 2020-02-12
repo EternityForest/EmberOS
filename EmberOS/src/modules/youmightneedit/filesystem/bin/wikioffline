@@ -17,8 +17,8 @@ indexdir=os.path.expanduser(indexdir)
 
 if len(sys.argv)>2:
     doBrowser=True
-    wiki = sys.argv[2]
-    port = sys.argv[3]
+    wiki = sys.argv[1]
+    port = sys.argv[2]
 else:
     wiki,port = sys.argv[1].split(":")
 subprocess.check_call(["mkdir","-p",indexdir])

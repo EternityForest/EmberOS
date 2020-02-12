@@ -360,7 +360,7 @@ The goal here is to be mostly batteries included, with a clean separation betwee
 application and the base image+packages, and usually you would just use "writable"
 and then apt-get as normal if you need to install something.
 
-However, /sketch/opt is bound to /sketch.opt, and /sketch/bin is bound to /usr/sketch.bin.
+However, /sketch/opt is bound to /sketch.opt, and /sketch/bin is bound to /usr/bin.sketch.
 
 Both mapped views are mode 755 and root-owned.
 
@@ -374,6 +374,12 @@ Youtube-dl cannot be included, as APIs change so frequently that it would not do
 It will be stored in /sketch/bin, due ti the need for frequent easy updates(We consider it more like dynamic data than a real program, because of how often it updates).
 
 
+## Media Center Use
+
+Kodi is installed! See the KioskUI file, at the bottom there is an example of booting straight to it, which is recommended over the usual systemd way.
+
+I suggest you get a 64GB or up SanDisk Industrial/Automotive/DVR grade SD
+card if you want to use Kodi.
 
 ## Making it actually read only
 

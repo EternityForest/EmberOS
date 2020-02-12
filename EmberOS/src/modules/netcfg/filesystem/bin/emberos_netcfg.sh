@@ -14,6 +14,7 @@ set -e
 
 update-ca-certificates
 
+! rm -r /home/pi/.pki/nssdb
 #That should already by in a ramdisk
 mkdir -p /home/pi/.pki/nssdb
 chmod -R 755 /home/pi/.pki/nssdb

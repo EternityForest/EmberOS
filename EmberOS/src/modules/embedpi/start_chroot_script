@@ -25,7 +25,8 @@ unpack /filesystem/sketch /sketch
 
 
 apt-get -y install -y ntfs-3g
-apt-get -y install -y bindfs
+#Very important!!! Fuse and Fuse3 have a horrible incompatibility because of -o nonempty
+apt-get -y install -y bindfs fuse3
 #Needed for reading config files
 apt-get -y install -y python3-yaml
 
@@ -160,7 +161,8 @@ if [ ! -f /sketch/kaithem/ssl/certificate.key ] ; then
     #Copy it so it's trusted by browsers
     mkdir -p /sketch/config/sslcerts.local/
     mkdir -p /sketch/config/sslcerts.local/ember-kaithem
-    cp /sketch/kaithem/ssl/certificate.cert /sketch/config/sslcerts.local/ember-kaithem/kaithem_localhost.cert
+    #Yes, the filename mismatch is intentional!!
+    cp /sketch/kaithem/ssl/certificate.cert /sketch/config/sslcerts.local/ember-kaithem/kaithem_localhost.crt
 fi
 EOF
 
@@ -332,6 +334,9 @@ mk_pi_persist_dir .local/share/marble
 mk_pi_persist_dir .local/share/Zeal
 mk_pi_persist_dir .config/deluge
 mk_pi_persist_dir .config/ardour5
+mk_pi_persist_dir .config/sigrok
+mk_pi_persist_dir .kodi
+
 #This one is annoying, it saves EVERYTHING
 #to the same session file on exit. But whatever, it's only
 #30kb, probably not a significant issue
@@ -402,6 +407,7 @@ __tmpfsoverlay__HOMEPI:
     mode: '750'
     user: pi
 
+
 /sketch/home/pi:
     mode: '0750'
     user: pi
@@ -415,7 +421,7 @@ EOF
 mkdir -p /sketch/share
 
 mkdir -p /sketch.opt
-mkdir -p /usr/sketch.bin
+mkdir -p /usr/bin.sketch
 
 mkdir -p /sketch/opt
 mkdir -p /sketch/bin
@@ -439,12 +445,12 @@ cat << EOF > /sketch/config/filesystem/emberos_opt_bin.yaml
     bindat: /sketch.opt
 /sketch/bin/:
     mode: '0755'
-    bindat: /usr/sketch.bin
+    bindat: /usr/bin.sketch
 EOF
 
 #Allow the /sketch/bin to work
 cat << EOF > /usr/lib/environment.d/98-ember-sketch-bin.conf 
-PATH=/usr/sketch.bin:$PATH
+PATH=/usr/bin.sketch:$PATH
 EOF
 
 
