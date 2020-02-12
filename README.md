@@ -21,6 +21,23 @@ a 16GB card will make wear leveling more effective and give your app room to exp
 * Declaratively configurable, you should be able to do almost everything just by editing files in /sketch
 * As little configuration as possible for common tasks, everything should just work.
 * Convenient platform for experimenting with your setup, includes all tools for minor tweaks to just about everything without needing a desktop computer.
+* Things that require updates to keep working(Timezones, SSL, etc) are managed via /sketch for easy updates.
+
+* Basically anything that's more of a "device" than a computer, that needs to be reliable and doesn't store too much data.
+
+
+### Use Cases
+
+* Light duty embedded control/Home Automation(Kaithem or NodeRed)
+* Digital Signage
+* Offline Wiki Server
+* Kiosk browser
+* DLNA Media server/Samba fileserver/Web server/Torrent box
+* Basic Desktop computer(If you are careful about the volatile home dir) 
+* Realtime audio mixing with multiple soundcards(through Kaithem)
+* Background Music player(Kaithem or Audacious)
+* Amateur Radio station
+* Mesh Networking node
 
 
 #### Semi read only
@@ -36,11 +53,6 @@ service by editing the config files(See /sketch/config/autostart/).
 They are very simple INI files.
 
 You can't disable services enabled via systemctl this way(Under the hood, a script reads the file and starts all enabled services but does not sto anything).  The intent is to use the config files for all optional or user services.
-
-## Provisioning.sh
-
-At boot, if there is a file named /sketch/provisioning.sh, it will be ran, then renamed to /sketch/provisioning.sh.RAN, and any output logged
-to /sketch/provisioning.sh.log
 
 
 ## Security
@@ -65,6 +77,12 @@ They are just self signed keys though, you will get a warning in your browser.
 
 
 
+### Changing the passwords
+At the moment, users and passwords are stored in their normal place.  /sketch is mostly for the things one might want under version control, to deploy repeatedly, or the stuff you might
+want to chage really quickly for basic non-critical non-secure use.
+
+I might move /etc/shadow, but for now just do `writable` then change passwords in the usual way, the users aren't exactly part of the "application data" anyway.
+
 
 ### /sketch
 
@@ -73,38 +91,6 @@ It can be read and executed by root's group, but only written by root itself, as
 
 It is not encrypted though.
 
-## What it does
-
-* Adds a ntfs partition called /sketch  that is intended to be the storage location for everything except the os and libs. It is owned by root with mode 750, so not just any random
-process can access it. For this reason a lot of it's data is copied to /tmp at boot
-
-
-* Makes a file at /sketch/config/hostname to let you change the hostname
-* Hostsfile is now at /sketch/config/hosts
-* Installs chrony instead of garbage timesyncd
-* Puts a whole bunch of tmpfses on things that write to disk, so they still work
-* Generates entropy from the HW rnd on boot
-* Makes sure avahi, exfat-utils, and other random stuff you probably want is installed
-* Runs kaithem as root, if kaithem.service is enabled in the autostart config
-* Runs node-red as root, if the service is enabled in the autostart config
-* Makes /boot and / read-only
-* Sets everything up for a realtime clock, just add dtoverlay
-* Enables SSH, I2C, and SPI, and the camera interface
-* Allows full configuration of SSH via the sketch partition
-* Puts a tmpfs over /home/pi and /root, making them volatile but writable.
-* BindFS binds /home/pi/persist to the /sketch/home/pi, allowing persistent user data
-* Disables overscan. You almost certainly don't want this on a modern display.
-* Sets up a US keyboard layout(This will eventually be set through /sketch if there's interest)
-* Boots by default into a Chromium fullscreen kiosk(Exit with alt-f4) pointed at http://localhost
-
-* Allows configuring NetworkManager via /sketch/networks
-
-* Does NOT make the NTFS partition /sketch read only. You have to do that one yourself if you want it, and some things assume it is writable.
-
-* Sets up firewalld, but the default zone is trusted, so it does nothing until you configure it, aside from making the Yggdrasil and CJDNS IP ranges untrusted
-
-* Symlink Documents, Downloads,Pictures, Arduino, Templates,Music, and Videos to ~/persist
-* Share /home/pi/SharedMedia via DLNA
 
 ## Prebuilt image
 
@@ -136,11 +122,16 @@ You can also just shrink / to make room for the sketch partition.  You may want 
 
 Mount the partition using `sudo udisksctl loop-setup -f 2019-06-20-raspbian-buster-full.img` 
 
-Using your favorite partition editor, add an ntfs partition called sketch just after the root partition,
-in that empty space you just made.
+Using your favorite partition editor, add an ntfs partition called sketch just after the root partition, in that empty space you just made.
 
 Copy everything in the root partition's sketch dir to the root of that partition.  Anything
 in the actual sketch dir is just the default, it gets covered over by the sketch partition that gets mounted there.
+
+Copy an Arch linux Zim wiki file to <sketchpartition>/share/wikis/archlinux
+Do not copy it to the sketch folder on the root partition, that would be wasteful.
+
+Should some unknown bug happen and /usr/share/mime has very few files in it, you will have
+to manually fix this, probably by copying the files there from a debian host machine or something.
 
 If your image is for systems with an RTC, see "using an RTC"
 
@@ -155,7 +146,12 @@ dtoverlay=i2c-rtc,ds3231
 ## Getting online
 Look in /sketch/networks, edit the wifi file as appropriate, or just connect ethernet.
 
-These are NetworkManager files, so wifi will automatically reconnect for you.
+These are NetworkManager files, so wifi will automatically reconnect for you, and you can configure almost any kind of network you want.
+
+You can also go to the command line and use "nm-tui" to connect.
+
+
+
 
 ## Sharing Files
 
@@ -213,6 +209,12 @@ Look at the very bottom for the lines that deal with launching apps.
 ## Changing the timezone
 /sketch/timezone is a text file that should just contain an Olson timezone name like "Us/Pacific" without quotes.
 
+## Running a script without SSH
+
+At boot, if there is a file named `/sketch/provisioning.sh`, it will be ran, then renamed to `/sketch/provisioning.sh.RAN`, and any output logged
+to `/sketch/provisioning.sh.log`
+
+
 ## Using
 
 Change /sketch/hostname to the name you want to give it.  You can now access
@@ -264,19 +266,36 @@ Other users home dirs won't be set up like this unless you do it manually, Ember
 
 ### Firewalling
 
-EmberOS uses firewalld.  The ranges used by Yggdrasil and CJDNS are mapped to the public zone which blocks almost everything incoming,
-including SSH(Some other setups default to allowing SSH, we don't, because raspbian has a default password). Everything else is trusted by default.
+EmberOS uses firewalld.  
+
+#### The Public Zone(Dofferent than the defaults!)
+The ranges used by Yggdrasil and CJDNS are mapped to the public zone which blocks almost everything incoming, including SSH(Some other setups default to allowing SSH, we don't, because raspbian has a default password).
+
+ Everything else is trusted by default.
 
 #### Opening a port:
  firewall-cmd --permanent --zone=public --add-port=80/tcp
 
-#### Offline Wiki Content
+### Offline Wiki Content
 Put any .zim files in a subfolder of /sketch/share/wikis/(One per subfolder).
 
 You can then activate wikioffline@SUBFOLDER:PORT.service to serve that wiki on all IPv4 addresses.
 
 The arch linux wiki will be included in the folder archlinux, so as to facilitate debugging 
 when there is no internet connection.
+
+This is provided by a small wrapper around ZIMPly.
+
+You can also temporarily start the wiki server with `wikioffline SUBFOLDER PORT`
+
+### Mesh Networks
+In `/sketch/config/autostart/`, enable yggdrasil.service.
+
+To configure it, see `/sketch/config.private/yggdrasil.conf`, which is mapped to the usual
+`/etc/yggdrasil.conf` file. A sane default is provided with a generated unique private key.
+
+You may then want to set up a NetworkManager file to use ad-hoc networking. Be sure to
+set the firewalld zone to `public`, or else  ensure that you are not running anything private(Like ssh with weak passwords!!!)
 
 
 ### Configuring Audio
@@ -285,6 +304,8 @@ If you need to force HDMI or Analog output, or change the ALSA volume of the onb
 just edit /sketch/config/sound.ini, and change the output option to "hdmi" or "analog" as desired.
 
 We default to "auto", which is probably not what you want if using an HDMI monitor and 3.5mm speakers.
+
+This is provided by `ember-manage-audio.service`
 
 
 ### The Bindings Manager
@@ -315,6 +336,7 @@ cat << EOF > /sketch/config/filesystem/some_directory.yaml
     bindfiles:
         foo: /etc/foo
 ```
+This is managed by `fs_bindings.service`
 
 ### Apps
 (See apps listing)[docs/IncludedApps.md]
@@ -324,13 +346,13 @@ cat << EOF > /sketch/config/filesystem/some_directory.yaml
 One of the most common tasks for embedded devices is as a media server.
 Put whatever you want to serve in /sketch/public.media for DLNA.
 
-You will need to enable minidlna in /sketch/config/autostart
-
 Put whatever you want to serve as a standard web site in /sketch/public.www to serve
 it on port 80 with apache. Whatever you put as index.http will be the start page for the fullscren kiosk!
 
 Don't use the prefix "public." for anything you don't want to be made public, in case more
 services are added!
+
+This is provided by `minidlna.service` and can be disabled in the sketch autostart config.
 
 ## Adding programs to the sketch
 
@@ -351,7 +373,6 @@ Youtube-dl cannot be included, as APIs change so frequently that it would not do
 
 It will be stored in /sketch/bin, due ti the need for frequent easy updates(We consider it more like dynamic data than a real program, because of how often it updates).
 
-Tartube is also included, which is a noce graphical YT client. It is installed in the normal setup.py way and can be updated.
 
 
 ## Making it actually read only
@@ -359,7 +380,9 @@ Tartube is also included, which is a noce graphical YT client. It is installed i
 You just add ro to the fstab entry for /sketch, that's the only writable part. You won't be
 able to save without SSHing(Or using kaithem's terminal) and running `sudo mount -o remount,rw /sketch`.
 
-NTFS is a journaling filesystem, so you may or may not actually need true read only.
+NTFS is a journaling filesystem, so you may or may not actually need true read only. Some stuff may break if you do this.
+
+Almost nothing ever writes to sketch randomly by itself, so it sould not cause disk wear.
 
 ## Updating Kaithem
 The whole install as found in the repo is in /sketch/opt/kaithem.  Just

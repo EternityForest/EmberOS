@@ -1,0 +1,42 @@
+#!/usr/bin/python3
+from zimply import ZIMServer
+
+import logging
+import sys
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
+
+import os, sys,subprocess,threading,time
+wikisdir = '/usr/share.sketch/wikis/'
+indexdir = '~/.wiki_indexes'
+
+x = None
+
+indexdir=os.path.expanduser(indexdir)
+
+
+if len(sys.argv)>2:
+    doBrowser=True
+    wiki = sys.argv[2]
+    port = sys.argv[3]
+else:
+    wiki,port = sys.argv[1].split(":")
+subprocess.check_call(["mkdir","-p",indexdir])
+print("Looking for files in:"+wikisdir+wiki)
+for i in os.listdir(wikisdir+wiki):
+    if i.endswith(".zim"):
+        x = os.path.join(wikisdir+wiki, i)
+        print("Serving: "+x)
+        break
+
+print("Using port: "+port)
+def f():
+    ZIMServer(x, port=int(port),index_file=os.path.join(indexdir,os.path.basename(x)+".index"))
+threading.Thread(target=f).start()
+
+import requests
+
+if doBrwoser:
+    print("Launching browser(You may need to refresh in a few minutes if the index isn't there")
+    time.sleep(1)
+    subprocess.check_call(["chromium-browser","--incognito", "http://localhost:"+port])

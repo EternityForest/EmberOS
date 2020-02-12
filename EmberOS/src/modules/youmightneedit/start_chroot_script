@@ -1,4 +1,5 @@
 #!/bin/bash
+source /common.sh
 
 set -x
 set -e
