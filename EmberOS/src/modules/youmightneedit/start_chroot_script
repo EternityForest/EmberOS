@@ -11,6 +11,27 @@ apt-get -y install -y wireshark
 #Also sometimes SMB does too
 apt-get -y install smbclient samba samba-common-bin cifs-utils minidlna
 
+unpack /filesystem/bin /usr/bin/ root
+chmod 755 /usr/bin/wikioffline
+
+
+cat << EOF > /etc/systemd/system/zimserver.service
+[Unit]
+Description=Manage things from sketch folder
+After=systemd-remount-fs.service network-online.target
+RequiresMountsFor=/etc/ /sketch/ /home/
+
+[Service]
+Type=simple
+ExecStart=wikioffline %i
+User=pi
+WorkingDirectory=~
+
+
+[Install]
+WantedBy=sysinit.target
+EOF
+
 
 
 apt-get -y install mosquitto libpng16-16 chromium-browser rpi-chromium-mods
@@ -85,7 +106,7 @@ curl https://getmic.ro | bash
 #Useful for testing
 apt-get -y install x11-apps
 
-apt-get -y install python3
+apt-get -y install python3 synaptic
 
 apt-get -y install exfat-utils python3-setproctitle python3-cffi python3-dbus python3-scipy python3-numpy python3-sympy python3-smbus
 
@@ -107,7 +128,8 @@ pip3 install adafruit-blinka
 
 pip3 install nimport
 
-pip install python-can
+pip3 install python-can
+pip3 install zimply
 
 
 

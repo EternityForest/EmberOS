@@ -253,7 +253,7 @@ for i in sorted(list(config.keys()),key=lambda x:bindSortKeyHelper(x,config[x]))
 
             if not i.startswith("__"):
                 
-                cmd = ['bindfs','-o','nonempty']
+                cmd = ['bindfs']
                 if m:
                     cmd.extend(['-p',m])
                 if 'user' in d:

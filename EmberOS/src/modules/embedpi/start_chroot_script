@@ -67,7 +67,7 @@ cat << EOF > /etc/fstab
 proc            /proc           proc    defaults          0       0
 /dev/mmcblk0p1  /boot           vfat    defaults,noatime,ro          0       2
 /dev/mmcblk0p2  /               ext4    defaults,noatime,ro  0       1
-/dev/mmcblk0p3 /sketch auto defaults,noatime,nofail,nonempty,fmask=027,dmask=027,umask=027 0 0
+/dev/mmcblk0p3 /sketch auto defaults,noatime,nofail,fmask=027,dmask=027,umask=027 0 0
 EOF
 
 
@@ -337,6 +337,8 @@ mk_pi_persist_dir .config/ardour5
 #30kb, probably not a significant issue
 mk_pi_persist_dir .config/spacefm
 
+mk_pi_persist_dir .config/.wiki_indexes
+
 #Youtube client
 mk_pi_persist_dir tartube_data
 
@@ -417,21 +419,19 @@ mkdir -p /usr/sketch.bin
 
 mkdir -p /sketch/opt
 mkdir -p /sketch/bin
+mkdir -p /sketch/share/fonts
+mkdir -p /sketch/share/wikis
+mkdir -p /sketch/share/doc/
+
+mkdir /usr/share.sketch
 
 cat << EOF > /sketch/config/filesystem/emberos_share.yaml
 /sketch/share/:
     mode: '0755'
+    bindat: /usr/share.sketch
 /sketch/share/fonts: /usr/local/share/fonts
 EOF
 
-cat << EOF > /sketch/config/filesystem/emberos_opt_bin.yaml
-/sketch/opt/:
-    mode: '0755'
-    bindat: /sketch.opt
-/sketch/bin/:
-    mode: '0755'
-    bindat: /usr/sketch.bin
-EOF
 
 cat << EOF > /sketch/config/filesystem/emberos_opt_bin.yaml
 /sketch/opt/:

@@ -270,6 +270,14 @@ including SSH(Some other setups default to allowing SSH, we don't, because raspb
 #### Opening a port:
  firewall-cmd --permanent --zone=public --add-port=80/tcp
 
+#### Offline Wiki Content
+Put any .zim files in a subfolder of /sketch/share/wikis/(One per subfolder).
+
+You can then activate wikioffline@SUBFOLDER:PORT.service to serve that wiki on all IPv4 addresses.
+
+The arch linux wiki will be included in the folder archlinux, so as to facilitate debugging 
+when there is no internet connection.
+
 
 ### Configuring Audio
 
