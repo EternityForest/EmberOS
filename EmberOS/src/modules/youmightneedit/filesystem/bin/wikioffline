@@ -36,7 +36,7 @@ threading.Thread(target=f).start()
 
 import requests
 
-if doBrwoser:
+if doBrowser:
     print("Launching browser(You may need to refresh in a few minutes if the index isn't there")
     time.sleep(1)
     subprocess.check_call(["chromium-browser","--incognito", "http://localhost:"+port])
