@@ -337,7 +337,7 @@ mk_pi_persist_dir .config/ardour5
 #30kb, probably not a significant issue
 mk_pi_persist_dir .config/spacefm
 
-mk_pi_persist_dir .config/.wiki_indexes
+mk_pi_persist_dir .wiki_indexes
 
 #Youtube client
 mk_pi_persist_dir tartube_data
