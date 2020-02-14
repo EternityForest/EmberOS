@@ -134,8 +134,8 @@ def tmpfs_overlay(onto, user, mode):
     subprocess.check_call(["mkdir", "-p",wrk])
     subprocess.check_call(["chmod", mode, tmp])
     subprocess.check_call(["chmod", mode, wrk])
-    subprocess.check_call(["chown", mode, tmp])
-    subprocess.check_call(["chown", mode, wrk])
+    subprocess.check_call(["chown", user, tmp])
+    subprocess.check_call(["chown", user, wrk])
     subprocess.check_call(["mount", "-t", 'overlay', '-o','lowerdir='+onto+',upperdir='+tmp+',workdir='+wrk,'overlay',onto])
     
 
@@ -253,7 +253,7 @@ for i in sorted(list(config.keys()),key=lambda x:bindSortKeyHelper(x,config[x]))
 
             if not i.startswith("__"):
                 
-                cmd = ['bindfs', '-o','-nonempty']
+                cmd = ['bindfs', '-o','nonempty']
                 if m:
                     cmd.extend(['-p',m])
                 if 'user' in d:

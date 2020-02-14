@@ -84,7 +84,7 @@ EOF
 
 
 #Batteries included, allow messing with kiosk browser media right from the device
-apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full testdisk baobab fldigi flrig flmsg flamp
+apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full testdisk baobab fldigi flrig flmsg flamp qsynth vmpk
 
 
 apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola audacious audacious-plugins gwenview calibre zeal convertall
@@ -190,10 +190,10 @@ apt-get -y install -y spacefm fslint deluge ardour pulseview
 
 
 
-apt-get -y install nmap robotfindskitten ncdu mc curl fatrace gstreamer1.0-tools pavucontrol
+apt-get -y install nmap robotfindskitten ncdu mc curl fatrace gstreamer1.0-tools pavucontrol xawtv
 
 #Sigh. Vim is huge but some people really love it...
-apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast
+apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs git-repair xloadimage
 
 
 

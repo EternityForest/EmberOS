@@ -332,6 +332,9 @@ mk_pi_persist_dir  .config/calibre
 mk_pi_persist_dir  .config/Zeal
 mk_pi_persist_dir .local/share/marble
 mk_pi_persist_dir .local/share/Zeal
+
+mkdir -p /sketch/home/pi/.local/share/Zeal
+
 mk_pi_persist_dir .config/deluge
 mk_pi_persist_dir .config/ardour5
 mk_pi_persist_dir .config/sigrok
@@ -359,8 +362,7 @@ mk_pi_persist_dir  .fldigi
 mk_pi_persist_dir  .flrig
 mk_pi_persist_dir  .flmsg
 mk_pi_persist_dir  .flamp
-#Very important .syncthing itself is handled separately, it has a private key
-#That needs to be mode 700
+mk_pi_persist_dir  .syncthing
 mk_pi_persist_dir  .syncthing-gtk
 mk_pi_persist_dir .local/share/fonts
 
@@ -368,9 +370,19 @@ mk_pi_persist_dir .local/share/fonts
 mkdir -p /sketch/public.files/pi
 mkdir -p /sketch/public.media/pi
 
+
+mkdir -p /sketch/public.media/Pictures
+mkdir -p /sketch/public.media/Music
+mkdir -p /sketch/public.media/Videos
+
 #The mountpoint
 mkdir -p /var/public.media/
 mkdir -p /var/public.files/
+
+#Make the example files more discoverable
+ln -s /var/public.media/Music/  "/sketch/home/pi/Music/sketch"
+ln -s /var/public.media/Pictures/  "/sketch/home/pi/Pictures/sketch"
+ln -s /var/public.media/Videos/  "/sketch/home/pi/Videos/sketch"
 
 cat << EOF > /sketch/config/filesystem/emberos_public.yaml
 /sketch/public.files:
@@ -408,8 +420,11 @@ __tmpfsoverlay__HOMEPI:
     user: pi
 
 
+
 /sketch/home/pi:
-    mode: '0750'
+    #We want to be able to stash security keys in there, so this must be mode
+    #700
+    mode: '0700'
     user: pi
     #The tmpfs overlay has to be under the sketch stuff, or it seems to point at the original home dir,
     #and cover up the sketch
@@ -525,3 +540,21 @@ EOF
 chmod 755 /usr/bin/writable
 chmod 755 /usr/bin/readonly
 
+
+#Hackishly patch this to call readonly first
+cat << EOF > /lib/systemd/system/regenerate_ssh_host_keys.service
+[Unit]
+Description=Regenerate SSH host keys
+Before=ssh.service
+ConditionFileIsExecutable=/usr/bin/ssh-keygen
+
+[Service]
+Type=oneshot
+ExecStartPre=-/bin/dd if=/dev/hwrng of=/dev/urandom count=1 bs=4096
+ExecStartPre=-/bin/sh -c "/bin/rm -f -v /etc/ssh/ssh_host_*_key*"
+ExecStart=/bin/bash -c ' /usr/bin/ssh-keygen -A -v >> /var/log/regenerate_ssh_host_keys.log 2>&1'
+ExecStartPost=/bin/bash -c 'for i in /etc/ssh/ssh_host_*_key*; do actualsize=$(wc -c <"$i") ;if [ $actualsize -eq 0 ]; then echo size is 0 bytes ; exit 1 ; fi ; done ; /usr/bin/writable; /bin/systemctl disable regenerate_ssh_host_keys ; /usr/bin/readonly'
+
+[Install]
+WantedBy=multi-user.target
+EOF

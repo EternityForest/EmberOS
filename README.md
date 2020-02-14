@@ -124,11 +124,12 @@ Mount the partition using `sudo udisksctl loop-setup -f 2019-06-20-raspbian-bust
 
 Using your favorite partition editor, add an ntfs partition called sketch just after the root partition, in that empty space you just made.
 
-Copy everything in the root partition's sketch dir to the root of that partition.  Anything
-in the actual sketch dir is just the default, it gets covered over by the sketch partition that gets mounted there.
+Copy everything in the root partition's sketch dir to the root of that partition.  Anything in the actual sketch dir is just the default, it gets covered over by the sketch partition that gets mounted there
 
-Copy an Arch linux Zim wiki file to <sketchpartition>/share/wikis/archlinux
-Do not copy it to the sketch folder on the root partition, that would be wasteful.
+Using rsync, copy the latest Included Data torrent's sketch folder over to the sketch partition:
+
+
+
 
 Should some unknown bug happen and /usr/share/mime has very few files in it, you will have
 to manually fix this, probably by copying the files there from a debian host machine or something.
