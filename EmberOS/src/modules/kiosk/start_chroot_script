@@ -15,7 +15,7 @@ unpack /filesystem/systemd /usr/lib/systemd/system/ root
 
 unpack /filesystem/sketch /sketch root
 
-
+unpack /filesystem/share /usr/share
 #This just makes menus work in a sane fashion
 mkdir -p /home/pi/.fvwm
 unpack /filesystem/pifvwm /home/pi/.fvwm pi

@@ -218,7 +218,7 @@ mkdir -p /root/ssh
 #Can't be in the config dir because there is keys in there
 mkdir -p /sketch/ssh/etc.ssh
 
-cp -a /etc/ssh/ssh_config  /sketch/ssh/etc.ssh/ssh_config
+cp -a /etc/ssh/  /sketch/ssh/etc.ssh/
 
 mkdir -p  /sketch/ssh/pi
 mkdir -p /sketch/ssh/root
@@ -410,6 +410,14 @@ cat << EOF > /sketch/config/filesystem/emberos_public_pi.yaml
     user: pi
     bindat: /home/pi/public.media
 EOF
+
+
+cat << EOF > /sketch/config/filesystem/emberos_consolesetup.yaml
+__tmpfsoverlay__CONSOLE:
+    bindat: /etc/console-setup
+    mode: '750'
+    user: root
+EOF 
 
 
 cat << EOF > /sketch/config/filesystem/emberos_pi.yaml

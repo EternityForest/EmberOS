@@ -6,7 +6,7 @@ SKETCH_UNITS = "/sketch/config/systemd"
 
 SKETCH_CONFIG = "/sketch/config/autostart"
 
-import os,shutil,configparser,subprocess
+import os,shutil,configparser,subprocess,traceback
 
 config = configparser.ConfigParser()
 
@@ -24,12 +24,15 @@ for i in sorted(list(os.listdir(SKETCH_CONFIG)), reverse=True):
 
 #For now, let's not allow disabling anything at runtime
 #That might cause issues if they were already enabled.
+s=[]
 if 'units' in config:
     for i in config['units']:
         if config['units'][i].lower() in ("enable","true","yes","enabled"):
-            try:
-                print(i)
-                subprocess.call(["systemctl","start",i])
-            except:
-                print(traceback.format_exc())
-            
+            s.append(i)
+            print("Enabled:"+i)
+
+#Start all as one transaction
+try:
+    subprocess.call(["systemctl","start"]+s)
+except:
+    print(traceback.format_exc())
