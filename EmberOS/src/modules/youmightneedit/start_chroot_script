@@ -183,7 +183,7 @@ apt-get -y install -y fonts-hack
 
 
 
-apt-get -y install -y spacefm fslint deluge ardour pulseview
+apt-get -y install -y spacefm fslint deluge ardour pulseview chkservice florence
 
 #apt-get -y install -y krita
 
