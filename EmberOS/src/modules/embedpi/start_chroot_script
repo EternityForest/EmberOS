@@ -323,6 +323,7 @@ mk_pi_persist_dir  Arduino
 mk_pi_persist_dir  Books
 mk_pi_persist_dir  Projects
 mk_pi_persist_dir  Maps
+mk_pi_persist_dir  Scratch Projects
 mk_pi_persist_dir  Misc
 mk_pi_persist_dir  Drawer
 mk_pi_persist_dir  Games
