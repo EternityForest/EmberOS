@@ -1,0 +1,9 @@
+/sketch/public.files:
+    mode: '0755'
+    user: root
+    bindat: /var/public.files/
+
+/sketch/public.media:
+    mode: '0755'
+    user: root
+    bindat: /var/public.media

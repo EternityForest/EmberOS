@@ -79,14 +79,6 @@ chmod 755 /usr/bin/get-youtube-dl
 # mkdir -p /usr/share/tartube/icons
 # cp -ar icons/. /usr/share/tartube/icons
 
-
-cat << EOF > /sketch/config/filesystem/emberos_pi_syncthing.yaml
-/sketch/home/pi/.syncthing:
-    mode: '0700'
-    user: pi
-    bindat: /home/pi/.config/syncthing/
-EOF
-
 #Also gets firewalld
 # apt-get -y install firewall-config
 

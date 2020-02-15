@@ -1,0 +1,4 @@
+__tmpfsoverlay__CONSOLE:
+    bindat: /etc/console-setup
+    mode: '750'
+    user: root
