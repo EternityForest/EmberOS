@@ -96,7 +96,7 @@ EOF
 apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full testdisk baobab fldigi flrig flmsg flamp qsynth vmpk
 
 
-apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola audacious audacious-plugins gwenview calibre zeal convertall
+apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola audacious audacious-plugins gwenview calibre zeal convertall bluetooth bluez blueman
 
 apt-get -y install fvwm fvwm-icons mpv libgdk-pixbuf2.0-bin gpsd gpsd-clients marble-qt marble-maps marble-plugins dosbox wxhexeditor d-feet
 
