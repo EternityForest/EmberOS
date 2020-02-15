@@ -105,8 +105,8 @@ gdk-pixbuf-query-loaders > /usr/lib/arm-linux-gnueabihf/gdk-pixbuf-2.0/2.10.0/lo
 cd /usr/bin/
 curl https://getmic.ro | bash
 
-#Useful for testing
-apt-get -y install x11-apps
+#Ghostwriter is used for markdown help text
+apt-get -y install x11-apps xterm retext
 
 apt-get -y install python3 synaptic
 
@@ -185,7 +185,7 @@ apt-get -y install -y fonts-hack
 
 
 
-apt-get -y install -y spacefm fslint deluge ardour pulseview chkservice florence
+apt-get -y install -y spacefm fslint deluge ardour pulseview chkservice matchbox-keyboard
 
 #apt-get -y install -y krita
 
