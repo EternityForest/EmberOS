@@ -107,9 +107,8 @@ Clone this repo with all submodules
 
 Put a fresh zipped raspbian full image in the src/images dir
 
-Run sudo ./build_dist in the src dir. This may take about an hour, and 
-you need internet access the whole time. It is not fully scripted, at one point samba will ask to modify the config file. You should say yes. Say no when wireshark asks about non superusers sniffing traffic.
-
+Run sudo ./build_dist in the src dir. This may take over an hour, and 
+you need internet access the whole time.
 
 Cd into the src/workspace folder.
 Expand the disk image by padding it with zeros:
