@@ -13,7 +13,7 @@ It would be possible to remove some things and shrink it, but I don't suggest th
 a 16GB card will make wear leveling more effective and give your app room to expand.
 
 
-See [EmberOS/src/modules/embedpi/filesystem/sketch/share/ember-doc/] for info on how to do common stuff.
+See [Here](EmberOS/src/modules/embedpi/filesystem/sketch/share/ember-doc/) for info on how to do common stuff.
 
 ### Goals
 
