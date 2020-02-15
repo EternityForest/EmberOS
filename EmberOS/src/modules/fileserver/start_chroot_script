@@ -18,7 +18,7 @@ mkdir -p /sketch/public.media/
 
 
 #Bind to /etc
-cat << EOF > /sketch/config/filesystem/emberos-netcfg.yaml
+cat << EOF > /sketch/config/filesystem/emberos-smbcfg.yaml
 /sketch/config/:
    bindfiles:
       smb.conf: /etc/samba/smb.conf
