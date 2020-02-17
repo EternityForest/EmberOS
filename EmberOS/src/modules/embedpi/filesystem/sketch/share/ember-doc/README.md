@@ -7,8 +7,43 @@ These are NetworkManager files, so wifi will automatically reconnect for you, an
 
 You can also go to the command line and use "nmtui" to connect.
 
+### The Home Dir and normal desktop use
+
+/home/pi is in a tmpfs, but /home/pi/persist is bound to /sketch/home/pi, and anything in there is persistant.
+
+The contents of /home/pi/persist/.home_template are copied to /home/pi after the tmpfs is mounted.
+
+By default, many common folders that seem logical to assume you want persistant storage for are symlinked to the persist folder. ALWAYS CHECK BEFORE PUTTING IMPORTANT DATA SOMEWHERE!
+
+DO NOT PUT ANYTHING YOU WANT TO KEEP IN THE ROOT OF THE HOME DIR!!!
 
 
+#### Adding a persisant directory/customizing the home dir
+```
+#Create the actual persistant directory
+mkdir persist/foo
+
+#Now create a link to it. You can't just put it in the home dir directly,
+#As that is just a tmpfs
+
+#So you add it to the .home_template, which is copied to home on boot.
+ln -s persist/foo .home_template/foo
+```
+
+#### Other user's home dirs
+
+Other users home dirs won't be set up like this unless you do it manually, EmberOS is mostly assuming  with Pi as the only non-system user.
+
+
+
+## Enabling services
+
+Instead of SSHing in(Which may not always be available), you can activate any systemd
+service by editing the config files(See /sketch/config/autostart/).
+
+They are very simple INI files.
+
+You can't disable services enabled via systemctl this way(Under the hood, a script reads the file and starts all enabled services but does not sto anything).  The intent is to use the config files for all optional or user services.
 
 ## Sharing Files
 
@@ -91,34 +126,6 @@ Go to https://hostname.local:8001, and ignore the security warnings you will get
 
 You can now use it as any other Kaithem instance.  Look at the example module to get started.
 Anything you create gets saved back to that /sketch partition.
-
-
-### The Home Dir and normal desktop use
-
-/home/pi is in a tmpfs, but /home/pi/persist is bound to /sketch/home/pi, and anything in there is persistant.
-
-The contents of /home/pi/persist/.home_template are copied to /home/pi after the tmpfs is mounted.
-
-By default, many common folders that seem logical to assume you want persistant storage for are symlinked to the persist folder. ALWAYS CHECK BEFORE PUTTING IMPORTANT DATA SOMEWHERE!
-
-DO NOT PUT ANYTHING YOU WANT TO KEEP IN THE ROOT OF THE HOME DIR!!!
-
-
-#### Adding a persisant directory/customizing the home dir
-```
-#Create the actual persistant directory
-mkdir persist/foo
-
-#Now create a link to it. You can't just put it in the home dir directly,
-#As that is just a tmpfs
-
-#So you add it to the .home_template, which is copied to home on boot.
-ln -s persist/foo .home_template/foo
-```
-
-#### Other user's home dirs
-
-Other users home dirs won't be set up like this unless you do it manually, EmberOS is mostly assuming  with Pi as the only non-system user.
 
 
 ### Firewalling
@@ -219,3 +226,4 @@ Almost nothing ever writes to sketch randomly by itself, so it sould not cause d
 ## Updating Kaithem
 The whole install as found in the repo is in /sketch/opt/kaithem.  Just
 copy the entire contents of the repo there.
+

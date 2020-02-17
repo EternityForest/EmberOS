@@ -46,15 +46,6 @@ See [Here](EmberOS/src/modules/embedpi/filesystem/sketch/share/ember-doc/) for i
  Read only root filesystem, and mostly read only /home/pi, with carefully controlled symlinks to persistent folders to make apps work as they should, while keeping everything
  else read only, or purely volatile, so things like chromium's absurd disk writes can't cause trouble.
 
- 
-## Enabling services
-
-Instead of SSHing in(Which may not always be available), you can activate any systemd
-service by editing the config files(See /sketch/config/autostart/).
-
-They are very simple INI files.
-
-You can't disable services enabled via systemctl this way(Under the hood, a script reads the file and starts all enabled services but does not sto anything).  The intent is to use the config files for all optional or user services.
 
 
 ## Security

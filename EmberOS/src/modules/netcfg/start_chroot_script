@@ -55,6 +55,7 @@ cp  /etc/ca-certificates.conf /sketch/config/ca-certificates.conf
 
 mkdir -p  /sketch/config/firewalld/
 
+mkdir -p /var/lib/blueman
 #Bind to /etc
 cat << EOF > /sketch/config/filesystem/emberos-netcfg.yaml
 /sketch/config/:
@@ -67,6 +68,13 @@ cat << EOF > /sketch/config/filesystem/emberos-netcfg.yaml
 
 __tmpfsoverlay__SSLCERTS:
   bindat: /etc/ssl/
+  mode: '0755'
+  user: root
+
+__tmpfsoverlay__BLUEMAN:
+  bindat: /var/lib/blueman
+  mode: '0755'
+  user: root
 EOF
 
 

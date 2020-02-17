@@ -120,9 +120,6 @@ apt-get -y install nim elixir gforth lua5.3
 
 
 pip3 install yappi
-pip3 install msgpack
-pip3 install paho-mqtt
-pip3 install smbus
 pip3 install automationhat
 
 pip3 install cherrypy
@@ -133,7 +130,7 @@ pip3 install nimport
 pip3 install python-can
 pip3 install zimply
 
-
+sudo apt-get install python3-smbus python3-msgpack python3-paho-mqtt
 
 mkdir -p /public.temp
 mkdir -p /sketch/public.www/
