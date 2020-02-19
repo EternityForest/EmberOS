@@ -108,7 +108,7 @@ curl https://getmic.ro | bash
 #Ghostwriter is used for markdown help text
 apt-get -y install x11-apps xterm retext
 
-apt-get -y install python3 synaptic
+apt-get -y install python3 synaptic conky-all grsync
 
 apt-get -y install exfat-utils python3-setproctitle python3-cffi python3-dbus python3-scipy python3-numpy python3-sympy python3-smbus
 

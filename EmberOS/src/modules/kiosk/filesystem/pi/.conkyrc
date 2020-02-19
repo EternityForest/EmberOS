@@ -1,0 +1,81 @@
+-- vim: ts=4 sw=4 noet ai cindent syntax=lua
+
+conky.config = {
+    alignment = 'top_left',
+    background = false,
+    border_width = 0.5,
+    cpu_avg_samples = 4,
+    default_color = 'black',
+    default_outline_color = 'white',
+    default_shade_color = 'black',
+    draw_borders = true,
+    draw_graph_borders = true,
+    draw_outline = true,
+    draw_shades = false,
+    use_xft = true,
+    font = 'DejaVu Sans Mono:size=10',
+    gap_x = 10,
+    gap_y = 50,
+    minimum_height = 5,
+    minimum_width = 5,
+    net_avg_samples = 2,
+    double_buffer = true,
+    out_to_console = false,
+    out_to_stderr = false,
+    extra_newline = true,
+    own_window = true,
+    own_window_colour = '003020',
+    own_window_class = 'Conky',
+    own_window_argb_visual = true,
+    own_window_argb_value = 70,
+    own_window_type = 'dock',
+    own_window_transparent = false,
+    own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
+    stippled_borders = 1,
+    update_interval = 1,
+    uppercase = false,
+    use_spacer = 'none',
+    show_graph_scale = false,
+    show_graph_range = false
+}
+
+conky.text = [[
+${image ~/.face -p 180,5 -s 70x70 -f 86400}${image ~/.pacman -p 20,9 -s 60x60 -f 86400}
+${font Latin Modern Mono Caps:bold:size=14}${alignc}${color 005000}$nodename
+${font Noto Sans:bold:size=8}${alignc}${desktop_name} ${desktop}/$desktop_number
+${font Noto Sans:bold:size=8}${alignc}    ${exec hostnamectl | grep System | cut -c21-40}
+${alignc}   ${exec hostnamectl | grep Architecture | cut -c7-30}
+${alignc}   ${exec hostnamectl | grep Kernel | cut -c13-32}
+${font Entopia:bold:size=12}${color 005000}PERFORMANCE ${hr 2}${font}
+${offset 15}${color 050010}System Uptime ${alignr}$color $uptime
+${offset 15}${color 050010}RAM :$color $mem $memperc% ${color yellow}${membar 4}
+${offset 15}${color 050010}Swap:$color $swap/$swapmax $swapperc% ${color yellow}${swapbar 4}
+${offset 25}${font DejaVu Sans Mono:size=8}${battery_time BAT1}${font DejaVu Sans Mono:size=8}${color 050010}
+${offset 15}CPU   ${color 050010}${cpubar cpu0 6}${color 050010}
+${offset 15}${font}${color 050010}Procs:$color $processes  ${color 050010}Run:$color $running_processes Temp: ${acpitemp}°C
+${font Entopia:bold:size=12}${color 005000}NETWORK ${hr 2}${font DejaVu Sans Mono:size=9}
+${offset 15}${color}IPv4 Addr(Eth) ${color 005000}${alignr}${addr eth0}
+${offset 15}${color}IPv4 Addr(WLAN) ${color 005000}${alignr}${addr wlan0}
+
+${offset 15}${color 005000}${font}▼ $color${totaldown } ${alignr}${color 005000}▲ $color${totalup }
+${offset 5}${font Entopia:bold:size=12}${color 005000}${wireless_essid } ${stippled_hr 1}
+${offset 15}${color 005000}${font DejaVu Sans Mono:size=9}WiFi ${alignr}${wireless_link_qual_perc wlan0
+}% ${color 005000}${addr wlan0}
+${offset 15}${font}${color 100040}▼ $color${totaldown } ${alignr}${color 005000}▲ $color${totalup }
+${font Entopia:bold:size=12}${color 050010}PROCESSES ${hr 2}
+${offset 15}${font Noto sans:size=8}${color 050010}Name               ${alignr}PID   CPU%   MEM%
+${offset 15}${color 050010}${top name 1} ${alignr}${top pid 1} ${top cpu 1} ${top mem 1}
+${offset 15}${color 050010}${top name 2} ${alignr}${top pid 2} ${top cpu 2} ${top mem 2}
+${offset 15}${color 050010}${top name 3} ${alignr}${top pid 3} ${top cpu 3} ${top mem 3}
+${offset 15}${color 050010}${top name 4} ${alignr}${top pid 4} ${top cpu 4} ${top mem 4}
+${font Entopia:bold:size=12}${color 005000}FILESYSTEMS ${hr 2}$color
+/ $color${fs_used /}    ${diskio_write /dev/sda}/s ${fs_bar 6 /} 
+/sketch $color${fs_used /sketch}     ${diskio_write /dev/sdc}/s 
+/public.temp $color${fs_used /public.temp}      ${fs_bar 6 /public.temp}
+
+${font Entopia:bold:size=12}${color 005000}FORTUNE ${hr 2}$color
+${offset 15}${font Noto Sans:size=10}${execi 600 genfortune | fold -s -w44}
+
+${font Open Sans Light:pixelsize=80}${time %H:%M:%S}${font}
+${font Open Sans Light:pixelsize=40}${time %d %b %Y}${font}
+]]

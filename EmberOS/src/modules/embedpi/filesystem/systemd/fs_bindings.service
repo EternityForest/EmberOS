@@ -2,7 +2,7 @@
 Description=Configure BindFS sketch management
 After=systemd-remount-fs.service
 #Possiblye issue here if we start *after* something important, don't forget to include things!
-Before=sysinit.target NetworkManager.service chronyd.service kaithem.service firewalld.service regenerate_ssh_host_keys.service smbd.service nmbd.service console-setup.service yggdrasil.service nodered.service ssh.service console-setup.service
+Before=sysinit.target NetworkManager.service chronyd.service kaithem.service firewalld.service regenerate_ssh_host_keys.service smbd.service nmbd.service console-setup.service yggdrasil.service nodered.service ssh.service console-setup.service serviceconfig.service
 RequiresMountsFor=/etc/ /sketch/ /home/
 DefaultDependencies=no
 

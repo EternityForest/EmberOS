@@ -9,6 +9,9 @@ set -e
 
 source /common.sh
 
+unpack /filesystem/pi /sketch/home/pi
+ls -s /home/pi/persist/.conkyrc /home/pi/.conkyrc
+
 
 unpack /filesystem/bin /usr/bin root
 unpack /filesystem/systemd /usr/lib/systemd/system/ root
