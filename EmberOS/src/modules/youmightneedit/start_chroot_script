@@ -92,13 +92,7 @@ apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola aud
 
 apt-get -y install fvwm fvwm-icons mpv libgdk-pixbuf2.0-bin gpsd gpsd-clients marble-qt marble-maps marble-plugins dosbox wxhexeditor d-feet
 
-update-icon-caches /usr/share/icons/*
 
-
-
-#Try to fix missing icons
-sudo ln -s /usr/lib/*/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders /usr/local/bin/gdk-pixbuf-query-loaders
-gdk-pixbuf-query-loaders > /usr/lib/arm-linux-gnueabihf/gdk-pixbuf-2.0/2.10.0/loaders.cache
 
 # Installs the Micro editor
 # Do this early, it can't be cached like apt
@@ -106,7 +100,13 @@ cd /usr/bin/
 curl https://getmic.ro | bash
 
 #Ghostwriter is used for markdown help text
-apt-get -y install x11-apps xterm retext
+apt-get -y install x11-apps xterm retext shared-mime-info
+
+#Try to fix missing icons
+sudo ln -s /usr/lib/*/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders /usr/local/bin/gdk-pixbuf-query-loaders
+gdk-pixbuf-query-loaders > /usr/lib/arm-linux-gnueabihf/gdk-pixbuf-2.0/2.10.0/loaders.cache
+
+update-icon-caches /usr/share/icons/*
 
 apt-get -y install python3 synaptic conky-all grsync
 
