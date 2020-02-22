@@ -10,7 +10,7 @@ set -e
 source /common.sh
 
 unpack /filesystem/pi /sketch/home/pi
-ls -s /home/pi/persist/.conkyrc /home/pi/.conkyrc
+ln -s /home/pi/persist/.conkyrc /home/pi/.conky
 
 
 unpack /filesystem/bin /usr/bin root
