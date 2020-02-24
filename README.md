@@ -27,6 +27,7 @@ See [Here](EmberOS/src/modules/embedpi/filesystem/sketch/share/ember-doc/) for i
 
 * Basically anything that's more of a "device" than a computer, that needs to be reliable and doesn't store too much data.
 
+![EmberOS](img/screenshot.webp)
 
 ### Use Cases
 
@@ -90,9 +91,9 @@ It is not encrypted though.
 Builds are available as torrents only, and unless otherwise noted, may
 go away when newer versions are released(My seedbox is fairly small!).
 
-### Feb 16 2020 Build
+### Feb 22 2020 Build(Node Red Fix, conky)
 ```
-magnet:?xt=urn:btih:4d954b6152f09fbb0ee21f43599b43bc332109f1&dn=EmberOS2020Feb16&tr=udp%3A%2F%2Fexodus.desync.com%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969
+magnet:?xt=urn:btih:VTKWGEIMDDJTX2ATG6RV67TRWLPQ5YPO&dn=EmberOS2020Feb22.zip&xl=3612427634&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969
 ```
 
 ### Dec 07 2019 alpha build
