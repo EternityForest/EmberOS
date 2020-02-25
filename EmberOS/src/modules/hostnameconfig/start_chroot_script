@@ -29,3 +29,25 @@ cat << EOF > /sketch/config/filesystem/emberos_hosts.yaml
         hosts: /etc/hosts
         hostname: /etc/hostname
 EOF
+
+
+
+#Hack alert! We do in fact bind mount the /etc/hostname file.
+#This lets us get the hostame set up in very early boot.
+cat << EOF > /etc/systemd/system/ember-load-hostname.service
+[Unit]
+Description=Load the hostname
+After=systemd-remount-fs.service 
+Before=sysinit.target fs_bindings.service systemd-hostnamed.service yggdrasil.service NetworkManager.service nodered.service kaithem.service smbd.service nmbd.service serviceconfig.service apache2.service
+RequiresMountsFor=/sketch/
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=hostname --file /sketch/config/hostname
+
+[Install]
+WantedBy=sysinit.target
+EOF
+
+systemctl enable ember-load-hostname.service

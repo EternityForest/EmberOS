@@ -175,7 +175,7 @@ cat << EOF > /etc/systemd/system/manage_sketch_folder.service
 Description=Manage things from sketch folder
 After=systemd-remount-fs.service 
 #Before fs_bindings, it sets up the stuff that we are binding.
-Before=sysinit.target fs_bindings.service
+Before=sysinit.target fs_bindings.service yggdrasil.service
 RequiresMountsFor=/etc/ /sketch/ /home/
 DefaultDependencies=no
 
@@ -454,6 +454,7 @@ cat << EOF > /sketch/config/filesystem/emberos_configdir.yaml
     mode: '0755'
     user: root
     bindat: /etc/sketchconfig
+
 /sketch/config.private:
     mode: '0700'
     user: root

@@ -170,7 +170,7 @@ for i in os.listdir(configdir):
                             x[j]['bindfiles'] = b
 
 
-                            for key in ['bindat','mode','user']:
+                            for key in ['bindat','mode','user','pre_cmd',"post_cmd"]:
                                 if key in config[path]:
                                     if key in x[j]:
                                         raise RuntimeError(key+" was already specified for path "+j +" in another file")
