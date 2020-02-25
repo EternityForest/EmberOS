@@ -350,6 +350,7 @@ mk_pi_persist_dir  Sync
 mk_pi_persist_dir  "Calibre Library"
 mk_pi_persist_dir  .config/calibre
 mk_pi_persist_dir  .config/Zeal
+
 mk_pi_persist_dir .local/share/marble
 mk_pi_persist_dir .local/share/Zeal
 
@@ -359,6 +360,11 @@ mk_pi_persist_dir .config/deluge
 mk_pi_persist_dir .config/ardour5
 mk_pi_persist_dir .config/sigrok
 mk_pi_persist_dir .kodi
+
+#Not actually installing HA at the moment
+mk_pi_persist_dir .homeassistant
+
+
 
 #This one is annoying, it saves EVERYTHING
 #to the same session file on exit. But whatever, it's only

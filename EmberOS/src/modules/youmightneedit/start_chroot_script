@@ -138,9 +138,18 @@ mkdir -p /sketch/public.files/
 
 echo "Welcome! This file is /sketch/public.www/index.html. You can alt+f4 out to a graphical desktop."> /sketch/public.www/index.html
 
-apt-get -y install apache2
 
 mkdir -p /sketch/public.www
+
+apt-get -y install apache2 
+
+# apt-get -y install postgresql libpq-dev postgresql-client postgresql-client-common 
+# mkdir -p /sketch/postgresql
+# mkdir -p /sketch/config/postgresql
+# mkdir -p /var/lib/postgresql
+# cp -ar /var/lib/postgresql/. /sketch/postgresql
+# cp -ar /etc/postgresql/. /sketch/config/postgresql
+
 
 #Give www-data a "window into the root filesystem"
 cat << EOF > /sketch/config/filesystem/www.yaml
@@ -150,7 +159,23 @@ cat << EOF > /sketch/config/filesystem/www.yaml
     bindat: /var/www/html
 EOF
 
-sudo apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,mysql,zip}
+
+#Give www-data a "window into the root filesystem"
+# cat << EOF > /sketch/config/filesystem/postgres.yaml
+# /sketch/postgresql:
+#     mode: '0750'
+#     user:  postgres
+#     bindat: /var/lib/postgresql
+
+# /sketch/config:
+#     bindfiles:
+#         /sketch/config/postgresql: /etc/postgresql
+
+# EOF
+
+systemctl disable postgresql.service
+
+apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,mysql,zip}
 apt-get install libapache2-mod-php -y
 
 
