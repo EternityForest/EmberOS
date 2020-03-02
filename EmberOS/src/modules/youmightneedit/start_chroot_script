@@ -42,7 +42,7 @@ EOF
 
 
 
-apt-get -y install mosquitto libpng16-16 chromium-browser rpi-chromium-mods
+apt-get -y install mosquitto libpng16-16 chromium-browser rpi-chromium-mods batmand batctl cubicsdr
 echo "persistence false" > /etc/mosquitto/conf.d/emberos.conf
 
 systemctl disable mosquitto.service
@@ -100,15 +100,14 @@ cd /usr/bin/
 curl https://getmic.ro | bash
 
 #Ghostwriter is used for markdown help text
-apt-get -y install x11-apps xterm retext shared-mime-info
-
+apt-get -y install x11-apps xterm retext
 #Try to fix missing icons
 sudo ln -s /usr/lib/*/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders /usr/local/bin/gdk-pixbuf-query-loaders
 gdk-pixbuf-query-loaders > /usr/lib/arm-linux-gnueabihf/gdk-pixbuf-2.0/2.10.0/loaders.cache
 
 update-icon-caches /usr/share/icons/*
 
-apt-get -y install python3 synaptic conky-all grsync screengrab
+apt-get -y install python3 synaptic conky-all grsync screengrab shared-mime-info
 
 apt-get -y install exfat-utils python3-setproctitle python3-cffi python3-dbus python3-scipy python3-numpy python3-sympy python3-smbus
 
@@ -143,13 +142,6 @@ mkdir -p /sketch/public.www
 
 apt-get -y install apache2 
 
-# apt-get -y install postgresql libpq-dev postgresql-client postgresql-client-common 
-# mkdir -p /sketch/postgresql
-# mkdir -p /sketch/config/postgresql
-# mkdir -p /var/lib/postgresql
-# cp -ar /var/lib/postgresql/. /sketch/postgresql
-# cp -ar /etc/postgresql/. /sketch/config/postgresql
-
 
 #Give www-data a "window into the root filesystem"
 cat << EOF > /sketch/config/filesystem/www.yaml
@@ -159,23 +151,30 @@ cat << EOF > /sketch/config/filesystem/www.yaml
     bindat: /var/www/html
 EOF
 
+apt-get -y install postgresql libpq-dev postgresql-client postgresql-contrib postgresql-client-common 
+mkdir -p /sketch/postgresql
+mkdir -p /sketch/config/postgresql
+mkdir -p /var/lib/postgresql
+cp -ar /var/lib/postgresql/. /sketch/postgresql
+cp -ar /etc/postgresql/. /sketch/config/postgresql
 
-#Give www-data a "window into the root filesystem"
-# cat << EOF > /sketch/config/filesystem/postgres.yaml
-# /sketch/postgresql:
-#     mode: '0750'
-#     user:  postgres
-#     bindat: /var/lib/postgresql
+! systemctl disable postgresql.service
 
-# /sketch/config:
-#     bindfiles:
-#         /sketch/config/postgresql: /etc/postgresql
+cat << EOF > /sketch/config/filesystem/postgres.yaml
+/sketch/postgresql:
+    mode: '0750'
+    user:  postgres
+    bindat: /var/lib/postgresql
 
-# EOF
+/sketch/config:
+    bindfiles:
+        /sketch/config/postgresql: /etc/postgresql
+
+EOF
 
 systemctl disable postgresql.service
 
-apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,mysql,zip}
+apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,pgsql,zip}
 apt-get install libapache2-mod-php -y
 
 
