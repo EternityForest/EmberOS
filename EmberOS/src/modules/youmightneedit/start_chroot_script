@@ -193,6 +193,8 @@ apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly pytho
 apt-get -y install -y fluidsynth pulseaudio-module-jack pulseaudio-module-bluetooth pulseaudio-module-zeroconf pulsemixer ffmpeg
 apt-get -y install kodi kodi-pvr-mythtv jaaa qjackctl
 
+! adduser pi pulse-access
+
 ! systemctl disable kodi.service
 
 #Better shells
