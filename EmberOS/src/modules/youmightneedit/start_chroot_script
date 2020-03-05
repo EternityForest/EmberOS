@@ -198,7 +198,16 @@ apt-get -y install kodi kodi-pvr-mythtv jaaa qjackctl
 ! systemctl disable kodi.service
 
 #Better shells
-apt-get -y install -y elvish fish
+apt-get -y install -y elvish fish xonsh xonsh-doc
+cat << EOF > /etc/shells
+# /etc/shells: valid login shells
+/bin/sh
+/bin/bash
+/bin/rbash
+/usr/bin/fish
+/usr/bin/elvish
+/usr/bin/xonsh
+EOF
 
 apt-get -y install npm
 npm install -g --unsafe-perm node-red

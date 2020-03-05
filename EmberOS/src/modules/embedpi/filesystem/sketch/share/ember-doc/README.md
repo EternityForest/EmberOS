@@ -35,6 +35,14 @@ ln -s persist/foo .home_template/foo
 Other users home dirs won't be set up like this unless you do it manually, EmberOS is mostly assuming  with Pi as the only non-system user.
 
 
+## Alternate shells
+fish, elvish, bash, and xonsh are included. I highly suggest trying xonsh,
+it is amazing! `xonsh` will likely never be removed from EmberOS and may be used
+instead of bash.
+
+### Setting as default shell
+
+`chsh -s $(which xonsh)`
 
 ## Enabling services
 
