@@ -91,9 +91,9 @@ It is not encrypted though.
 Builds are available as torrents only, and unless otherwise noted, may
 go away when newer versions are released(My seedbox is fairly small!).
 
-### Feb 22 2020 Build(Node Red Fix, conky)
+### Mar 4 2020 Build
 ```
-magnet:?xt=urn:btih:VTKWGEIMDDJTX2ATG6RV67TRWLPQ5YPO&dn=EmberOS2020Feb22.zip&xl=3612427634&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969
+magnet:?xt=urn:btih:UCPOQ4SCKM2NBKSFBZQOXZOBI6NX2JYZ&dn=EmberOS2020Mar4.zip&xl=3701126025&tr=udp%3A%2F%2Fexodus.desync.com%3A6969
 ```
 
 ### Dec 07 2019 alpha build
