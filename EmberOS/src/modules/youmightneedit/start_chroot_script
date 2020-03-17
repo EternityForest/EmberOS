@@ -90,7 +90,7 @@ apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p
 
 apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola audacious audacious-plugins gwenview calibre zeal convertall bluetooth bluez blueman
 
-apt-get -y install fvwm fvwm-icons mpv libgdk-pixbuf2.0-bin gpsd gpsd-clients marble-qt marble-maps marble-plugins dosbox wxhexeditor d-feet
+apt-get -y install fvwm fvwm-icons mpv libgdk-pixbuf2.0-bin gpsd gpsd-clients marble-qt marble-maps marble-plugins dosbox wxhexeditor d-feet sshpass
 
 
 
