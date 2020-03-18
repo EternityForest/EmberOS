@@ -12,6 +12,9 @@ even have internet access. As such, it includes a lot of stuff and requires a 16
 It would be possible to remove some things and shrink it, but I don't suggest this, as 
 a 16GB card will make wear leveling more effective and give your app room to expand.
 
+As a notable feature, the entire sketch partition is a Git repository, so you will
+be able to track changes to the system(A sane .gitignore is included).
+
 
 See [Here](EmberOS/src/modules/embedpi/filesystem/sketch/share/ember-doc/) for info on how to do common stuff.
 
@@ -133,7 +136,10 @@ magnet:?xt=urn:btih:c8fde4b8305851937bbb9e19d625ca1b8e3290d1&dn=sketch_included_
 Should some unknown bug happen and /usr/share/mime has very few files in it, you will have
 to manually fix this, probably by copying the files there from a debian host machine or something.
 
-If your image is for systems with an RTC, see "using an RTC"
+Once you have done this, you'll want to go into the sketch folder, launch your
+Git client of choice, and commit all untracked files.
+
+
 
 ### The Bindings Manager
 
