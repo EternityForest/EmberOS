@@ -127,11 +127,9 @@ Using your favorite partition editor, add an ntfs partition called sketch just a
 
 Copy everything in the root partition's sketch dir to the root of that partition.  Anything in the actual sketch dir is just the default, it gets covered over by the sketch partition that gets mounted there
 
-Using rsync, copy the latest Included Data torrent's sketch folder over to the sketch partition(It has things like a few sample image files and the offline docs):
+Using rsync, copy the latest Included Data torrent's sketch folder over to the sketch partition(It has things like a few sample image files and the offline docs).
 
-```
-magnet:?xt=urn:btih:c8fde4b8305851937bbb9e19d625ca1b8e3290d1&dn=sketch_included_data.zip&tr=udp%3A%2F%2Fexodus.desync.com%3A6969
-```
+See the torrents folder in the repo for the torrent.
 
 Should some unknown bug happen and /usr/share/mime has very few files in it, you will have
 to manually fix this, probably by copying the files there from a debian host machine or something.
