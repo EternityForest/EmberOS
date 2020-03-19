@@ -1,0 +1,19 @@
+#This file lists the things you probably don't want to be backing up
+#with git or rsync
+public.media/Music/Alexander Nakarada/Adventures of Flying Jack.mp3
+public.media/Music/Alexander Nakarada/README.md
+public.media/Pictures/Wallpaper/september-in-the-forest.jpg
+home/pi/.local/share/marble/**
+home/pi/.local/share/Zeal/**
+home/pi/.kodi/addons/script.globalsearch/**
+opt/kaithem/
+share/wikis/archlinux/
+*.pyc
+*.pyo
+cache/
+config/ca-certificates.conf
+config/sslcerts/**
+config/timezones/**
+postgresql/**
+ssh/**
+home/pi/Programs/arduino-1.8.12

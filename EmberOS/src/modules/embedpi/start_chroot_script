@@ -352,6 +352,7 @@ mk_pi_persist_dir  Misc
 mk_pi_persist_dir  Drawer
 mk_pi_persist_dir  Games
 mk_pi_persist_dir  Sync
+mk_pi_persist_dir  Programs
 mk_pi_persist_dir  "Calibre Library"
 mk_pi_persist_dir  .config/calibre
 mk_pi_persist_dir  .config/Zeal
