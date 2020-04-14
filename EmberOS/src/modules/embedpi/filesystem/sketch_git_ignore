@@ -17,3 +17,4 @@ config/timezones/**
 postgresql/**
 ssh/**
 home/pi/Programs/arduino-1.8.12
+home/pi/Arduino/libraries/**

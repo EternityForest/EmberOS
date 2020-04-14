@@ -124,7 +124,8 @@ pip3 install automationhat
 pip3 install cherrypy
 pip3 install adafruit-blinka
 
-pip3 install nimport
+pip3 install nimporter
+pip3 install pyfirmata
 
 pip3 install python-can
 pip3 install zimply
