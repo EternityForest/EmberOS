@@ -7,3 +7,6 @@
 [submodule "EmberOS/src/modules/youmightneedit/filesystem/tartube"]
 	path = EmberOS/src/modules/youmightneedit/filesystem/tartube
 	url = https://github.com/axcore/tartube.git
+[submodule "EmberOS/src/modules/rpitx/filesystem/rpitx"]
+	path = EmberOS/src/modules/rpitx/filesystem/rpitx
+	url = https://github.com/F5OEO/rpitx

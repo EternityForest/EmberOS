@@ -1,5 +1,10 @@
 # EmberOS Help
 
+
+## The command shell
+New! We now use xonshell for the default shell. It is mostly bash compatible, but
+also supports python. To use bash by default instead, do `chsh -s /bin/bash`
+
 ## Getting online
 Look in /sketch/networks, edit the wifi file as appropriate, or just connect ethernet.
 

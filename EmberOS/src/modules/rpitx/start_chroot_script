@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -x
+set -y
+
+mkdir -p /sketch/opt/rpitx
+
+#Hacktasktic awfulness
+mv filesystem/csdr /filesystem/rpitx/
+mv filesystem/librpitx /filesystem/rpitx/src
+mv filesystem/ft8_lib /filesystem/rpitx/src
+
+#the 3 git clones will fail because we already supplied
+#dependancies. That's fine.
+
+#The echo y sets the gpio freq to 250. Hopefully that is not a problem?
+echo y | /filesystem/install.sh
+
+
+rsync -a /filesystem/rpitx/ /sketch/opt/rpitx
