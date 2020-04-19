@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-kexi-connectiondata">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <comment xml:lang="bg">Връзка към база от данни — Kexi</comment>
+  <comment xml:lang="fo">Kexi stillingar fyri dátustovnsambætara sambinding</comment>
+  <comment xml:lang="he">הגדרות של Kexi עבור חיבור שרת למסד נתונים</comment>
+  <comment xml:lang="id">Tatanan Kexi bagi koneksi server basis data</comment>
+  <comment xml:lang="oc">paramètres Kexi per connexion al servidor de banca de donadas</comment>
+  <glob pattern="*.kexic"/>
+  <comment>data for database server connection</comment>
+  <comment xml:lang="ar">بيانات اتصال خادم قاعدة البيانات</comment>
+  <comment xml:lang="ast">datos pa conexón a sirvidor de bases de datos</comment>
+  <comment xml:lang="bs">podaci za vezu sa serverom baze</comment>
+  <comment xml:lang="ca">dades per a la connexió al servidor de bases de dades</comment>
+  <comment xml:lang="ca@valencia">dades per a la connexió al servidor de bases de dades</comment>
+  <comment xml:lang="cs">údaje pro spojení s databázovým serverem</comment>
+  <comment xml:lang="da">data til database-server-forbindelse</comment>
+  <comment xml:lang="de">Daten für Datenbank-Server-Verbindung</comment>
+  <comment xml:lang="el">Δεδομένα για σύνδεση βάσης δεδομένων</comment>
+  <comment xml:lang="en_GB">data for database server connection</comment>
+  <comment xml:lang="es">datos para conexión a servidor de bases de datos</comment>
+  <comment xml:lang="et">andmebaasiserveri ühenduse andmed</comment>
+  <comment xml:lang="eu">datuak datubase zerbitzari konexiorako</comment>
+  <comment xml:lang="fi">dataa tietokantapalvelinyhteydelle</comment>
+  <comment xml:lang="fr">Données de connexion au serveur de base de données.</comment>
+  <comment xml:lang="ga">sonraí le haghaidh ceangail le freastalaí an bhunachair sonraí</comment>
+  <comment xml:lang="gl">datos de conexión a un servidor de bases de datos</comment>
+  <comment xml:lang="hr">podaci za vezu sa poslužiteljem baze podataka</comment>
+  <comment xml:lang="hu">adatbáziskapcsolat-fájl</comment>
+  <comment xml:lang="ia">datos pro connexion de servitor de base de datos</comment>
+  <comment xml:lang="is">upplýsingar um gagnagrunnstengingu</comment>
+  <comment xml:lang="it">dati per la connessione a server di banca dati</comment>
+  <comment xml:lang="ja">データベースサーバ接続のデータ</comment>
+  <comment xml:lang="kk">деректер қорына қосылу дерегі</comment>
+  <comment xml:lang="km">ទិន្នន័យ​សម្រាប់​ការ​តភ្ជាប់​ម៉ាស៊ីនបម្រើ​មូលដ្ឋាន​ទិន្នន័យ</comment>
+  <comment xml:lang="ko">데이터베이스 서버 연결 데이터</comment>
+  <comment xml:lang="lt">duomenų bazės serverio jungites duomenys</comment>
+  <comment xml:lang="lv">dati datubāzes servera savienojumam</comment>
+  <comment xml:lang="ml">വിവരസഞ്ജയ സേവകനിലേയ്ക്കുള്ള ബന്ധത്തിനാവശ്യമായ വിവരം</comment>
+  <comment xml:lang="mr">डेटाबेस सर्व्हर जुळवणी करिता डेटा</comment>
+  <comment xml:lang="nb">data for forbindelse til databasetjener</comment>
+  <comment xml:lang="nds">Daten för Datenbankserververbinnen</comment>
+  <comment xml:lang="nl">gegevens voor verbinding met databaseserver</comment>
+  <comment xml:lang="nn">data for databasetenar-samband</comment>
+  <comment xml:lang="pa">ਡਾਟਾਬੇਸ ਸਰਵਰ ਕੁਨੈਕਨਸ਼ਨ ਲਈ ਡਾਟਾ</comment>
+  <comment xml:lang="pl">dane do połączenia z serwerem bazy danych</comment>
+  <comment xml:lang="pt">dados de ligação a servidores de bases de dados</comment>
+  <comment xml:lang="pt_BR">dados de conexão a servidores de bases de dados</comment>
+  <comment xml:lang="ro">date pentru conexiune la server de bază de date</comment>
+  <comment xml:lang="ru">сведения о соединении с сервером баз данных</comment>
+  <comment xml:lang="se">datat diehtovuođđobálvá lávttašumi várás</comment>
+  <comment xml:lang="sk">údaje pre spojenie s databázovým serverom</comment>
+  <comment xml:lang="sl">podatki za povezavo s strežnikom za podatkovno zbirko</comment>
+  <comment xml:lang="sr">подаци за везу са сервером базе</comment>
+  <comment xml:lang="sr@ijekavian">подаци за везу са сервером базе</comment>
+  <comment xml:lang="sr@ijekavianlatin">podaci za vezu sa serverom baze</comment>
+  <comment xml:lang="sr@latin">podaci za vezu sa serverom baze</comment>
+  <comment xml:lang="sv">data för anslutning till databasserver</comment>
+  <comment xml:lang="tr">veritabanı bağlantısı için veri</comment>
+  <comment xml:lang="ug">ساندان مۇلازىمېتىر باغلىنىشىنىڭ سانلىق-مەلۇماتى</comment>
+  <comment xml:lang="uk">дані для з’єднання з сервером бази даних</comment>
+  <comment xml:lang="zh_CN">数据库服务器连接数据</comment>
+  <comment xml:lang="zh_TW">資料庫伺服器連線資料</comment>
+  <glob pattern="*.kexic"/>
+</mime-type>

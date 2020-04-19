@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-5view">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <comment>Packet Capture (Accellent/InfoVista 5view)</comment>
+  <generic-icon name="application-wireshark-doc"/>
+  <glob pattern="*.5vw"/>
+  <glob pattern="*.5vw.gz"/>
+</mime-type>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+   <mime-type type="application/x-scratch-project">
+     <comment>Scratch Application</comment>
+     <comment xml:lang="es">Aplicación de Scratch</comment>
+     <glob pattern="*.sb"/>
+   </mime-type>
+</mime-info>

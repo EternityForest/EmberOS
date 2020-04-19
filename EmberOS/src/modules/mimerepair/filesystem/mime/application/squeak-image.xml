@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/squeak-image">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <sub-class-of type="application/x-executable"/>
+  <comment>Squeak Image</comment>
+  <comment xml:lang="es">Imagen de Squeak</comment>
+  <glob pattern="*.image"/>
+</mime-type>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="text/x-wxmaxima-batch">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <comment>wxMaxima document</comment>
+  <comment xml:lang="de">wxMaxima Dokument</comment>
+  <glob pattern="*.wxm"/>
+  <generic-icon name="text-x-wxmaxima-batch"/>
+</mime-type>

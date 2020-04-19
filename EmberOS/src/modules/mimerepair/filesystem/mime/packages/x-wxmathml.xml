@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="text/x-wxmathml">
+    <comment>wxMaxima document</comment>
+    <comment xml:lang="de">wxMaxima Dokument</comment>
+    <sub-class-of type="application/zip"/>
+    <glob pattern="*.wxmx"/>
+    <generic-icon name="text-x-wxmathml"/>
+  </mime-type>
+</mime-info>

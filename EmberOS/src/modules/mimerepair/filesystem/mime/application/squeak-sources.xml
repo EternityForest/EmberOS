@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/squeak-sources">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <comment>Squeak Sources</comment>
+  <comment xml:lang="es">Fuentes de Squeak</comment>
+  <glob pattern="*.sources"/>
+</mime-type>

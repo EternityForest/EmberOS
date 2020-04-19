@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-pcapng">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <comment>Packet Capture (PCAPNG)</comment>
+  <generic-icon name="application-wireshark-doc"/>
+  <glob pattern="*.pcapng"/>
+  <glob pattern="*.ntar"/>
+  <glob pattern="*.pcapng.gz"/>
+  <glob pattern="*.ntar.gz"/>
+</mime-type>

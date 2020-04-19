@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-osm+xml">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <sub-class-of type="application/xml"/>
+  <comment>OSM Data</comment>
+  <comment xml:lang="bg">Данни OSM</comment>
+  <comment xml:lang="bs">OSM podaci</comment>
+  <comment xml:lang="ca">Dades OSM</comment>
+  <comment xml:lang="ca@valencia">Dades OSM</comment>
+  <comment xml:lang="cs">Data OSM</comment>
+  <comment xml:lang="da">OSM-data</comment>
+  <comment xml:lang="de">OSM-Daten</comment>
+  <comment xml:lang="el">Δεδομένα OSM</comment>
+  <comment xml:lang="en_GB">OSM Data</comment>
+  <comment xml:lang="eo">OSM Datumoj</comment>
+  <comment xml:lang="es">Datos OSM</comment>
+  <comment xml:lang="et">OSM andmed</comment>
+  <comment xml:lang="fi">OSM-data</comment>
+  <comment xml:lang="fr">Données « OSM »</comment>
+  <comment xml:lang="ga">Sonraí OSM</comment>
+  <comment xml:lang="gl">Datos de OSM</comment>
+  <comment xml:lang="hu">OSM adat</comment>
+  <comment xml:lang="it">Dati OSM</comment>
+  <comment xml:lang="kk">OSM деректері</comment>
+  <comment xml:lang="ko">OSM 데이터</comment>
+  <comment xml:lang="lt">OSM duomenys</comment>
+  <comment xml:lang="lv">OSM dati</comment>
+  <comment xml:lang="mr">OSM डेटा</comment>
+  <comment xml:lang="nb">OSM-data</comment>
+  <comment xml:lang="nds">OSM-Daten</comment>
+  <comment xml:lang="nl">OSM-gegevens</comment>
+  <comment xml:lang="nn">OSM-data</comment>
+  <comment xml:lang="pl">Dane OSM</comment>
+  <comment xml:lang="pt">Dados do OSM</comment>
+  <comment xml:lang="pt_BR">Dados OSM</comment>
+  <comment xml:lang="ru">Данные OSM</comment>
+  <comment xml:lang="sk">Dáta OSM</comment>
+  <comment xml:lang="sl">Podatki OSM</comment>
+  <comment xml:lang="sv">OSM-data</comment>
+  <comment xml:lang="tr">OSM Verisi</comment>
+  <comment xml:lang="uk">дані OSM</comment>
+  <comment xml:lang="zh_CN">OSM 数据</comment>
+  <comment xml:lang="zh_TW">OSM 資料</comment>
+  <acronym>OSM</acronym>
+  <expanded-acronym>OpenStreetMap</expanded-acronym>
+  <generic-icon name="application-vnd-google-earth-kml"/>
+  <glob pattern="*.osm"/>
+  <glob pattern="*.osc"/>
+</mime-type>

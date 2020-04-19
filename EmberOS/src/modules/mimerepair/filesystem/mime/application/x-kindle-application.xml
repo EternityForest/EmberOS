@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-kindle-application">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <comment>Amazon Kindle Application (Kindlet)</comment>
+  <sub-class-of type="application/x-java-archive"/>
+  <glob pattern="*.azw2"/>
+</mime-type>

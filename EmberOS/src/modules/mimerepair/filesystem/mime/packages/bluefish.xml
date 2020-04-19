@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+	<mime-type type="application/x-bluefish-project">
+		<sub-class-of type="text/plain"/>
+		<comment>Bluefish project file</comment>
+		<comment xml:lang="ca">Fitxer de projecte Bluefish</comment>
+		<comment xml:lang="cs">Projektový soubor Bluefish</comment>
+		<comment xml:lang="da">Projektfil for Bluefish</comment>
+		<comment xml:lang="de">Bluefish Projektdatei</comment>
+		<comment xml:lang="en">Bluefish project file</comment>
+		<comment xml:lang="es">Archivo de proyecto Bluefish</comment>
+		<comment xml:lang="eu">Bluefish proiektuaren fitxategia</comment>
+		<comment xml:lang="fa">پرونده پروژه ؛ بلو فیش ؛‬</comment>
+		<comment xml:lang="fr">Fichier de projet Bluefish</comment>
+		<comment xml:lang="gl">Ficheiro de proxecto Bluefish</comment>
+		<comment xml:lang="hu">Bluefish projekt fájl</comment>
+		<comment xml:lang="it">File di progetto di Bluefish</comment>
+		<comment xml:lang="ja">Bluefish プロジェクトファイル</comment>
+		<comment xml:lang="ko">Bluefish 프로젝트 파일</comment>
+		<comment xml:lang="nb">Bluefish prosjektfil</comment>
+		<comment xml:lang="nl">Bluefish-projectbestand</comment>
+		<comment xml:lang="nn">Bluefish prosjektfil</comment>
+		<comment xml:lang="pl">Plik projektu Bluefish</comment>
+		<comment xml:lang="pt">Ficheiro de projecto do Bluefish</comment>
+		<comment xml:lang="pt_BR">Arquivo de projeto Bluefish</comment>
+		<comment xml:lang="ro">Fisier proiect Bluefish</comment>
+		<comment xml:lang="ru">Файл проекта Bluefish</comment>
+		<comment xml:lang="sk">Súbor Bluefish projektu</comment>
+		<comment xml:lang="uk">Файл проекту Bluefish</comment>
+		<comment xml:lang="zh_CN">Bluefish 项目文件</comment>
+		<glob pattern="*.bfproject"/>
+	</mime-type>
+	<mime-type type="application/x-bluefish-language2">
+		<sub-class-of type="application/xml"/>
+		<comment>Bluefish language definition file</comment>
+		<comment xml:lang="ca">Fitxer de definició de la llengua de Bluefish</comment>
+		<comment xml:lang="cs">Soubor Bluefish s definicí jazyka</comment>
+		<comment xml:lang="da">Sprogdefinitionsfil for Bluefish</comment>
+		<comment xml:lang="de">Bluefish Sprach- und Syntaxunterstützung</comment>
+		<comment xml:lang="en">Bluefish language definition file</comment>
+		<comment xml:lang="es">Archivo de definición de idioma de Bluefish</comment>
+		<comment xml:lang="eu">Bluefish hizkuntzaren definizioaren fitxategia</comment>
+		<comment xml:lang="fa">Bluefish زبان فایل تعریف</comment>
+		<comment xml:lang="fr">Fichier de définition de language Bluefish</comment>
+		<comment xml:lang="gl">Ficheiro de definición de linguaxe de Bluefish</comment>
+		<comment xml:lang="hu">Bluefish language definition file</comment>
+		<comment xml:lang="it">File di definizione linguaggio di Bluefish</comment>
+		<comment xml:lang="ja">Bluefish 言語定義ファイル</comment>
+		<comment xml:lang="ko">Bluefish 언어 정의 파일</comment>
+		<comment xml:lang="nb">Språkdefinisjonsfil for Bluefish</comment>
+		<comment xml:lang="nl">Bluefish-taaldefinitiebestand</comment>
+		<comment xml:lang="nn">Bluefish språkdefinisjonsfil</comment>
+		<comment xml:lang="pl">Plik definicji języka Bluefish</comment>
+		<comment xml:lang="pt">Ficheiro de definição de linguagem do Bluefish</comment>
+		<comment xml:lang="pt_BR">Arquivo de definição de linguagem do Bluefish</comment>
+		<comment xml:lang="ro">Fisier definire limba</comment>
+		<comment xml:lang="ru">Файл определений языка Bluefish</comment>
+		<comment xml:lang="uk">Файл визначення мов Bluefish</comment>
+		<comment xml:lang="zh_CN">Bluefish 语言定义文件</comment>
+		<magic priority="90">
+			<match value="&lt;bflang" type="string" offset="0:1024"/>
+			<match value="&lt;bfinc" type="string" offset="0:1024"/>
+		</magic>	
+		<glob pattern="*.bflang2"/>
+		<glob pattern="*.bfinc"/>
+		<root-XML namespaceURI="http://bluefish.openoffice.nl/bflang2" localName="bflang"/>
+	</mime-type>
+</mime-info>

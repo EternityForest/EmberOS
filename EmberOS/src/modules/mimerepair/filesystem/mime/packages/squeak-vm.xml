@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/squeak-image">
+    <sub-class-of type="application/x-executable"/>
+    <comment>Squeak Image</comment>
+    <comment xml:lang="es">Imagen de Squeak</comment>
+    <glob pattern="*.image" />
+  </mime-type>
+  <mime-type type="application/squeak-changes">
+    <sub-class-of type="text/plain"/>
+    <comment>Squeak Changes</comment>
+    <comment xml:lang="es">Archivo de cambios de Squeak</comment>
+    <glob pattern="*.changes" />
+  </mime-type>
+  <mime-type type="application/squeak-changeset">
+    <sub-class-of type="text/plain"/>
+    <comment>Squeak Changeset</comment>
+    <comment xml:lang="es">Cambios ejecutables para Squeak</comment>
+    <glob pattern="*.st" />
+  </mime-type>
+  <mime-type type="application/squeak-sources">
+    <comment>Squeak Sources</comment>
+    <comment xml:lang="es">Fuentes de Squeak</comment>
+    <glob pattern="*.sources" />
+  </mime-type>
+  <mime-type type="application/squeak-project">
+    <sub-class-of type="application/x-executable"/>
+    <comment>Squeak Project</comment>
+    <comment xml:lang="es">Proyecto de Squeak</comment>
+    <glob pattern="*.pr" />
+  </mime-type>
+</mime-info>

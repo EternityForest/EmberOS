@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="text/x-wxmathml">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <comment>wxMaxima document</comment>
+  <comment xml:lang="de">wxMaxima Dokument</comment>
+  <sub-class-of type="application/zip"/>
+  <glob pattern="*.wxmx"/>
+  <generic-icon name="text-x-wxmathml"/>
+</mime-type>

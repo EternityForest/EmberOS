@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="text/x-rst">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <sub-class-of type="text/plain"/>
+  <comment>reStructuredText document</comment>
+  <comment xml:lang="ca">Document reStructuredText</comment>
+  <comment xml:lang="cs">Dokument reStructuredText</comment>
+  <comment xml:lang="cy">Dogfen reStructuredText</comment>
+  <comment xml:lang="da">reStructuredText-dokument</comment>
+  <comment xml:lang="de">reStructuredText-Dokument</comment>
+  <comment xml:lang="es">Documento reStructuredText</comment>
+  <comment xml:lang="et">reStructuredText dokument</comment>
+  <comment xml:lang="eu">Dokumentua reStructuredText</comment>
+  <comment xml:lang="fr">Document reStructuredText</comment>
+  <comment xml:lang="hu">reStructuredText dokumentum</comment>
+  <comment xml:lang="it">Documento reStructuredText</comment>
+  <comment xml:lang="ja">ドキュメント reStructuredText</comment>
+  <comment xml:lang="pl">Dokument reStructuredText</comment>
+  <comment xml:lang="pt">Documento reStructuredText</comment>
+  <comment xml:lang="ru">Документ reStructuredText</comment>
+  <comment xml:lang="sk">Dokument reStructuredText</comment>
+  <comment xml:lang="ua">Документ reStructuredText</comment>
+  <comment xml:lang="zh-CN">reStructuredText 文档</comment>
+  <comment xml:lang="zh-TW">reStructuredText 文件</comment>
+  <glob pattern="*.rst"/>
+  <glob pattern="*.rest"/>
+</mime-type>

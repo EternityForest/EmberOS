@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-meld-comparison">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <comment>Meld comparison description</comment>
+  <comment xml:lang="bs">Meld opis usporedbe</comment>
+  <comment xml:lang="ca">Descripció de la comparació del Meld</comment>
+  <comment xml:lang="ca@valencia">Descripció de la comparació del Meld</comment>
+  <comment xml:lang="cs">Definice porovnávání Meld</comment>
+  <comment xml:lang="da">Meld-sammenligningsbeskrivelse</comment>
+  <comment xml:lang="de">Meld Vergleichsbeschreibung</comment>
+  <comment xml:lang="el">Περιγραφή σύγκρισης Meld</comment>
+  <comment xml:lang="es">Descripción de la comparación de Meld</comment>
+  <comment xml:lang="eu">Meld-en konparazioaren azalpena</comment>
+  <comment xml:lang="fi">Meld-vertailun kuvaus</comment>
+  <comment xml:lang="fr">Description de la comparaison Meld</comment>
+  <comment xml:lang="gl">Descrición da comparación do Meld</comment>
+  <comment xml:lang="he">תיאור ההשוואה</comment>
+  <comment xml:lang="hu">Meld összehasonlítás-leírás</comment>
+  <comment xml:lang="id">Deskripsi perbandingan Meld</comment>
+  <comment xml:lang="it">Descrizione confronto Meld</comment>
+  <comment xml:lang="pl">Opis porównywania programu Meld</comment>
+  <comment xml:lang="pt">Descrição da comparação do Meld</comment>
+  <comment xml:lang="pt_BR">Descrição da comparação do Meld</comment>
+  <comment xml:lang="ro">Descrierea comparației Meld</comment>
+  <comment xml:lang="ru">Описание сравнения Meld</comment>
+  <comment xml:lang="sk">Popis porovnávania Meld</comment>
+  <comment xml:lang="sl">Opis primerjave Meld</comment>
+  <comment xml:lang="sr">Опис Мелдовог поређења</comment>
+  <comment xml:lang="sr@latin">Opis Meldovog poređenja</comment>
+  <comment xml:lang="sv">Meld jämförelsebeskrivning</comment>
+  <comment xml:lang="tr">Meld karşılaştırma açıklaması</comment>
+  <comment xml:lang="zh_CN">Meld 比较描述</comment>
+  <comment xml:lang="zh_TW">Meld 比對描述</comment>
+  <glob pattern="*.meldcmp"/>
+  <icon name="org.gnome.meld"/>
+</mime-type>

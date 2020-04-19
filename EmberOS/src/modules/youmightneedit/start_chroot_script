@@ -144,6 +144,8 @@ mkdir -p /sketch/public.www
 
 apt-get -y install apache2 
 
+#Enable .htaccess
+cp /filesystem/apache2.conf /etc/apache2/apache2.conf
 
 #Give www-data a "window into the root filesystem"
 cat << EOF > /sketch/config/filesystem/www.yaml
@@ -153,10 +155,25 @@ cat << EOF > /sketch/config/filesystem/www.yaml
     bindat: /var/www/html
 EOF
 
+#Make apache configurable
+cat << EOF > /sketch/config/filesystem/apache2.yaml
+/sketch/config/apache2:
+    mode: '0755'
+    user:  www-data
+    bindat: /etc/apache2
+EOF
+
+mkdir -p /sketch/config/apache2
+cp -ar /etc/apache2 /sketch/config/apache2
+
 apt-get -y install postgresql libpq-dev postgresql-client postgresql-contrib postgresql-client-common 
 mkdir -p /sketch/postgresql
 mkdir -p /sketch/config/postgresql
 mkdir -p /var/lib/postgresql
+psql -c "CREATE USER www-data;"
+psql -c "CREATE DATABASE nextcloud;"
+psql -c "GRANT ALL PRIVILEGES ON DATABASE nextcloud to www-data;"
+
 cp -ar /var/lib/postgresql/. /sketch/postgresql
 cp -ar /etc/postgresql/. /sketch/config/postgresql
 
@@ -176,7 +193,7 @@ EOF
 
 systemctl disable postgresql.service
 
-apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,pgsql,zip}
+apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,pgsql,zip,xml,gd,sqlite3}
 apt-get install libapache2-mod-php -y
 
 
@@ -191,9 +208,9 @@ apt-get -y install python3-tz python3-dateutil lm-sensors python3-lxml python3-s
 
 apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3-libnacl jack-tools
 apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid python3-pycryptodome 
-apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly python3-psutil mumble-server
+apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly python3-psutil mumble-server mumble
 apt-get -y install -y fluidsynth pulseaudio-module-jack pulseaudio-module-bluetooth pulseaudio-module-zeroconf pulsemixer ffmpeg
-apt-get -y install kodi kodi-pvr-mythtv jaaa qjackctl
+apt-get -y install kodi kodi-pvr-mythtv jaaa qjackctl evince
 
 ! adduser pi pulse-access
 
@@ -218,7 +235,7 @@ EOF
 #Important to take note of this!!!!!!
 #We are setting the default shell to xonsh.
 #It's bash compatible enough.
-chsh -s $(which xonsh)
+sudo -u pi chsh -s /usr/bin/xonsh
 
 apt-get -y install npm
 npm install -g --unsafe-perm node-red

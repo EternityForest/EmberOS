@@ -371,7 +371,7 @@ mk_pi_persist_dir .kodi
 mk_pi_persist_dir .homeassistant
 
 
-
+echo "# Project Notes" > /sketch/home/pi/Documents/README.md
 #This one is annoying, it saves EVERYTHING
 #to the same session file on exit. But whatever, it's only
 #30kb, probably not a significant issue

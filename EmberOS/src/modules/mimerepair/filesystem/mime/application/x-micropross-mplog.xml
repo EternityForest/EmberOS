@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-micropross-mplog">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <comment>Packet Capture (Micropross mplog)</comment>
+  <generic-icon name="application-wireshark-doc"/>
+  <glob pattern="*.mplog"/>
+  <glob pattern="*.mplog.gz"/>
+</mime-type>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-nettl">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <comment>Packet Capture (HP-UX nettl)</comment>
+  <generic-icon name="application-wireshark-doc"/>
+  <glob pattern="*.trc0"/>
+  <glob pattern="*.trc1"/>
+  <glob pattern="*.trc0.gz"/>
+  <glob pattern="*.trc1.gz"/>
+</mime-type>

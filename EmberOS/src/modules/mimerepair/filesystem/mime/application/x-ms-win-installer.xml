@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-ms-win-installer">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <comment>Windows installer</comment>
+  <comment xml:lang="zh_TW">Windows 安裝程式</comment>
+  <glob pattern="*.msi"/>
+</mime-type>

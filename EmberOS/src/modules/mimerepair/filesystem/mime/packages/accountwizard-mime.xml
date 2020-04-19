@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+    <mime-type type="application/x-accountwizard-package">
+        <comment>KDE Accountwizard Package</comment>
+        <glob pattern="*.awp"></glob>
+    </mime-type>
+</mime-info>

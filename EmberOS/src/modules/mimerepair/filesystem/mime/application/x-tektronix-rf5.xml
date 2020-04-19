@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-tektronix-rf5">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <comment>Packet Capture (Tektronix rf5)</comment>
+  <generic-icon name="application-wireshark-doc"/>
+  <glob pattern="*.rf5"/>
+  <glob pattern="*.rf5.gz"/>
+</mime-type>

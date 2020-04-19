@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-kexiproject-sqlite2">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <comment xml:lang="bg">Проект с база от данни — Kexi</comment>
+  <comment xml:lang="fo">Kexi dátustovns fílugrundað verkætlan</comment>
+  <comment xml:lang="he">מיזם מסד נתונים מבוסס-קובץ של Kexi</comment>
+  <comment xml:lang="id">Projek berbasis berkas basis data Kexi</comment>
+  <comment xml:lang="oc">projècte de banca de donadas Kexi en mòde fichièr</comment>
+  <sub-class-of type="application/x-sqlite2"/>
+  <glob pattern="*.kexi"/>
+  <sub-class-of type="application/x-sqlite2"/>
+  <comment>Kexi database file-based project</comment>
+  <comment xml:lang="ar">مشروع قاعدة بيانات Kexi يعتمد على ملفات</comment>
+  <comment xml:lang="ast">Proyeutu basáu en ficheros de base de datos Kexi</comment>
+  <comment xml:lang="bs">Kexijev projekat baze na osnovu datoteke</comment>
+  <comment xml:lang="ca">projecte basat en fitxer de base de dades del Kexi</comment>
+  <comment xml:lang="ca@valencia">projecte basat en fitxer de base de dades del Kexi</comment>
+  <comment xml:lang="cs">Projekt databáze Kexi ze souboru</comment>
+  <comment xml:lang="da">Databasefil-baseret projekt til Kexi</comment>
+  <comment xml:lang="de">Kexi-Datenbank Dateibasiertes Projekt</comment>
+  <comment xml:lang="el">Βάση δεδομένων έργο βασισμένη σε αρχείο Kexi</comment>
+  <comment xml:lang="en_GB">Kexi database file-based project</comment>
+  <comment xml:lang="es">Proyecto basado en archivos de base de datos Kexi</comment>
+  <comment xml:lang="et">Kexi andmebaasi failipõhine projekt</comment>
+  <comment xml:lang="eu">Kexi datubasearen fitxategian oinarritutako proiektua</comment>
+  <comment xml:lang="fi">Kexi-tietokanta tiedostoperustainen projekti</comment>
+  <comment xml:lang="fr">Projet de base de données Kexi</comment>
+  <comment xml:lang="ga">Tionscadal bunachair sonraí Kexi bunaithe ar chomhaid</comment>
+  <comment xml:lang="gl">Proxecto de base de datos de Kexi baseada en ficheiros</comment>
+  <comment xml:lang="hr">Kexi projekt datotečno bazirane baze podataka</comment>
+  <comment xml:lang="hu">Kexi adatbázisfájl-alapú projekt</comment>
+  <comment xml:lang="ia">Kexi :Projecto basate su file de base de datos</comment>
+  <comment xml:lang="is">Skráartengt Kexi gagnagrunnsverkefni</comment>
+  <comment xml:lang="it">progetto basato su file di banche dati di Kexi</comment>
+  <comment xml:lang="ja">Kexi データベース ファイルベースプロジェクト</comment>
+  <comment xml:lang="kk">Kexi деректер қоры файл негіздегі жоба</comment>
+  <comment xml:lang="km">គម្រោង​ដែល​មាន​មូលដ្ឋាន​លើ​ឯកសារ​មូលដ្ឋាន​ទិន្នន័យ​របស់ Kexi</comment>
+  <comment xml:lang="ko">Kexi 데이터베이스 파일 기반 프로젝트</comment>
+  <comment xml:lang="lt">Kexi failinis duomenų bazės projektas</comment>
+  <comment xml:lang="lv">Kexi datubāzes faila bāzēts projekts</comment>
+  <comment xml:lang="ml">ക്ലെക്സി വിവരസഞ്ജയത്തിന്റെ ഫയല്‍ അടിസ്ഥാനമാക്കിയുള്ള പദ്ധതി</comment>
+  <comment xml:lang="mr">केक्सी डेटाबेस फाईल-आधारित परियोजना</comment>
+  <comment xml:lang="nb">Kexi database filbasert prosjekt</comment>
+  <comment xml:lang="nds">Dateibaseert Kexi-Datenbankprojekt</comment>
+  <comment xml:lang="nl">Kexi database met bestandgebaseerd project</comment>
+  <comment xml:lang="nn">Filbasert Kexi-databaseprosjekt</comment>
+  <comment xml:lang="pl">Projekt bazy danych w pliku Kexi</comment>
+  <comment xml:lang="pt">Projecto de bases de dados em ficheiros do Kexi</comment>
+  <comment xml:lang="pt_BR">Projeto de banco de dados em arquivo do Kexi</comment>
+  <comment xml:lang="ro">proiect bază de date Kexi bazat pe fișier</comment>
+  <comment xml:lang="ru">проект файловой базы данных Kexi</comment>
+  <comment xml:lang="se">Kexi-diehtovuođđu fiilavuođđoduvvon prošeakta</comment>
+  <comment xml:lang="sk">Projekt databázy Kexi zo súboru</comment>
+  <comment xml:lang="sl">Projekt Kexi s podatkovno zbirko v datoteki</comment>
+  <comment xml:lang="sr">Кексијев пројекат базе на основу фајла</comment>
+  <comment xml:lang="sr@ijekavian">Кексијев пројекат базе на основу фајла</comment>
+  <comment xml:lang="sr@ijekavianlatin">Kexijev projekat baze na osnovu fajla</comment>
+  <comment xml:lang="sr@latin">Kexijev projekat baze na osnovu fajla</comment>
+  <comment xml:lang="sv">Kexi filbaserat databasprojekt</comment>
+  <comment xml:lang="tr">Dosya temelli Kexi veritabanı projesi</comment>
+  <comment xml:lang="ug">Kexi ساندان ھۆججەت ئاساسىدىكى قۇرۇلۇش</comment>
+  <comment xml:lang="uk">проект файлової бази даних Kexi</comment>
+  <comment xml:lang="zh_CN">Kexi 基于数据库文件项目</comment>
+  <comment xml:lang="zh_TW">Kexi 資料庫檔案專案</comment>
+  <glob pattern="*.kexi"/>
+</mime-type>

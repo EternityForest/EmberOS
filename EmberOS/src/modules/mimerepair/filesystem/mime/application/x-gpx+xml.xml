@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-gpx+xml">
+  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
+  <sub-class-of type="application/xml"/>
+  <comment>GPX geographic data</comment>
+  <comment xml:lang="bg">Географски данни GPX</comment>
+  <comment xml:lang="bs">GPX geografski podaci</comment>
+  <comment xml:lang="ca">Dades geogràfiques GPX</comment>
+  <comment xml:lang="ca@valencia">Dades geogràfiques GPX</comment>
+  <comment xml:lang="cs">Zeměpisná data GPX</comment>
+  <comment xml:lang="da">GPX-geografidata</comment>
+  <comment xml:lang="de">GPX-Geografiedaten</comment>
+  <comment xml:lang="el">Γεωγραφικά δεδομένα GPX</comment>
+  <comment xml:lang="en_GB">GPX geographic data</comment>
+  <comment xml:lang="eo">GPX geografiaj datumoj</comment>
+  <comment xml:lang="es">Datos geográficos GPX</comment>
+  <comment xml:lang="et">GPX geograafilised andmed</comment>
+  <comment xml:lang="fi">GPX-paikkatieto</comment>
+  <comment xml:lang="fr">Données géographiques « GPX »</comment>
+  <comment xml:lang="ga">Sonraí geografacha GPX</comment>
+  <comment xml:lang="gl">Datos xeográficos GPX</comment>
+  <comment xml:lang="hu">GPX földrajzi adat</comment>
+  <comment xml:lang="it">Dati geografici GPX</comment>
+  <comment xml:lang="kk">GPX географиялық деректер</comment>
+  <comment xml:lang="ko">GPX 지리 데이터</comment>
+  <comment xml:lang="lt">GPX geografiniai duomenys</comment>
+  <comment xml:lang="lv">GPX ģeogrāfiskie dati</comment>
+  <comment xml:lang="mr">GPX भूगोल डेटा</comment>
+  <comment xml:lang="nb">GPX geografiske data</comment>
+  <comment xml:lang="nds">GPX-Geodaten</comment>
+  <comment xml:lang="nl">GPX geografische gegevens</comment>
+  <comment xml:lang="nn">GPX-geografidata</comment>
+  <comment xml:lang="pl">Dane geograficzne GPX</comment>
+  <comment xml:lang="pt">Dados geográficos GPX</comment>
+  <comment xml:lang="pt_BR">Dados geográficos GPX</comment>
+  <comment xml:lang="ru">Географические данные GPX</comment>
+  <comment xml:lang="sk">Zemepisné dáta GPX</comment>
+  <comment xml:lang="sl">Geografski podatki GPX</comment>
+  <comment xml:lang="sv">GPX-geografisk data</comment>
+  <comment xml:lang="tr">GPX geografik ver</comment>
+  <comment xml:lang="uk">географічні дані GPX</comment>
+  <comment xml:lang="zh_CN">GPX 地理数据</comment>
+  <comment xml:lang="zh_TW">GPX 地理資料</comment>
+  <acronym>GPX</acronym>
+  <expanded-acronym>GPS eXchange Format</expanded-acronym>
+  <generic-icon name="application-vnd-google-earth-kml"/>
+  <glob pattern="*.gpx"/>
+  <alias type="application/gpx"/>
+  <alias type="application/gpx+xml"/>
+  <alias type="application/x-gpx"/>
+</mime-type>
