@@ -129,9 +129,10 @@ pip3 install pyfirmata
 
 
 pip3 install python-can
-pip3 install zimply
 
-sudo apt-get -y install python3-smbus python3-msgpack python3-paho-mqtt
+sudo apt-get -y install python3-smbus python3-msgpack python3-paho-mqtt python3-gevent python3-falcon python3-mako
+
+pip3 install zimply
 
 mkdir -p /public.temp
 mkdir -p /sketch/public.www/

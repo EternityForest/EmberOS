@@ -185,7 +185,13 @@ We default to "auto", which is probably not what you want if using an HDMI monit
 This is provided by `ember-manage-audio.service`
 
 
+## Installing NextCloud
 
+All dependancies should already be included, as is the zipped version of nexcloud itself.
+
+You should be able to run `sh /usr/share.sketch/php_apps/install_nextcloud.sh`
+
+.htaccess is already enabled, you shouldn't need anything else.
 
 ## Serving Media
 
@@ -193,7 +199,7 @@ One of the most common tasks for embedded devices is as a media server.
 Put whatever you want to serve in /sketch/public.media for DLNA.
 
 Put whatever you want to serve as a standard web site in /sketch/public.www to serve
-it on port 80 with apache. Whatever you put as index.http will be the start page for the fullscren kiosk!
+it on port 80 with apache. Whatever you put as index.http will be the start page for the fullscren kiosk!  .htaccess files are already enabled.
 
 Don't use the prefix "public." for anything you don't want to be made public, in case more
 services are added!
