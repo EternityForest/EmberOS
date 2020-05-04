@@ -13,8 +13,13 @@ echo "samba-common samba-common/do_debconf boolean true" | sudo debconf-set-sele
 #Non-superusers can't capture packets
 echo "wireshark-common wireshark-common/install-setuid boolean false" | sudo debconf-set-selections
 
-
-
+# mkdir -p /opt/ipfs-installer
+# cp -ar /filesystem/ipfs-rpi/. /opt/ipfs-installer
+# cd /opt/ipfs-installer
+# sudo -u pi ./install
+# #Give user a way to update
+# ln -s /opt/ipfs-installer/ipfs-rpi-0.1.1/install /usr/bin/install-ipfs-rpi
+# sudo systemctl disable ipfs-daemon.service
 
 apt-get -y install -y wireshark
 apt-get -y install smbclient samba samba-common-bin cifs-utils minidlna
@@ -265,22 +270,18 @@ apt-get -y install -y spacefm fslint deluge ardour pulseview chkservice matchbox
 apt-get -y install nmap robotfindskitten ncdu mc curl fatrace gstreamer1.0-tools pavucontrol xawtv
 
 #Sigh. Vim is huge but some people really love it...
-apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs git-repair xloadimage
+apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs git-repair xloadimage goldendict goldendict-wordnet
 
-
+#Enable builtin wordnet, disable the wiktionary service by default because that uses
+#Network
+! rm /home/pi/.goldendict/config
+cp /filesystem/goldendict_config /home/pi/.goldendict/config
 
 
 gtk-update-icon-cache
 
 
-# cd /tmp
-# wget https://github.com/claudiobizzotto/ipfs-rpi/archive/v0.1.1.tar.gz
-# tar xvzf v0.1.1.tar.gz
-# cd ipfs-rpi-0.1.1
-# sudo -u pi ./install
-# mkdir -p /home/pi/.ipfs
 
-# cp -ar /home/pi/.ipfs/. /sketch/home/pi/.ipfs/
 
 
 apt-get autoremove -y --purge
