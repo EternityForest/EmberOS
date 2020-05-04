@@ -1,5 +1,5 @@
 #!/bin/bash
-! apt purge -y ^wolfram-engine$
+! apt purge -y ^wolfram-engine$ ^sonic-pi-samples$ ^midori$ ^netsurf-gtk$
 
 #Everyhting aside from scratch3 official can go
 ! apt purge -y ^nuscratch$  ^scratch2$ ^scratch$  ^minecraft-pi$ ^python-minecraftpi$

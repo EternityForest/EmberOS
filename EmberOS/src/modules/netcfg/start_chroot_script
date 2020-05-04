@@ -14,8 +14,10 @@ sudo apt-get -y install dirmngr
 #gpg --export 569130E8CA20FBC4CB3FDE555898470A764B32C9 | sudo apt-key add -
 sudo cp /filesystem/569130E8CA20FBC4CB3FDE555898470A764B32C9.pubkey /etc/apt/trusted.gpg.d/yggdrasil.gpg
 echo 'deb http://neilalexander.s3.dualstack.eu-west-2.amazonaws.com/deb/ debian yggdrasil' | sudo tee /etc/apt/sources.list.d/yggdrasil.list
+
 sudo apt-get -y update
-sudo apt-get -y install yggdrasil 
+
+
 
 # Don't even think about setting this up without
 # some serious firewalling(See below, but we still should probably not enable this by default for various reasons)
@@ -23,6 +25,17 @@ sudo apt-get -y install yggdrasil
 
 echo "Dummy file, only used as mountpoint" > /etc/yggdrasil.conf
 chmod 700 /etc/yggdrasil.conf
+
+#Manually do everything to avoind the postinst script
+groupadd --system --force yggdrasil 
+#Install after the dummy file, not before
+cd /tmp
+apt-get download yggdrasil
+sudo dpkg --unpack yggdrasil*.deb
+sudo rm /var/lib/dpkg/info/yggdrasil.postinst -f
+sudo dpkg --configure yggdrasil
+sudo apt-get install -yf #To fix dependencies
+
 
 apt-get -y install network-manager libnss3-tools ca-certificates nftables firewalld avahi-daemon avahi-utils radvd
 

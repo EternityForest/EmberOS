@@ -25,7 +25,7 @@ chmod 755 /usr/bin/wikioffline
 
 cat << EOF > /etc/systemd/system/zimserver.service
 [Unit]
-Description=Manage things from sketch folder
+Description=Serve wikis
 After=systemd-remount-fs.service network-online.target
 RequiresMountsFor=/etc/ /sketch/ /home/
 
@@ -42,7 +42,7 @@ EOF
 
 
 
-apt-get -y install mosquitto libpng16-16 chromium-browser rpi-chromium-mods batmand batctl cubicsdr
+apt-get -y install mosquitto libpng16-16 chromium-browser rpi-chromium-mods batmand batctl 
 echo "persistence false" > /etc/mosquitto/conf.d/emberos.conf
 
 systemctl disable mosquitto.service
@@ -50,8 +50,16 @@ systemctl disable mosquitto.service
 # SyncThing is installed, but not set up!!!
 wget -O - https://syncthing.net/release-key.txt > /etc/apt/trusted.gpg.d/syncthing.asc
 echo "deb http://apt.syncthing.net/ syncthing release" | sudo tee -a /etc/apt/sources.list.d/syncthing-release.list
+
+
+#Retroshare
+#wget -qO - http://download.opensuse.org/repositories/network:retroshare/Raspbian_9.0/Release.key | sudo apt-key add -
+sudo cp /filesystem/retroshare.pubkey /etc/apt/trusted.gpg.d/retroshare.asc
+echo 'deb http://download.opensuse.org/repositories/network:/retroshare/Raspbian_9.0/ /' > /etc/apt/sources.list.d/retroshare.list
+
+
 sudo apt-get update
-sudo apt-get install syncthing syncthing-gtk -y
+sudo apt-get install syncthing syncthing-gtk retroshare -y
 
 mkdir -p /sketch/home/pi/.syncthing
 mkdir -p /sketch/home/pi/.syncthing-gtk
@@ -85,14 +93,18 @@ chmod 755 /usr/bin/get-youtube-dl
 
 
 #Batteries included, allow messing with kiosk browser media right from the device
-apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full testdisk baobab fldigi flrig flmsg flamp qsynth vmpk
+apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full testdisk baobab qsynth vmpk 
+
+
+#Ham radio stuff
+apt-get -y install fldigi flrig flmsg flamp xastir chirp cubicsdr antennavis
 
 
 apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola audacious audacious-plugins gwenview calibre zeal convertall bluetooth bluez blueman
 
-apt-get -y install fvwm fvwm-icons mpv libgdk-pixbuf2.0-bin gpsd gpsd-clients marble-qt marble-maps marble-plugins dosbox wxhexeditor d-feet sshpass
+apt-get -y install mpv libgdk-pixbuf2.0-bin gpsd gpsd-clients marble-qt marble-maps marble-plugins dosbox wxhexeditor d-feet sshpass jami jami-daemon
 
-
+systemctl disable gpsd.service
 
 # Installs the Micro editor
 # Do this early, it can't be cached like apt
@@ -134,51 +146,64 @@ sudo apt-get -y install python3-smbus python3-msgpack python3-paho-mqtt python3-
 
 pip3 install zimply
 
-mkdir -p /public.temp
-mkdir -p /sketch/public.www/
-mkdir -p /sketch/public.files/
 
-echo "Welcome! This file is /sketch/public.www/index.html. You can alt+f4 out to a graphical desktop."> /sketch/public.www/index.html
+mkdir -p /sketch/share/tilestache_cache
 
-
-mkdir -p /sketch/public.www
-
-apt-get -y install apache2 
-
-#Enable .htaccess
-cp /filesystem/apache2.conf /etc/apache2/apache2.conf
-
-#Give www-data a "window into the root filesystem"
-cat << EOF > /sketch/config/filesystem/www.yaml
-/sketch/public.www:
-    mode: '0750'
-    user:  www-data
-    bindat: /var/www/html
+#TODO: It really sucks that you can't actually download maps automatically
+cat << EOF > /sketch/config/tilestache.cfg
+{
+  "cache": {
+      "name": "Disk",
+      "path": "/home/pi/.local/share/marble/maps/earth",
+      "dirs": "portable",
+      "gzip": []
+    },
+  "layers":
+  {
+    "openstreetmap":
+    {
+      "provider":
+      {
+        "name": "proxy", 
+        "url": "https://tile.openstreetmap.org.dummydomain/{Z}/{X}/{Y}.png"
+      }
+    }
+  }
+}
 EOF
 
-#Make apache configurable
-cat << EOF > /sketch/config/filesystem/apache2.yaml
-/sketch/config/apache2:
-    mode: '0755'
-    user:  www-data
-    bindat: /etc/apache2
+cat << EOF > /etc/systemd/system/tilestache.service
+[Unit]
+Description=Serve map tiles. Format is tilestache@port.service
+After=systemd-remount-fs.service network-online.target
+RequiresMountsFor=/etc/ /sketch/
+
+[Service]
+Type=simple
+ExecStart=tilestache-server.py -p %i -c /etc/sketchconfig/tilestache.cfg
+User=pi
+
+[Install]
+WantedBy=sysinit.target
 EOF
 
-mkdir -p /sketch/config/apache2
-cp -ar /etc/apache2 /sketch/config/apache2
 
-apt-get -y install postgresql libpq-dev postgresql-client postgresql-contrib postgresql-client-common 
+
+apt-get -y install postgresql libpq-dev postgresql-client postgresql-contrib postgresql-client-common tilestache
 mkdir -p /sketch/postgresql
 mkdir -p /sketch/config/postgresql
 mkdir -p /var/lib/postgresql
-psql -c "CREATE USER www-data;"
-psql -c "CREATE DATABASE nextcloud;"
-psql -c "GRANT ALL PRIVILEGES ON DATABASE nextcloud to www-data;"
+# systemctl start postgresql.service
+# psql -c "CREATE USER www-data;"
+# psql -c "CREATE DATABASE nextcloud;"
+# psql -c "GRANT ALL PRIVILEGES ON DATABASE nextcloud to www-data;"
+# systemctl stop postgresql.service
+
+systemctl disable postgresql.service
 
 cp -ar /var/lib/postgresql/. /sketch/postgresql
 cp -ar /etc/postgresql/. /sketch/config/postgresql
 
-! systemctl disable postgresql.service
 
 cat << EOF > /sketch/config/filesystem/postgres.yaml
 /sketch/postgresql:
@@ -192,9 +217,8 @@ cat << EOF > /sketch/config/filesystem/postgres.yaml
 
 EOF
 
-systemctl disable postgresql.service
 
-apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,pgsql,zip,xml,gd,sqlite3}
+apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,pgsql,zip,xml,gd,sqlite3,json}
 apt-get install libapache2-mod-php -y
 
 
@@ -211,32 +235,17 @@ apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3
 apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid python3-pycryptodome 
 apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly python3-psutil mumble-server mumble
 apt-get -y install -y fluidsynth pulseaudio-module-jack pulseaudio-module-bluetooth pulseaudio-module-zeroconf pulsemixer ffmpeg
-apt-get -y install kodi kodi-pvr-mythtv jaaa qjackctl evince
+apt-get -y install kodi kodi-pvr-mythtv jaaa qjackctl backintime-qt4 
 
 ! adduser pi pulse-access
 
 ! systemctl disable kodi.service
 
 ! mv /etc/mumble-server.ini /sketch/config/mumble-server.ini
-ln -s /sketch/config/mumble-server.ini /etc/mumble-server.ini
+ln -s /etc/sketchconfig/mumble-server.ini /etc/mumble-server.ini
 sudo systemctl disable mumble-server.service
 
-#Better shells
-apt-get -y install -y elvish fish xonsh xonsh-doc python3-pygments python3-ptk
-cat << EOF > /etc/shells
-# /etc/shells: valid login shells
-/bin/sh
-/bin/bash
-/bin/rbash
-/usr/bin/fish
-/usr/bin/elvish
-/usr/bin/xonsh
-EOF
 
-#Important to take note of this!!!!!!
-#We are setting the default shell to xonsh.
-#It's bash compatible enough.
-sudo -u pi chsh -s /usr/bin/xonsh
 
 apt-get -y install npm
 npm install -g --unsafe-perm node-red
@@ -260,23 +269,18 @@ apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs
 
 
 
-#Without this we have all kinds of issues doing startx
-apt-get -y install xserver-xorg-legacy
-
-#Allow non-console startx, needed to make kiosk browsing work
-#This has to be AFTER the xserver-xorg-legacy to work
-sed -i \
-    's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
-
 
 gtk-update-icon-cache
 
 
-#Install last so the build doesn't try using it from inside quemu
-#And slow everything down by not working
-#Currently removed
-#apt-get -y install squid-deb-proxy-client
+# cd /tmp
+# wget https://github.com/claudiobizzotto/ipfs-rpi/archive/v0.1.1.tar.gz
+# tar xvzf v0.1.1.tar.gz
+# cd ipfs-rpi-0.1.1
+# sudo -u pi ./install
+# mkdir -p /home/pi/.ipfs
 
+# cp -ar /home/pi/.ipfs/. /sketch/home/pi/.ipfs/
 
 
 apt-get autoremove -y --purge

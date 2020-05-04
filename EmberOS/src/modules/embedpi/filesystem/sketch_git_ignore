@@ -3,11 +3,14 @@
 public.media/Music/Alexander Nakarada/Adventures of Flying Jack.mp3
 public.media/Music/Alexander Nakarada/README.md
 public.media/Pictures/Wallpaper/september-in-the-forest.jpg
+public.files/emberos/**
+public.media/emberos/**
 home/pi/.local/share/marble/**
 home/pi/.local/share/Zeal/**
 home/pi/.kodi/addons/script.globalsearch/**
 opt/kaithem/**
 opt/rpitx/**
+opt/kouchat/**
 share/wikis/archlinux/**
 *.pyc
 cache/**

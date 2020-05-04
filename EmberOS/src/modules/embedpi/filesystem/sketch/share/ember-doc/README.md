@@ -1,5 +1,9 @@
 # EmberOS Help
 
+## Remove packages
+
+dillo, claws-mail, minecraft, mathematica, sonicpi, and several other apps have been removed. Most things have been replaed with more useful or more free equivalents.
+
 
 ## The command shell
 New! We now use xonshell for the default shell. It is mostly bash compatible, but
@@ -11,6 +15,19 @@ Look in /sketch/networks, edit the wifi file as appropriate, or just connect eth
 These are NetworkManager files, so wifi will automatically reconnect for you, and you can configure almost any kind of network you want.
 
 You can also go to the command line and use "nmtui" to connect.
+
+## Offline Comms
+
+A primary goal for EmberOS, although it is meant mostly as an embedded OS for "large" devices, is that in a pinch, if it is all you've got, you should be able
+to cobble together whatever you need.
+
+Kaochat provides a simple LAN chatroom, and is available on Android too. Drop a file
+onto a username to share it.
+
+Jami provides decentralized chat, video, and file sharing, but no group chat.
+
+Retroshare provides decentralized forums, chat, and filesharing, and may be very useful in emergencies but is not available for Android.
+
 
 ### The Home Dir and normal desktop use
 
@@ -41,13 +58,11 @@ Other users home dirs won't be set up like this unless you do it manually, Ember
 
 
 ## Alternate shells
-fish, elvish, bash, and xonsh are included. I highly suggest trying xonsh,
-it is amazing! `xonsh` will likely never be removed from EmberOS and may be used
-instead of bash.
+fish, elvish, bash, and xonsh are included.
 
-### Setting as default shell
+### Setting bash back to default shell
 
-`chsh -s $(which xonsh)`
+`chsh -s $(which bash)`
 
 ## Enabling services
 
@@ -183,6 +198,24 @@ just edit /sketch/config/sound.ini, and change the output option to "hdmi" or "a
 We default to "auto", which is probably not what you want if using an HDMI monitor and 3.5mm speakers.
 
 This is provided by `ember-manage-audio.service`
+
+## Serving OpenStreetMap Maps
+
+Enable tilestache in 99-defults in the autostart config.  The maps are stored at 
+`/home/pi/.local/share/marble/maps/earth`, which is the same folder that marble uses.
+
+This is possible because the both use a relatively simple raw tile format.
+
+Tilestache is not currently capable of downloading maps from openstreetmap because
+of user agent header issues. However, maps downloaded via Marble will be available at:
+`http://localhost:8083/openstreetmap/0/0/0.png`.
+
+You can use this to power any local applications that need a mapserver. Low resolution
+maps up to zoom level 6 are included, anything more would use too much storage.
+
+Be careful not to get blocked from the tile server by hitting them too hard when downloading.
+
+You can configure tilestache with `/sketch/config/tilestache.cfg`
 
 
 ## Installing NextCloud

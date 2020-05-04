@@ -1,6 +1,6 @@
 [Unit]
 Description=Allow configuration of systemd units via /sketch/config/autostart
-After=systemd-remount-fs.service fs_bindings.service
+After=systemd-remount-fs.service fs_bindings.service manage_sketch_folder.service
 RequiresMountsFor=/etc/ /sketch/
 
 

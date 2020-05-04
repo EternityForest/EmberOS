@@ -30,6 +30,18 @@ apt-get -y install -y bindfs fuse3
 #Needed for reading config files
 apt-get -y install -y python3-yaml
 
+#For the GUI
+apt-get -y install -y fvwm fvwm-icons
+
+
+#Without this we have all kinds of issues doing startx
+apt-get -y install xserver-xorg-legacy
+#Allow non-console startx, needed to make kiosk browsing work
+#This has to be AFTER the xserver-xorg-legacy to work
+sed -i \
+    's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
+
+
 
 #The special /sketch partition is for everything that is not part of the image. It is made after the fact.
 ! mkdir /sketch
@@ -356,6 +368,10 @@ mk_pi_persist_dir  Programs
 mk_pi_persist_dir  "Calibre Library"
 mk_pi_persist_dir  .config/calibre
 mk_pi_persist_dir  .config/Zeal
+mk_pi_persist_dir  .ipfs
+mk_pi_persist_dir  .local/share/jami
+mk_pi_persist_dir  .config/jami
+mk_pi_persist_dir  .retroshare
 
 mk_pi_persist_dir .local/share/marble
 mk_pi_persist_dir .local/share/Zeal
@@ -544,3 +560,57 @@ ExecStartPost=/bin/bash -c 'for i in /etc/ssh/ssh_host_*_key*; do actualsize=$(w
 [Install]
 WantedBy=multi-user.target
 EOF
+
+
+
+# Setup apache
+#################################################################
+mkdir -p /public.temp
+mkdir -p /sketch/public.www/
+mkdir -p /sketch/public.files/
+
+echo "Welcome! This file is /sketch/public.www/index.html. You can alt+f4 out to a graphical desktop."> /sketch/public.www/index.html
+
+mkdir -p /sketch/public.www
+
+apt-get -y install apache2 
+#Enable .htaccess
+cp /filesystem/apache2.conf /etc/apache2/apache2.conf
+
+#Give www-data a "window into the root filesystem"
+cat << EOF > /sketch/config/filesystem/www.yaml
+/sketch/public.www:
+    mode: '0750'
+    user:  www-data
+    bindat: /var/www/html
+EOF
+
+#Make apache configurable
+cat << EOF > /sketch/config/filesystem/apache2.yaml
+/sketch/config/apache2:
+    mode: '0755'
+    user:  www-data
+    bindat: /etc/apache2
+EOF
+
+mkdir -p /sketch/config/apache2
+cp -ar /etc/apache2/. /sketch/config/apache2
+
+######################################################
+
+
+#Switch to xonsh
+apt-get -y install -y elvish fish xonsh xonsh-doc python3-pygments python3-ptk
+cat << EOF > /etc/shells
+# /etc/shells: valid login shells
+/bin/sh
+/bin/bash
+/bin/rbash
+/usr/bin/fish
+/usr/bin/elvish
+/usr/bin/xonsh
+EOF
+
+usermod --shell /usr/bin/xonsh pi
+touch /sketch/home/pi/.xonshrc
+ln -s /sketch/home/pi/.xonshrc /home/pi/.xonshrc

@@ -6,4 +6,4 @@ set -e
 source /common.sh
 
 unpack /filesystem/mime/ /usr/share/mime/
-chmod -R 644 /usr/share/mime
+chmod -R 755 /usr/share/mime
