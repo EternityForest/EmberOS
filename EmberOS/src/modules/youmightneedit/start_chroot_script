@@ -21,7 +21,9 @@ echo "wireshark-common wireshark-common/install-setuid boolean false" | sudo deb
 # ln -s /opt/ipfs-installer/ipfs-rpi-0.1.1/install /usr/bin/install-ipfs-rpi
 # sudo systemctl disable ipfs-daemon.service
 
+
 apt-get -y install -y wireshark
+
 apt-get -y install smbclient samba samba-common-bin cifs-utils minidlna
 
 unpack /filesystem/bin /usr/bin/ root
@@ -62,6 +64,9 @@ echo "deb http://apt.syncthing.net/ syncthing release" | sudo tee -a /etc/apt/so
 sudo cp /filesystem/retroshare.pubkey /etc/apt/trusted.gpg.d/retroshare.asc
 echo 'deb http://download.opensuse.org/repositories/network:/retroshare/Raspbian_9.0/ /' > /etc/apt/sources.list.d/retroshare.list
 
+#Something seems to break when we ubgrade curl and libcurl,
+#so do it explicitly here, right before and update to hopefully fix that.
+apt-get install curl libcurl4
 
 sudo apt-get update
 sudo apt-get install syncthing syncthing-gtk retroshare -y
@@ -267,15 +272,16 @@ apt-get -y install -y spacefm fslint deluge ardour pulseview chkservice matchbox
 
 
 
-apt-get -y install nmap robotfindskitten ncdu mc curl fatrace gstreamer1.0-tools pavucontrol xawtv
+apt-get -y install nmap robotfindskitten ncdu mc curl fatrace gstreamer1.0-tools pavucontrol xawtv evince stegosuite
 
+apt-get -y remove qpdfview
 #Sigh. Vim is huge but some people really love it...
-apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs git-repair xloadimage goldendict goldendict-wordnet
+apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs git-repair xloadimage goldendict goldendict-wordnet pidgin
 
 #Enable builtin wordnet, disable the wiktionary service by default because that uses
 #Network
 ! rm /home/pi/.goldendict/config
-cp /filesystem/goldendict_config /home/pi/.goldendict/config
+cp /filesystem/goldendict_config /sketch/home/pi/.goldendict/config
 
 
 gtk-update-icon-cache

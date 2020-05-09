@@ -384,6 +384,7 @@ mk_pi_persist_dir .config/deluge
 mk_pi_persist_dir .config/ardour5
 mk_pi_persist_dir .config/sigrok
 mk_pi_persist_dir .kodi
+mk_pi_persist_dir .purple
 
 #Not actually installing HA at the moment
 mk_pi_persist_dir .homeassistant
@@ -616,3 +617,8 @@ EOF
 usermod --shell /usr/bin/xonsh pi
 touch /sketch/home/pi/.xonshrc
 ln -s /sketch/home/pi/.xonshrc /home/pi/.xonshrc
+
+! sudo usermod -a -G dialout pi
+! sudo usermod -a -G serial pi
+! sudo usermod -a -G audio pi
+! sudo usermod -a -G pulse-access pi

@@ -1,8 +1,8 @@
 # EmberOS Help
 
-## Remove packages
+## Removed packages
 
-dillo, claws-mail, minecraft, mathematica, sonicpi, and several other apps have been removed. Most things have been replaed with more useful or more free equivalents.
+dillo, claws-mail, minecraft, mathematica, sonicpi, all but one version of Scratch, and several other apps have been removed. Most things have been replaced with more useful or more free equivalents.
 
 
 ## The command shell
@@ -21,13 +21,39 @@ You can also go to the command line and use "nmtui" to connect.
 A primary goal for EmberOS, although it is meant mostly as an embedded OS for "large" devices, is that in a pinch, if it is all you've got, you should be able
 to cobble together whatever you need.
 
-Kaochat provides a simple LAN chatroom, and is available on Android too. Drop a file
-onto a username to share it.
+To that end, an unusually high number of communication options are included.
 
-Jami provides decentralized chat, video, and file sharing, but no group chat.
+#### Kouchat 
 
-Retroshare provides decentralized forums, chat, and filesharing, and may be very useful in emergencies but is not available for Android.
+Provides a simple LAN chatroom, and is available on Android too. Drop a file
+onto a username to share it. Text length is limited, but it is a very easy and
+reliable choice.
 
+#### Jami 
+Provides decentralized chat, video, and file sharing, but no group chat. Android
+is well supported. It is already configured for persistant storage.
+
+#### Retroshare 
+
+Provides decentralized forums, chat, and filesharing, and may be very useful in emergencies but is not available for Android. Start via the "compatibility mode"
+shortcut. It is already configured for persistant storage.
+
+As you must exchange keys with a peer to communicate, and they are too long for Kouchat's chat window, the recommemded way to bootstrap is to put your key in a file with mousepad, and share it via Kouchat.
+
+The other option is to use Pidgin.
+
+Once this is done, creating forums allows an experience not unlike BBS. Remember that messages will eventually disappear, unless you explicitly mark them to be saved
+indefinately.
+
+#### Pidgin
+
+Provides the Bonjour LAN-only chat. This is a very common reliable choice that
+is included with some distros, and also provides many other chat services including IRC. It is already configured for persistant storage.
+
+
+#### Deluge
+
+For sharing larger files, you will probably get better results just making a torrent, and sending the torrent file through Kouchat.
 
 ### The Home Dir and normal desktop use
 
@@ -91,11 +117,21 @@ Used for media sharing, not writable from the network. Backed by /sketch/public.
 
 There is a special subfolder called pi, which is bound to /home/pi/public.media, owned by pi, and readable to any.
 
-### media
+### files
 
 Used for general sharing, not writable from the network. Backed by /sketch/public.files(Bound to /var/public/files, which is readable by all and only writable by root).
 
 There is a special subfolder called pi, which is bound to /home/pi/public.files, owned by pi, and readable to any.
+
+
+## Educational Content/Offline resources
+
+Several interesting PDFs, along with open source math, chemistry, and physics textbooks, are included. 
+
+Low-resolution maps of the entire world are already included with Marble, which
+is configured for persistent storage.
+
+The wordnet dictionary, plus the GoldenDict viewer are included.
 
 
 ## Securing SSH

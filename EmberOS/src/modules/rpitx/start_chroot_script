@@ -18,3 +18,5 @@ echo y | /filesystem/install.sh
 
 
 rsync -a /filesystem/rpitx/ /sketch/opt/rpitx
+
+! rm -r /sketch/opt/rpitx/ft8_lib

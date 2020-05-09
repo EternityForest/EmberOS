@@ -7,6 +7,9 @@
 ! apt purge -y ^dillo$  ^idle3$  ^smartsim$ ^sonic-pi$  ^epiphany-browser$  ^python-minecraftpi$ ^bluej$ 
 ! apt purge -y ^greenfoot$  ^greenfoot-unbundled$  ^claws-mail$ ^claws-mail-i18n$
 
+! rm -r /opt/Wolfram
+! rm -r /usr/share/code-the-classics
+! rm -r /home/pi/MagPi/MagPi90.pdf
 
 apt autoremove -y --purge
 
