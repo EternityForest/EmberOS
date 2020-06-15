@@ -9,13 +9,13 @@ source /common.sh
 
 
 cat << 'EOF' > /sketch/config/sound.ini
-#This section configures the pi's onboard audio
-#It does not set which card is the default, it configures the device itself.
-[Onboard]
+#This file allows you to automatically set the volume of all soundcards.
+#Set to -1 to disable this behavior.
+
+#Note: The current implementation just tries to set the first 4 cards and skips any errors,
+#And it will not affect cards not present at boot
+[SetVolume]
 volume=0db
-#Controls where the onboard analog device routes sound.
-#Available options: auto, analog, hdmi
-output=auto
 EOF
 
 cat << 'EOF' > /usr/bin/ember-manage-audio.py
@@ -24,20 +24,43 @@ import subprocess,configparser
 config = configparser.ConfigParser()
 config.read('/sketch/config/sound.ini')
 
-vol = config['Onboard']['volume']
-interface = config['Onboard']['output'].lower()
+vol = config['SetVolume']['volume']
 
-interfaces={
-    "auto": 0,
-    "analog": 1,
-    "hdmi": 2
-}
+#interface = config['Onboard']['output'].lower()
+#interfaces={
+#    "auto": 0,
+#    "analog": 1,
+#    "hdmi": 2
+# }
+# interface= interfaces[interface]
 
-interface= interfaces[interface]
+#THIS NO LONGER WORKS ON NEW RASPBIAN, YOU INSTEAD GET 2 SEPARATE DEVICES
+#try:
+#    subprocess.check_call(["amixer", "cset", "numid=3", str(interface)])
+#except:
+#    print(traceback.format_exc())
 
-subprocess.check_call(["amixer", "cset", "numid=3", str(interface)])
-#Expects a value in db, like "0db"
-subprocess.check_call(["amixer","-c","0", "set", "PCM", vol])
+if not int(vol) == -1:
+    try:
+        subprocess.check_call(["amixer", "-c","0", "cset", "numid=1", str(vol)])
+    except:
+        print(traceback.format_exc())
+
+    try:
+        subprocess.check_call(["amixer","-c","1", "cset", "numid=1", str(vol)])
+    except:
+        print(traceback.format_exc())
+
+    try:
+        subprocess.check_call(["amixer","-c","2", "cset", "numid=1", str(vol)])
+    except:
+        print(traceback.format_exc())
+
+    try:
+        subprocess.check_call(["amixer","-c","3", "cset", "numid=1", str(vol)])
+    except:
+        print(traceback.format_exc())
+
 EOF
 
 chmod 744 /usr/bin/ember-manage-audio.py

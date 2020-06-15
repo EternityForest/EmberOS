@@ -1,0 +1,3 @@
+#!/bin/bash
+
+usermod --shell /usr/bin/xonsh pi

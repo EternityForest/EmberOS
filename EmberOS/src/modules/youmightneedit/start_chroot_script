@@ -103,7 +103,7 @@ chmod 755 /usr/bin/get-youtube-dl
 
 
 #Batteries included, allow messing with kiosk browser media right from the device
-apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full testdisk baobab qsynth vmpk 
+apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full testdisk baobab qsynth vmpk flite
 
 
 #Ham radio stuff
@@ -112,7 +112,9 @@ apt-get -y install fldigi flrig flmsg flamp xastir chirp cubicsdr antennavis
 
 apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola audacious audacious-plugins gwenview calibre zeal convertall bluetooth bluez blueman
 
-apt-get -y install mpv libgdk-pixbuf2.0-bin gpsd gpsd-clients marble-qt marble-maps marble-plugins dosbox wxhexeditor d-feet sshpass jami jami-daemon
+apt-get -y install mpv libgdk-pixbuf2.0-bin gpsd gpsd-clients marble-qt marble-maps marble-plugins dosbox wxhexeditor d-feet sshpass jami jami-daemon lirc
+
+systemctl disable lircd.service
 
 systemctl disable gpsd.service
 
@@ -129,9 +131,9 @@ gdk-pixbuf-query-loaders > /usr/lib/arm-linux-gnueabihf/gdk-pixbuf-2.0/2.10.0/lo
 
 update-icon-caches /usr/share/icons/*
 
-apt-get -y install python3 synaptic conky-all grsync screengrab shared-mime-info rdiff-backup
+apt-get -y install python3 synaptic conky-all grsync screengrab shared-mime-info rdiff-backup pocketsphinx jack-stdio
 
-apt-get -y install exfat-utils python3-setproctitle python3-cffi python3-dbus python3-scipy python3-numpy python3-sympy python3-smbus
+apt-get -y install exfat-utils python3-setproctitle python3-cffi python3-dbus python3-scipy python3-numpy python3-sympy python3-smbus python3-pyaudio python3-pexpect python3-pydub
 
 #This language is included because of it's excellent dynamic imports in python
 #Elixir is included because it seems to be the one most practical functional type things
@@ -140,6 +142,10 @@ apt-get -y install exfat-utils python3-setproctitle python3-cffi python3-dbus py
 apt-get -y install nim elixir gforth lua5.3
 
 
+# tflite tensorflow
+pip3 install 	https://dl.google.com/coral/python/tflite_runtime-2.1.0.post1-cp37-cp37m-linux_armv7l.whl
+
+pip3 install baresipy
 pip3 install yappi
 pip3 install automationhat
 
@@ -148,13 +154,13 @@ pip3 install adafruit-blinka
 
 pip3 install nimporter
 pip3 install pyfirmata
-
-
 pip3 install python-can
 
-sudo apt-get -y install python3-smbus python3-msgpack python3-paho-mqtt python3-gevent python3-falcon python3-mako
+sudo apt-get -y install python3-smbus python3-msgpack python3-paho-mqtt python3-gevent python3-falcon python3-mako python3-typeguard
 
 pip3 install zimply
+pip3 install pycryptodome
+
 
 
 mkdir -p /sketch/share/tilestache_cache
@@ -214,7 +220,6 @@ systemctl disable postgresql.service
 cp -ar /var/lib/postgresql/. /sketch/postgresql
 cp -ar /etc/postgresql/. /sketch/config/postgresql
 
-
 cat << EOF > /sketch/config/filesystem/postgres.yaml
 /sketch/postgresql:
     mode: '0750'
@@ -239,13 +244,13 @@ apt-get -y install python3-dev build-essential gcc g++ cmake
 apt-get -y install python3 systemd cython3 build-essential mplayer python3-serial cutecom neofetch xoscope sigrok-firmware-fx2lafw 
 apt-get -y install python3-pyqt5 python3-pyqt5.qtserialport python3-pyqt5.qtsvg python3-pyqt5.qtchart python3-pyqt5.qtmultimedia
 apt-get -y install python3-pyqt5.qtsql python3-pyqt5.qtwebkit python3-pyqt5.qtopengl python3-pyqt5.qtsensors
-apt-get -y install python3-tz python3-dateutil lm-sensors python3-lxml python3-six python3-requests
+apt-get -y install python3-tz python3-dateutil lm-sensors python3-lxml python3-six python3-requests avahi-discover
 
 apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3-libnacl jack-tools
-apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid python3-pycryptodome 
+apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-pocketsphinx pocketsphinx pocketsphinx-en-us a2jmidid 
 apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly python3-psutil mumble-server mumble
 apt-get -y install -y fluidsynth pulseaudio-module-jack pulseaudio-module-bluetooth pulseaudio-module-zeroconf pulsemixer ffmpeg
-apt-get -y install kodi kodi-pvr-mythtv jaaa qjackctl backintime-qt4 
+apt-get -y install kodi kodi-pvr-mythtv jaaa qjackctl backintime-qt4 baresip twinkle
 
 ! adduser pi pulse-access
 

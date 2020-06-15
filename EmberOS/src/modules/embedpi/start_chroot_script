@@ -21,8 +21,7 @@ apt update
 
 unpack /filesystem/sketch /sketch
 
-
-
+mkdir -p /sketch/opt
 
 apt-get -y install -y ntfs-3g git
 #Very important!!! Fuse and Fuse3 have a horrible incompatibility because of -o nonempty
@@ -614,8 +613,17 @@ cat << EOF > /etc/shells
 /usr/bin/xonsh
 EOF
 
-usermod --shell /usr/bin/xonsh pi
-touch /sketch/home/pi/.xonshrc
+
+cat << EOF > /sketch/home/pi/.xonshrc
+# Import these as a convenience, so you don't have to
+import time
+import math
+import re
+import random
+import os
+import sys
+EOF
+
 ln -s /sketch/home/pi/.xonshrc /home/pi/.xonshrc
 
 ! sudo usermod -a -G dialout pi

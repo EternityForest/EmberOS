@@ -5,6 +5,7 @@ public.media/Music/Alexander Nakarada/README.md
 public.media/Pictures/Wallpaper/september-in-the-forest.jpg
 public.files/emberos/**
 public.media/emberos/**
+kaithem/modules/data/Examples/**
 home/pi/.local/share/marble/**
 home/pi/.local/share/Zeal/**
 home/pi/.kodi/addons/script.globalsearch/**
@@ -12,7 +13,6 @@ opt/kaithem/**
 opt/rpitx/**
 opt/kouchat/**
 share/wikis/archlinux/**
-*.pyc
 cache/**
 config/ca-certificates.conf
 config/sslcerts/**
@@ -22,3 +22,44 @@ ssh/**
 home/pi/Programs/arduino-1.8.12/**
 home/pi/Arduino/libraries/**
 share/emberos/**
+config/apache2/mods-available
+
+
+# Standard apache2 stuff. I wish there was a better way to do this.
+# But everything has to be in this file so we can rsync it.
+
+config/apache2/mods-enabled/access_compat.load
+config/apache2/mods-enabled/authz_core.load
+config/apache2/mods-enabled/autoindex.load
+config/apache2/mods-enabled/env.load
+config/apache2/mods-enabled/mpm_event.load
+config/apache2/mods-enabled/setenvif.conf
+config/apache2/mods-enabled/alias.conf
+config/apache2/mods-enabled/authz_host.load
+config/apache2/mods-enabled/deflate.conf
+config/apache2/mods-enabled/filter.load
+config/apache2/mods-enabled/negotiation.conf
+config/apache2/mods-enabled/setenvif.load
+config/apache2/mods-enabled/alias.load
+config/apache2/mods-enabled/authz_user.load
+config/apache2/mods-enabled/deflate.load
+config/apache2/mods-enabled/mime.conf
+config/apache2/mods-enabled/negotiation.load
+config/apache2/mods-enabled/status.conf
+config/apache2/mods-enabled/authn_core.load
+config/apache2/mods-enabled/auth_basic.load
+config/apache2/mods-enabled/dir.conf
+config/apache2/mods-enabled/mime.load
+config/apache2/mods-enabled/reqtimeout.conf
+config/apache2/mods-enabled/status.load
+config/apache2/mods-enabled/authn_file.load
+config/apache2/mods-enabled/autoindex.conf
+config/apache2/mods-enabled/dir.load
+config/apache2/mods-enabled/mpm_event.conf
+config/apache2/mods-enabled/reqtimeout.load
+
+#Exclude some of the default configs
+config/filesystem/emberos*
+
+#This is there so rsync doesn't try an sync it
+.git
