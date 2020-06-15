@@ -19,9 +19,10 @@ config/sslcerts/**
 config/timezones/**
 postgresql/**
 ssh/**
-home/pi/Programs/arduino-1.8.12/**
+home/pi/Programs/arduino*
 home/pi/Arduino/libraries/**
 share/emberos/**
+share/ember-doc/**
 config/apache2/mods-available
 
 

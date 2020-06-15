@@ -220,7 +220,7 @@ systemctl disable postgresql.service
 cp -ar /var/lib/postgresql/. /sketch/postgresql
 cp -ar /etc/postgresql/. /sketch/config/postgresql
 
-cat << EOF > /sketch/config/filesystem/postgres.yaml
+cat << EOF > /sketch/config/filesystem/emberos-postgres.yaml
 /sketch/postgresql:
     mode: '0750'
     user:  postgres

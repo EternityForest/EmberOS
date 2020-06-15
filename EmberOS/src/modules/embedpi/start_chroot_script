@@ -580,7 +580,7 @@ apt-get -y install apache2
 cp /filesystem/apache2.conf /etc/apache2/apache2.conf
 
 #Give www-data a "window into the root filesystem"
-cat << EOF > /sketch/config/filesystem/www.yaml
+cat << EOF > /sketch/config/filesystem/emberos-www.yaml
 /sketch/public.www:
     mode: '0750'
     user:  www-data
@@ -588,7 +588,7 @@ cat << EOF > /sketch/config/filesystem/www.yaml
 EOF
 
 #Make apache configurable
-cat << EOF > /sketch/config/filesystem/apache2.yaml
+cat << EOF > /sketch/config/filesystem/emberos-apache2.yaml
 /sketch/config/apache2:
     mode: '0755'
     user:  www-data
