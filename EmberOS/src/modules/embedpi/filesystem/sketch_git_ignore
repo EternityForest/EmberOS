@@ -6,6 +6,20 @@ public.media/Pictures/Wallpaper/september-in-the-forest.jpg
 public.files/emberos/**
 public.media/emberos/**
 kaithem/modules/data/Examples/**
+
+# The old backup data dirs are named after timestamps
+# We don't want those
+kaithem/modules/1*
+kaithem/modules/2*
+kaithem/modules/3*
+kaithem/modules/4*
+kaithem/modules/5*
+kaithem/modules/6*
+kaithem/modules/7*
+kaithem/modules/8*
+kaithem/modules/9*
+
+
 home/pi/.local/share/marble/**
 home/pi/.local/share/Zeal/**
 home/pi/.kodi/addons/script.globalsearch/**

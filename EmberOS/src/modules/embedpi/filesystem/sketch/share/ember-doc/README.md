@@ -16,6 +16,14 @@ These are NetworkManager files, so wifi will automatically reconnect for you, an
 
 You can also go to the command line and use "nmtui" to connect.
 
+## Making a backup
+
+To pull everything on a remote EmberOS machine's sketch folder(Aside from things that are listed in the /sketch/.gitignore file),
+use the tools/pullBack.sh script, and modify the hostname and password as needed.
+
+Note that only the root .gitignore works for this, which is why the file comes preloaded with so many
+entries.
+
 ## Offline Comms
 
 A primary goal for EmberOS, although it is meant mostly as an embedded OS for "large" devices, is that in a pinch, if it is all you've got, you should be able
