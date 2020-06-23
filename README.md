@@ -94,14 +94,7 @@ It is not encrypted though.
 Builds are available as torrents only, and unless otherwise noted, may
 go away when newer versions are released(My seedbox is fairly small!).
 
-### Mar 4 2020 Build
-```
-magnet:?xt=urn:btih:UCPOQ4SCKM2NBKSFBZQOXZOBI6NX2JYZ&dn=EmberOS2020Mar4.zip&xl=3701126025&tr=udp%3A%2F%2Fexodus.desync.com%3A6969
-```
-
-### Dec 07 2019 alpha build
-
-magnet:?xt=urn:btih:43679a8e9597c89a6f68612bb57e9169a662b44c&dn=2019Dec7EmberOS.zip&tr=udp%3a%2f%2ftracker.leechers-paradise.org%3a6969&tr=udp%3a%2f%2ftracker.coppersurfer.tk%3a6969&tr=udp%3a%2f%2fopen.demonii.com%3a1337&tr=udp%3a%2f%2ftracker.pomf.se&tr=udp%3a%2f%2fexodus.desync.com%3a6969&x.pe=97.126.96.222:44319&x.pe=[2602:61:7e60:de00:30e5:5f70:3d00:4bbd]:44319&x.pe=[fd00::95f1:a94c:35be:32ff]:44319&x.pe=[2602:61:7e60:de00:b095:fd54:f0dc:1c3c]:44319&x.pe=[fd00::b095:fd54:f0dc:1c3c]:44319&x.pe=[fd00::d83c:8af6:9c12:cdec]:44319&x.pe=[200:615:1617:bc9f:9ae8:14fe:2673:10c0]:44319&x.pe=[2602:61:7e60:de00:d83c:8af6:9c12:cdec]:44319
+See the torrent files folder!
 
 ## Building(Need linux)
 
@@ -129,7 +122,7 @@ Copy everything in the root partition's sketch dir to the root of that partition
 
 Using rsync, copy the latest Included Data torrent's sketch folder over to the sketch partition(It has things like a few sample image files and the offline docs).
 
-See the torrents folder in the repo for the torrent.
+See the torrents folder in the repo for the included data torrent, but it may be out of date.
 
 Should some unknown bug happen and /usr/share/mime has very few files in it, you will have
 to manually fix this, probably by copying the files there from a debian host machine or something.
