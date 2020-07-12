@@ -103,16 +103,20 @@ chmod 755 /usr/bin/get-youtube-dl
 
 
 #Batteries included, allow messing with kiosk browser media right from the device
-apt-get -y install gimp audacity lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full testdisk baobab qsynth vmpk flite
+apt-get -y install lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full testdisk qdirstat
 
 
 #Ham radio stuff
 apt-get -y install fldigi flrig flmsg flamp xastir chirp cubicsdr antennavis
 
 
-apt-get -y install transmission-cli xclip zenmap sqlitebrowser meld git-cola audacious audacious-plugins gwenview calibre zeal convertall bluetooth bluez blueman
+# GUI Utils
+apt-get -y install zenmap sqlitebrowser meld git-cola convertall wxhexeditor d-feet
 
-apt-get -y install mpv libgdk-pixbuf2.0-bin gpsd gpsd-clients marble-qt marble-maps marble-plugins dosbox wxhexeditor d-feet sshpass jami jami-daemon lirc
+
+apt-get -y install transmission-cli xclip  bluetooth bluez blueman
+
+apt-get -y install mpv libgdk-pixbuf2.0-bin gpsd gpsd-clients dosbox  sshpass lirc
 
 systemctl disable lircd.service
 
@@ -131,9 +135,14 @@ gdk-pixbuf-query-loaders > /usr/lib/arm-linux-gnueabihf/gdk-pixbuf-2.0/2.10.0/lo
 
 update-icon-caches /usr/share/icons/*
 
-apt-get -y install python3 synaptic conky-all grsync screengrab shared-mime-info rdiff-backup pocketsphinx jack-stdio
+apt-get -y install python3 synaptic conky-all grsync screengrab shared-mime-info rdiff-backup 
 
-apt-get -y install exfat-utils python3-setproctitle python3-cffi python3-dbus python3-scipy python3-numpy python3-sympy python3-smbus python3-pyaudio python3-pexpect python3-pydub
+apt-get -y install python3-setproctitle python3-cffi python3-dbus python3-scipy python3-numpy python3-sympy python3-smbus python3-pyaudio python3-pexpect python3-pydub
+
+#All the different FSes that you might want to have
+apt-get -y install btrfs-progs nilfs-tools f2fs-tools xfsprogs exfat-utils btrfsmaintenance
+
+
 
 #This language is included because of it's excellent dynamic imports in python
 #Elixir is included because it seems to be the one most practical functional type things
@@ -155,6 +164,7 @@ pip3 install adafruit-blinka
 pip3 install nimporter
 pip3 install pyfirmata
 pip3 install python-can
+pip3 install pynput
 
 sudo apt-get -y install python3-smbus python3-msgpack python3-paho-mqtt python3-gevent python3-falcon python3-mako python3-typeguard
 
@@ -243,18 +253,33 @@ apt-get -y install python3-dev build-essential gcc g++ cmake
 
 apt-get -y install python3 systemd cython3 build-essential mplayer python3-serial cutecom neofetch xoscope sigrok-firmware-fx2lafw 
 apt-get -y install python3-pyqt5 python3-pyqt5.qtserialport python3-pyqt5.qtsvg python3-pyqt5.qtchart python3-pyqt5.qtmultimedia
-apt-get -y install python3-pyqt5.qtsql python3-pyqt5.qtwebkit python3-pyqt5.qtopengl python3-pyqt5.qtsensors
-apt-get -y install python3-tz python3-dateutil lm-sensors python3-lxml python3-six python3-requests avahi-discover
+apt-get -y install python3-pyqt5.qtsql python3-pyqt5.qtwebkit python3-pyqt5.qtopengl python3-pyqt5.qtsensors libinput-tools
+apt-get -y install python3-tz python3-dateutil lm-sensors python3-lxml python3-six python3-requests avahi-discover python3-psutil backintime-qt4
 
-apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3-libnacl jack-tools
-apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-pocketsphinx pocketsphinx pocketsphinx-en-us a2jmidid 
-apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly python3-psutil mumble-server mumble
-apt-get -y install -y fluidsynth pulseaudio-module-jack pulseaudio-module-bluetooth pulseaudio-module-zeroconf pulsemixer ffmpeg
-apt-get -y install kodi kodi-pvr-mythtv jaaa qjackctl backintime-qt4 baresip twinkle
+apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3-libnacl 
+
+
+#Audio handling
+apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid  jack-tools jack-stdio
+apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly zynaddsubfx qsynth vmpk
+apt-get -y install -y fluidsynth pulseaudio-module-jack pulseaudio-module-bluetooth pulseaudio-module-zeroconf pulsemixer
+apt-get -y install jaaa qjackctl ffmpeg
+
+#Voice recognition and sythesis
+apt-get -y install pocketsphinx  gstreamer1.0-pocketsphinx pocketsphinx pocketsphinx-en-us flite
+
 
 ! adduser pi pulse-access
 
+
+#Mega GUI apps
+apt-get -y install deluge ardour gimp audacity kodi kodi-pvr-mythtv audacious audacious-plugins gwenview calibre zeal
+
+
 ! systemctl disable kodi.service
+
+#Communication and chat
+apt-get -y mumble-server mumble  baresip twinkle jami jami-daemon pidgin
 
 ! mv /etc/mumble-server.ini /sketch/config/mumble-server.ini
 ln -s /etc/sketchconfig/mumble-server.ini /etc/mumble-server.ini
@@ -270,9 +295,12 @@ apt-get -y install -y fonts-hack
 
 
 
-apt-get -y install -y spacefm fslint deluge ardour pulseview chkservice matchbox-keyboard
+apt-get -y install -y spacefm fslint pulseview chkservice matchbox-keyboard
 
 #apt-get -y install -y krita
+
+#Education
+apt-get -y install goldendict goldendict-wordnet marble-qt marble-maps marble-plugins
 
 
 
@@ -281,7 +309,7 @@ apt-get -y install nmap robotfindskitten ncdu mc curl fatrace gstreamer1.0-tools
 
 apt-get -y remove qpdfview
 #Sigh. Vim is huge but some people really love it...
-apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs git-repair xloadimage goldendict goldendict-wordnet pidgin
+apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs git-repair xloadimage iotop
 
 #Enable builtin wordnet, disable the wiktionary service by default because that uses
 #Network

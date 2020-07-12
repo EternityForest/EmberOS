@@ -21,6 +21,7 @@ EOF
 cat << 'EOF' > /usr/bin/ember-manage-audio.py
 #!/usr/bin/python3
 import subprocess,configparser
+import traceback
 config = configparser.ConfigParser()
 config.read('/sketch/config/sound.ini')
 
@@ -40,7 +41,15 @@ vol = config['SetVolume']['volume']
 #except:
 #    print(traceback.format_exc())
 
-if not int(vol) == -1:
+noSetVol = False
+try:
+    vol=int(vol)
+    if vol==-1:
+        noSetVol=True
+except:
+    pass
+
+if not noSetVol:
     try:
         subprocess.check_call(["amixer", "-c","0", "cset", "numid=1", str(vol)])
     except:
