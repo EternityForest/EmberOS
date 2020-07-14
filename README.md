@@ -7,7 +7,7 @@ It has a variety of preinstalled applications and can be configured almost entir
 Notably, everything except /sketch boots as read-only, and there is an Apache2 server and a chromium based kiosk browser enabled by default.
 
 This is a "batteries included" distro, meant to be usable in odd places when you might not
-even have internet access. As such, it includes a lot of stuff and requires a 16GB card(The image is just under 9GB min, including 1024MB of free space on root.)
+even have internet access. As such, it includes a lot of stuff, and requires an 8GB card.
 
 It would be possible to remove some things and shrink it, but I don't suggest this, as 
 a 16GB card will make wear leveling more effective and give your app room to expand.
@@ -15,6 +15,12 @@ a 16GB card will make wear leveling more effective and give your app room to exp
 As a notable feature, the entire sketch partition is a Git repository, so you will
 be able to track changes to the system(A sane .gitignore is included).
 
+
+As another notable feature, the root filesystem uses BTRFS(Since the July 12 build), which allows us to compress things. BTRFS has a very high write amplification,
+so I don't suggest using it on SD cards in non-mostly-readonly configurations, however it should not be a problem for this.
+
+
+*Important: If you ever update the kernel, you have to run* `mkinitramfs -o /boot/initramfs-emberos.gz`
 
 See [Here](EmberOS/src/modules/embedpi/filesystem/sketch/share/ember-doc/) for info on how to do common stuff.
 
@@ -105,31 +111,13 @@ Put a fresh zipped raspbian full image in the src/images dir
 Run sudo ./build_dist in the src dir. This may take over an hour, and 
 you need internet access the whole time.
 
-Cd into the src/workspace folder.
-Expand the disk image by padding it with zeros:
-Example:
-`dd if=/dev/zero bs=1M count=1K >> 2019-06-20-raspbian-buster-full.img`
-Change the filenames as neccesary. Count is in blocks. This appends about 1GB of extra space. You probably don't need this much.
 
-You can also just shrink / to make room for the sketch partition.  You may want to keep it small for 8GB sd cards
+Unpack latest Included Data torrent's sketch folder over to src/sketch_included_data/sketch.
 
+Now run the postprocess script inside src.
 
-Mount the partition using `sudo udisksctl loop-setup -f 2019-06-20-raspbian-buster-full.img` 
-
-Using your favorite partition editor, add an ntfs partition called sketch just after the root partition, in that empty space you just made.
-
-Copy everything in the root partition's sketch dir to the root of that partition.  Anything in the actual sketch dir is just the default, it gets covered over by the sketch partition that gets mounted there
-
-Using rsync, copy the latest Included Data torrent's sketch folder over to the sketch partition(It has things like a few sample image files and the offline docs).
-
-See the torrents folder in the repo for the included data torrent, but it may be out of date.
-
-Should some unknown bug happen and /usr/share/mime has very few files in it, you will have
-to manually fix this, probably by copying the files there from a debian host machine or something.
-
-Once you have done this, you'll want to go into the sketch folder, launch your
-Git client of choice, and commit all untracked files.
-
+You will find the postprocessed file in the workspace. You will then need to rename it to whatever you want, and you should
+be ready to flash!
 
 
 ### The Bindings Manager

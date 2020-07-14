@@ -1,3 +1,8 @@
 #!/bin/bash
 
 usermod --shell /usr/bin/xonsh pi
+
+
+rm -rf /tmp/*
+rm -rf /var/tmp/*
+rm -rf /var/log/*

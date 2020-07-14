@@ -1,5 +1,5 @@
 export DIST_NAME=embedPi
 export DIST_VERSION=0.1.0
-export MODULES="base(embedpi,,kaithem,rpitx,genfortune,audiomanage,netcfg,timemanagement, rtc,ramdisks,youwontneedit,games,youmightneedit,fileserver,kiosk,hostnameconfig,mimerepair)"
+export MODULES="base(embedpi,rpitx,kaithem,genfortune,audiomanage,netcfg,timemanagement, rtc,ramdisks,youwontneedit,games,youmightneedit,fileserver,kiosk,hostnameconfig,mimerepair)"
 export BASE_IMAGE_ENLARGEROOT=2048
 export BASE_IMAGE_RESIZEROOT=1024

@@ -24,6 +24,36 @@ echo "wireshark-common wireshark-common/install-setuid boolean false" | sudo deb
 
 apt-get -y install -y wireshark
 
+
+# Printerie
+apt-get -y install cups cups-ipp-utils cups-core-drivers system-config-printer
+
+
+mkdir -p /sketch/spool/cups/
+mkdir -p /sketch/config/cups/
+mkdir -p /etc/cups/
+mkdir -p /var/spool/cups/
+
+rsync -av /etc/cups/ /sketch/config/cups/
+usermod -a -G lpadmin pi
+
+cat << EOF > /sketch/config/filesystem/emberos_cups.yaml
+/sketch/config/cups/:
+    mode: '0770'
+    user: root
+    group: lpadmin
+    bindat: /etc/cups
+
+/sketch/spool/cups/:
+    mode: '0700'
+    user: root
+    bindat: /var/spool/cups/
+
+/sketch/ssh/root: /root/.ssh/
+EOF
+
+
+
 apt-get -y install smbclient samba samba-common-bin cifs-utils minidlna
 
 unpack /filesystem/bin /usr/bin/ root
@@ -66,7 +96,7 @@ echo 'deb http://download.opensuse.org/repositories/network:/retroshare/Raspbian
 
 #Something seems to break when we ubgrade curl and libcurl,
 #so do it explicitly here, right before and update to hopefully fix that.
-apt-get install curl libcurl4
+apt-get -y install curl libcurl4
 
 sudo apt-get update
 sudo apt-get install syncthing syncthing-gtk retroshare -y
@@ -86,6 +116,11 @@ wget -N -S --backups=1 https://yt-dl.org/downloads/latest/youtube-dl
 chmod 755 youtube-dl
 EOF
 chmod 755 /usr/bin/get-youtube-dl
+
+
+#HW drivers
+sudo apt-get -y install xboxdrv xserver-xorg-input-wacom
+
 
 
 ##This is currently not included, it has some challenges getting install to work
@@ -109,6 +144,8 @@ apt-get -y install lame gnome-disk-utility unclutter imagemagick p7zip p7zip-ful
 #Ham radio stuff
 apt-get -y install fldigi flrig flmsg flamp xastir chirp cubicsdr antennavis
 
+#Pure data, because it seems to still be the best in it's class and there's really no equivalent
+apt-get -y install puredata puredata-extra
 
 # GUI Utils
 apt-get -y install zenmap sqlitebrowser meld git-cola convertall wxhexeditor d-feet
@@ -273,13 +310,12 @@ apt-get -y install pocketsphinx  gstreamer1.0-pocketsphinx pocketsphinx pocketsp
 
 
 #Mega GUI apps
-apt-get -y install deluge ardour gimp audacity kodi kodi-pvr-mythtv audacious audacious-plugins gwenview calibre zeal
+apt-get -y install deluge ardour gimp audacity kodi kodi-pvr-mythtv kodi-pvr-dvbviewer kodi-pvr-iptvsimple audacious audacious-plugins gwenview calibre zeal tuxguitar filezilla gelemental stellarium
 
 
-! systemctl disable kodi.service
 
 #Communication and chat
-apt-get -y mumble-server mumble  baresip twinkle jami jami-daemon pidgin
+apt-get -y install mumble-server mumble  baresip twinkle jami jami-daemon pidgin
 
 ! mv /etc/mumble-server.ini /sketch/config/mumble-server.ini
 ln -s /etc/sketchconfig/mumble-server.ini /etc/mumble-server.ini
@@ -295,7 +331,11 @@ apt-get -y install -y fonts-hack
 
 
 
-apt-get -y install -y spacefm fslint pulseview chkservice matchbox-keyboard
+#OpenCV+deps
+
+sudo apt-get -y install python3-opencv libhdf5-dev libhdf5-serial-dev libatlas-base-dev libjasper-dev libqtgui4 libqt4-test
+
+apt-get -y install spacefm fslint pulseview chkservice matchbox-keyboard
 
 #apt-get -y install -y krita
 

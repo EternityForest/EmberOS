@@ -19,6 +19,135 @@ echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99-force-ipv4
 apt update -y --allow-releaseinfo-change
 apt update
 
+
+#Enable initramfs which also gives the rescue shell, but mainly we need it to allow BTRFS
+sudo apt-get -y install initramfs-tools btrfs-tools
+
+
+# Do these need to be added too???
+# zstd_decompress
+# zstd_compress
+# xxhash
+# lzo_compress
+# zlib_deflate
+# sha256_generic
+
+
+cat << EOF > /etc/initramfs-tools/modules
+btrfs
+xor
+zlib_deflate
+raid6_pq
+EOF
+mkdir -p /usr/src/initramfs/
+
+cat << EOF >  /usr/src/initramfs/init
+#!/bin/busybox sh
+
+rescue_shell() {
+    echo "Something went wrong. Dropping to a shell."
+    exec sh
+}
+
+# Mount the /proc and /sys filesystems.
+mount -t proc none /proc
+mount -t sysfs none /sys
+
+# Do your stuff here.
+echo "EmberOS Initramfs running!"
+
+# Mount the root filesystem. NOTE!!!
+mount -t ext4,btrfs -o ro /dev/mmcblk0p2 /mnt/root || rescue_shell
+
+# Clean up.
+umount /proc
+umount /sys
+
+# Boot the real thing.
+exec switch_root /mnt/root /sbin/init || rescue_shell
+EOF
+
+
+cat << EOF >  /etc/kernel/postinst.d/rpi-initramfs-tools
+#!/bin/bash -e
+# Environment variables are set by the calling script
+
+version="$1"
+bootopt=""
+
+command -v update-initramfs >/dev/null 2>&1 || exit 0
+
+# passing the kernel version is required
+if [ -z "${version}" ]; then
+        echo >&2 "W: initramfs-tools: ${DPKG_MAINTSCRIPT_PACKAGE:-kernel package} did not pass a version number"
+        exit 2
+fi
+
+# there are only two kernel types: with and without postfix "-v7+" or "-v8+"
+currentversion="$(uname -r)"
+
+# get §currenttype from $currentversion
+currenttype="<no currenttype>"
+echo $currentversion | grep -Pq '^\d+\.\d+\.\d+\+$'
+[ $? -eq 0 ] && currenttype="+"
+echo $currentversion | grep -Pq '^\d+\.\d+\.\d+-v[78]\+$'
+[ $? -eq 0 ] && currenttype="${currentversion#*-}"
+
+# get $newtype from $version
+newtype="<no newtype>"
+echo $version | grep -Pq '^\d+\.\d+\.\d+\+$'
+[ $? -eq 0 ] && newtype="+"
+echo $version | grep -Pq '^\d+\.\d+\.\d+-v[78]\+$'
+[ $? -eq 0 ] && newtype="${version#*-}"
+
+# we do nothing if the new kernel is not for the same kernel type then the current
+# Note that we build all three, but we only want to trigger on the current
+if [ "$newtype" != "$currenttype" ]; then
+        exit 0
+fi
+
+# absolute file name of kernel image may be passed as a second argument;
+# create the initrd in the same directory
+if [ -n "$2" ]; then
+        bootdir=$(dirname "$2")
+        bootopt="-b ${bootdir}"
+fi
+
+# avoid running multiple times
+if [ -n "$DEB_MAINT_PARAMS" ]; then
+        eval set -- "$DEB_MAINT_PARAMS"
+        if [ -z "$1" ] || [ "$1" != "configure" ]; then
+                exit 0
+        fi
+fi
+
+# We don't use set -e, if some of these stop existing, that's fine.
+# Find most recently added kernel folder, assume there are three versions
+KERNELNUM=$(ls -Art /lib/modules | tail -n 1|head -n 1 | cut -d- -f1 | cut -d+ -f1)
+#Build the three versions we will need
+mkinitramfs -o /boot/initramfs-emberos.gz -k ${KERNELNUM}+
+mkinitramfs -o /boot/initramfs-emberos-v7.gz -k ${KERNELNUM}-v7+
+mkinitramfs -o /boot/initramfs-emberos-v7l.gz -k ${KERNELNUM}-v7l+
+
+EOF
+chmod +x /etc/kernel/postinst.d/rpi-initramfs-tools
+
+cp /filesystem/boot/config.txt /boot/config.txt
+
+# Find most recently added kernel folder, assume there are three versions
+KERNELNUM=$(ls -Art /lib/modules | tail -n 1|head -n 1 | cut -d- -f1 | cut -d+ -f1)
+#Build the three versions we will need
+mkinitramfs -o /boot/initramfs-emberos.gz -k ${KERNELNUM}+
+mkinitramfs -o /boot/initramfs-emberos-v7.gz -k ${KERNELNUM}-v7+
+mkinitramfs -o /boot/initramfs-emberos-v7l.gz -k ${KERNELNUM}-v7l+
+
+
+cp /boot/config.txt /tmp/bc
+
+echo "initramfs initramfs-emberos.gz" > /boot/config.txt
+cat /tmp/bc >> /boot/config.txt
+
+
 unpack /filesystem/sketch /sketch
 
 mkdir -p /sketch/opt
@@ -83,7 +212,16 @@ proc            /proc           proc    defaults          0       0
 EOF
 
 
+mkdir -p  /usr/lib/systemd/system.conf.d/
 
+#Set up the watchdog timer to handle really bad crashes
+cat << EOF > /usr/lib/systemd/system.conf.d/20-emberos-watchdog.conf
+# This file is part of EmberOS, it enables the Pi's hardware watchdog to allow recovery from
+# total system crashes
+[Manager]
+RuntimeWatchdogSec=15
+ShutdownWatchdogSec=45min
+EOF
 
 
 
@@ -576,6 +714,7 @@ echo "Welcome! This file is /sketch/public.www/index.html. You can alt+f4 out to
 mkdir -p /sketch/public.www
 
 apt-get -y install apache2 
+
 #Enable .htaccess
 cp /filesystem/apache2.conf /etc/apache2/apache2.conf
 

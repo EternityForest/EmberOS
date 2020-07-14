@@ -1,22 +1,37 @@
 #!/bin/bash
 
 set -x
-set -y
+set -e
 
 mkdir -p /sketch/opt/rpitx
 
+sudo apt-get install -y libsndfile1-dev git
+sudo apt-get install -y imagemagick libfftw3-dev
+sudo apt-get install -y rtl-sdr buffer
+
 #Hacktasktic awfulness
 mv filesystem/csdr /filesystem/rpitx/
-mv filesystem/librpitx /filesystem/rpitx/src
-mv filesystem/ft8_lib /filesystem/rpitx/src
 
-#the 3 git clones will fail because we already supplied
-#dependancies. That's fine.
+cd /filesystem/rpitx/
+patch -i csdrpizero.diff csdr/Makefile
+cd csdr/
 
-#The echo y sets the gpio freq to 250. Hopefully that is not a problem?
-echo y | /filesystem/install.sh
+make
+make install
 
 
-rsync -a /filesystem/rpitx/ /sketch/opt/rpitx
+mv /filesystem/librpitx /filesystem/rpitx/src
+cd /filesystem/rpitx/src/librpitx/src
+make
+
+mv /filesystem/ft8_lib /filesystem/rpitx/src/pift8
+
+cd /filesystem/rpitx/src/
+
+make
+sudo make install
+
+
+rsync -a --exclude="src" --exclude="csdr" /filesystem/rpitx/ /sketch/opt/rpitx
 
 ! rm -r /sketch/opt/rpitx/ft8_lib
