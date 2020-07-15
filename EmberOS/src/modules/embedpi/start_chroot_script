@@ -774,3 +774,4 @@ ln -s /sketch/home/pi/.xonshrc /home/pi/.xonshrc
 ! sudo usermod -a -G serial pi
 ! sudo usermod -a -G audio pi
 ! sudo usermod -a -G pulse-access pi
+! sudo usermod -G bluetooth -a pi
