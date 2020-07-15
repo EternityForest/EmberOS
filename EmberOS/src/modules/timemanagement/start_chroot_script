@@ -69,9 +69,10 @@ chmod 755 /dev/shm/localtime
 
 #Check if system time is older than the newest file in /sketch. If it is, set system time to that time.
 #This allows approximately setting the time, to within a few minutes(Good enough to get SSL working),
-#By writing anything on the card
+#By writing anything on the card, but only in its root dir because we don't want to spend a bazillion years
+#Scanning the entire card.
 
-set fakertc $(date -r $(find /sketch -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" "))
+set fakertc $(date -r $(find /sketch --maxdepth 1 -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" "))
 if [ "$(date -d $fakertc +%s)" -gt "$(date +%s)" ]; then
     date -s $fakertc
 fi

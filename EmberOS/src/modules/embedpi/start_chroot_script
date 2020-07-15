@@ -305,8 +305,13 @@ fi
 if [ ! -f /sketch/kaithem/ssl/certificate.key ] ; then
     mkdir -p /sketch/kaithem/ssl/
     #Look at this race condition here! Someone could steal that private key before we chmod it!
-    openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout /sketch/kaithem/ssl/certificate.key  -out  /sketch/kaithem/ssl/certificate.cert -subj '/CN=localhost'
-    
+
+
+    openssl req -x509 -out /sketch/kaithem/ssl/certificate.cert -keyout /sketch/kaithem/ssl/certificate.key \
+    -newkey rsa:2048 -nodes -sha256 \
+    -subj '/CN=localhost' -extensions EXT -config <( \
+    printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
+        
     #Copy it so it's trusted by browsers
     mkdir -p /sketch/config/sslcerts.local/
     mkdir -p /sketch/config/sslcerts.local/ember-kaithem

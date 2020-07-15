@@ -68,13 +68,16 @@ cp  /etc/ca-certificates.conf /sketch/config/ca-certificates.conf
 
 mkdir -p  /sketch/config/firewalld/
 
+mkdir -p /sketch/.emberos/cache/etc.ssl
+touch /sketch/.emberos/cache/ssl_tar_md5
+
 mkdir -p /var/lib/blueman
 #Bind to /etc
 cat << EOF > /sketch/config/filesystem/emberos-netcfg.yaml
 /sketch/config/:
    bindfiles:
     sslcerts: /usr/share/ca-certificates/
-    sslcerts.local: /usr/local/share/ca-certificates
+    sslcerts.local: /usr/local/share/ca-certificates/
     ca-certificates.conf: /etc/ca-certificates.conf
 
 /sketch/config/firewalld/: /etc/firewalld/
