@@ -6,8 +6,8 @@ set -e
 
 
 source /common.sh
-
-
+#mkdir -p /etc/pulse
+#cp /filesystem/defaults.pa /etc/pulse/default.pa
 cat << 'EOF' > /sketch/config/sound.ini
 #This file allows you to automatically set the volume of all soundcards.
 #Set to -1 to disable this behavior.

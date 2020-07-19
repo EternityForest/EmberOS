@@ -694,8 +694,7 @@ EOF
 
 
 
-chmod 755 /usr/bin/activate_zram.sh
-
+chmod 755 /usr/bin/ember-activate-zram.sh
 systemctl enable ember-activate-zram.service
 
 mkdir -p /sketch/config.private
