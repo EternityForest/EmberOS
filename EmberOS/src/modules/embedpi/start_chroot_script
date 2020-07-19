@@ -234,6 +234,11 @@ EOF
 
 
 mkdir -p /var/www/html/
+
+mkdir -p /public.temp
+mkdir -p /sketch/public.www/
+mkdir -p /sketch/public.files/
+
 cat << EOF > /sketch/public.www/index.html
 
 <h1 id="welcome-to-emberos">Welcome to EmberOS</h1>
@@ -383,7 +388,7 @@ EOF
 
 chmod 744 /usr/bin/manage_sketch_folder.sh
 
-ln -s /sketch/config/emberCA.pem /sketch/public.www/emberCA.pem
+ln -s /etc/sketchconfig/emberCA.pem /sketch/public.www/emberCA.pem
 
 cat << EOF > /etc/systemd/system/manage_sketch_folder.service
 [Unit]
@@ -574,6 +579,12 @@ mk_pi_persist_dir  .config/Zeal
 mk_pi_persist_dir  .ipfs
 mk_pi_persist_dir  .go-ipfs
 mk_pi_persist_dir  .local/share/jami
+mk_pi_persist_dir  .local/share/kstars
+
+mkdir -p /sketch/home/pi/.config/
+touch /sketch/home/pi/.config/kstarsrc
+ln -s /sketch/home/pi/.config/kstarsrc /home/pi/.config/kstarsrc
+
 mk_pi_persist_dir  .config/jami
 mk_pi_persist_dir  .retroshare
 mk_pi_persist_dir  .goldendict
@@ -681,6 +692,12 @@ PATH=/usr/bin.sketch:$PATH
 EOF
 
 
+
+
+chmod 755 /usr/bin/activate_zram.sh
+
+systemctl enable ember-activate-zram.service
+
 mkdir -p /sketch/config.private
 mkdir -p /etc/sketchconfig.private
 
@@ -776,9 +793,7 @@ EOF
 
 # Setup apache
 #################################################################
-mkdir -p /public.temp
-mkdir -p /sketch/public.www/
-mkdir -p /sketch/public.files/
+
 
 
 mkdir -p /sketch/public.www

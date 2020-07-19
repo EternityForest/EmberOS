@@ -313,7 +313,7 @@ apt-get -y install pocketsphinx  gstreamer1.0-pocketsphinx pocketsphinx pocketsp
 
 
 #Mega GUI apps
-apt-get -y install deluge ardour gimp audacity kodi kodi-pvr-mythtv kodi-pvr-dvbviewer kodi-pvr-iptvsimple audacious audacious-plugins gwenview calibre zeal tuxguitar filezilla gelemental vlc
+apt-get -y install deluge ardour gimp audacity kodi kodi-pvr-mythtv kodi-pvr-dvbviewer kodi-pvr-iptvsimple audacious audacious-plugins gwenview calibre zeal tuxguitar filezilla gelemental kstars vlc
 
 
 #Communication and chat

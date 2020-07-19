@@ -6,4 +6,4 @@
 systemctl stop avahi-daemon.service
 #Attempt to avoid race conditions with the previous iteration
 sleep 3
-systemctl start avahi-daemon.service
+systemctl restart avahi-daemon.service

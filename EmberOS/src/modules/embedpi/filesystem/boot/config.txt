@@ -78,7 +78,11 @@ initramfs initramfs-emberos-v7l.gz followkernel
 [all]
 #dtoverlay=vc4-fkms-v3d
 start_x=1
-gpu_mem=128
 enable_uart=1
 #Need this for rpitx to work, but it slows things down too much
 #gpu_freq=250
+
+
+gpu_mem_256=64
+gpu_mem_512=128
+gpu_mem_1024=128
