@@ -177,7 +177,7 @@ apt-get -y install xserver-xorg-legacy
 sed -i \
     's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
 
-
+echo "need_root_rights=yes" >> /etc/X11/Xwrapper.config
 
 #The special /sketch partition is for everything that is not part of the image. It is made after the fact.
 ! mkdir /sketch
@@ -577,9 +577,12 @@ mk_pi_persist_dir  .local/share/jami
 mk_pi_persist_dir  .config/jami
 mk_pi_persist_dir  .retroshare
 mk_pi_persist_dir  .goldendict
+mk_pi_persist_dir  .stellarium
+mk_pi_persist_dir  .pychess
 
 mk_pi_persist_dir .local/share/marble
 mk_pi_persist_dir .local/share/Zeal
+mk_pi_persist_dir .local/share/gaiasky/data
 
 mkdir -p /sketch/home/pi/.local/share/Zeal
 

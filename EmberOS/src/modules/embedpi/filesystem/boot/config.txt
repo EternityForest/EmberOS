@@ -80,5 +80,5 @@ initramfs initramfs-emberos-v7l.gz followkernel
 start_x=1
 gpu_mem=128
 enable_uart=1
-#Need this for rpitx to work
-gpu_freq=250
+#Need this for rpitx to work, but it slows things down too much
+#gpu_freq=250
