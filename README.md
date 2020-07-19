@@ -22,7 +22,7 @@ so I don't suggest using it on SD cards in non-mostly-readonly configurations, h
 
 *Important: If you ever update the kernel, you have to run* `mkinitramfs -o /boot/initramfs-emberos.gz`
 
-See [Here](EmberOS/src/modules/embedpi/filesystem/sketch/share/ember-doc/) for info on how to do common stuff.
+See [Here](EmberOS/src/modules/embedpi/filesystem/sketch/public.files/emberos/ember-doc/README.md) for info on how to do common stuff.
 
 ### Goals
 

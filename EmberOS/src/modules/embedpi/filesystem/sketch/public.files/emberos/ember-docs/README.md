@@ -6,7 +6,7 @@ dillo, claws-mail, minecraft, mathematica, sonicpi, all but one version of Scrat
 
 
 ## The command shell
-New! We now use xonshell for the default shell. It is mostly bash compatible, but
+We now use xonshell for the default shell. It is mostly bash compatible, but
 also supports python. To use bash by default instead, do `chsh -s /bin/bash`
 
 ## Getting online
@@ -90,6 +90,19 @@ ln -s persist/foo .home_template/foo
 
 Other users home dirs won't be set up like this unless you do it manually, EmberOS is mostly assuming  with Pi as the only non-system user.
 
+
+#### Managing the certificate for Kaithem
+
+Keys are generated automaticaly if the key(not the cert) is missing, and auto added to the browser trust.
+
+The root CA that actually gets trusted is at /sketch/config/emberCA.pem,
+And the key is at /sketch/config.private/emberCA.key
+
+Delete both this key, and kaithem's key at /sketch/kaithem/ssl/certificate.key and reboot.
+
+Then you will need to add the new key at /sketch/config/emberCA.pem to any browsers that need to be secure.
+
+Of course, you can also manually supply these keys.
 
 ## Alternate shells
 fish, elvish, bash, and xonsh are included.

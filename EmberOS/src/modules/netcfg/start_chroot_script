@@ -116,13 +116,14 @@ systemctl enable firewalld.service
 mkdir -p /etc/firewalld/zones/
 cat << EOF > /etc/firewalld/zones/public.xml
 <?xml version="1.0" encoding="utf-8"?>
-<zone>
+<zone target="%%REJECT%%">
   <short>Public</short>
   <description>For use in public areas. You do not trust the other computers on networks to not harm your computer. Only selected incoming connections are accepted.</description>
   <source address="300::/8"/>
   <source address="200::/8"/>
   <source address="fc00::/8"/>
   <service name="dhcpv6-client"/>
+  <port port="123" protocol="udp"/>
 </zone>
 EOF
 

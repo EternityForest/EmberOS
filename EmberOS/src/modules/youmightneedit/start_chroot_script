@@ -142,7 +142,7 @@ apt-get -y install lame gnome-disk-utility unclutter imagemagick p7zip p7zip-ful
 
 
 #Ham radio stuff
-apt-get -y install fldigi flrig flmsg flamp xastir chirp cubicsdr antennavis
+apt-get -y install fldigi flrig flmsg flamp xastir chirp cubicsdr antennavis librtlsdr0
 
 #Pure data, because it seems to still be the best in it's class and there's really no equivalent
 apt-get -y install puredata puredata-extra
@@ -172,9 +172,9 @@ gdk-pixbuf-query-loaders > /usr/lib/arm-linux-gnueabihf/gdk-pixbuf-2.0/2.10.0/lo
 
 update-icon-caches /usr/share/icons/*
 
-apt-get -y install python3 synaptic conky-all grsync screengrab shared-mime-info rdiff-backup 
+apt-get -y install python3 synaptic conky-all grsync screengrab shared-mime-info rdiff-backup
 
-apt-get -y install python3-setproctitle python3-cffi python3-dbus python3-scipy python3-numpy python3-sympy python3-smbus python3-pyaudio python3-pexpect python3-pydub
+apt-get -y install python3-setproctitle python3-cffi python3-dbus python3-pydbus python3-scipy python3-numpy python3-sympy python3-smbus python3-pyaudio python3-pexpect python3-pydub
 
 #All the different FSes that you might want to have
 apt-get -y install btrfs-progs nilfs-tools f2fs-tools xfsprogs exfat-utils btrfsmaintenance
@@ -187,6 +187,9 @@ apt-get -y install btrfs-progs nilfs-tools f2fs-tools xfsprogs exfat-utils btrfs
 #Lua is even smaller and more popular
 apt-get -y install nim elixir gforth lua5.3
 
+
+#Python Bluez API
+pip3 install tcpbridge
 
 # tflite tensorflow
 pip3 install 	https://dl.google.com/coral/python/tflite_runtime-2.1.0.post1-cp37-cp37m-linux_armv7l.whl
@@ -293,13 +296,13 @@ apt-get -y install python3-pyqt5 python3-pyqt5.qtserialport python3-pyqt5.qtsvg 
 apt-get -y install python3-pyqt5.qtsql python3-pyqt5.qtwebkit python3-pyqt5.qtopengl python3-pyqt5.qtsensors libinput-tools
 apt-get -y install python3-tz python3-dateutil lm-sensors python3-lxml python3-six python3-requests avahi-discover python3-psutil backintime-qt4
 
-apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3-libnacl 
+apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3-libnacl  python3-libusb1 python3-fuse python3-bluez
 
 
 #Audio handling
 apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid  jack-tools jack-stdio
 apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly zynaddsubfx qsynth vmpk
-apt-get -y install -y fluidsynth pulseaudio-module-jack pulseaudio-module-bluetooth pulseaudio-module-zeroconf pulsemixer
+apt-get -y install -y fluidsynth pulseaudio-module-jack pulseaudio-module-bluetooth pulseaudio-module-zeroconf pulsemixer bluealsa 
 apt-get -y install jaaa qjackctl ffmpeg
 
 #Voice recognition and sythesis
@@ -310,7 +313,7 @@ apt-get -y install pocketsphinx  gstreamer1.0-pocketsphinx pocketsphinx pocketsp
 
 
 #Mega GUI apps
-apt-get -y install deluge ardour gimp audacity kodi kodi-pvr-mythtv kodi-pvr-dvbviewer kodi-pvr-iptvsimple audacious audacious-plugins gwenview calibre zeal tuxguitar filezilla gelemental stellarium
+apt-get -y install deluge ardour gimp audacity kodi kodi-pvr-mythtv kodi-pvr-dvbviewer kodi-pvr-iptvsimple audacious audacious-plugins gwenview calibre zeal tuxguitar filezilla gelemental stellarium vlc
 
 
 
@@ -349,7 +352,7 @@ apt-get -y install nmap robotfindskitten ncdu mc curl fatrace gstreamer1.0-tools
 
 apt-get -y remove qpdfview
 #Sigh. Vim is huge but some people really love it...
-apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs git-repair xloadimage iotop
+apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs git-repair xloadimage iotop zenity
 
 #Enable builtin wordnet, disable the wiktionary service by default because that uses
 #Network

@@ -13,6 +13,14 @@ set -e
 source /common.sh
 install_cleanup_trap
 
+
+! sudo usermod -a -G dialout pi
+! sudo usermod -a -G serial pi
+! sudo usermod -a -G pulse-access pi
+! sudo usermod -a -G bluetooth pi
+! sudo usermod -a -G audio pi
+
+
 #Force IPv4 for apt updates until such a time as ipv6 is supported everywhere.
 echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99-force-ipv4
 
@@ -226,12 +234,25 @@ EOF
 
 
 mkdir -p /var/www/html/
-cat << EOF > /var/www/html/index.html
+cat << EOF > /sketch/public.www/index.html
 
 <h1 id="welcome-to-emberos">Welcome to EmberOS</h1>
 <p>This is the kiosk start page. It is served from /sketch/kiosk_startpage.html.</p>
-<p>You can of course exit back to the shell with Alt+F4</p>
+<p>You can of course exit back to the shell with Alt+F4.</p>
+
+<h3>Links:</h3>
+<a href="/public_files">Public shared files(Including EmberOS offline content at /var/public.files)</a><br>
+<a href="/public_media">Public shared media(/var/public.media)</a><br>
+<a href="/public_files/emberos/webapps/falstad-simulator-offline-html5/src/circuitjs.html">Circuit Simulator</a>
+
+<h3>Utility</h3>
+<p>Note: Don't trust this cert unless you are accessing it via a safe network</p>
+<a href="/emberCA.pem">Security certificate for this node</a>
+
 EOF
+
+ln -s /var/public.files /sketch/public.www/public_files
+ln -s /var/public.media /sketch/public.www/public_media
 
 #Generate an RSA key whenever it does not exist, if we can
 #Then move whatever kets we find into the SSH ramdisk.
@@ -301,28 +322,68 @@ if [ ! -f /sketch/config.private/yggdrasil.conf ]; then
 ! yggdrasil -genconf -json > /sketch/config.private/yggdrasil.conf
 fi
 
+
+if [ ! -f /sketch/config.private/emberCA.key ] ; then
+######################
+# Become a Certificate Authority
+######################
+
+# Generate private key
+openssl genrsa -out /sketch/config.private/emberCA.key 2048
+# Generate root certificate
+openssl req -x509 -new -nodes -key /sketch/config.private/emberCA.key -sha256 -days 825 -out /sketch/config/emberCA.pem -subj "/C=US/ST=Washington/L=Seattle/O=EmberOS Autogen/OU=A Bash Script/CN=localhost"
+
+
+#Copy it so it's trusted by browsers
+mkdir -p /sketch/config/sslcerts.local/
+mkdir -p /sketch/config/sslcerts.local/ember-os
+cp /sketch/config/emberCA.pem /sketch/config/sslcerts.local/ember-os/localhost.crt
+fi
+
+
 #Generate missing SSL keys
 if [ ! -f /sketch/kaithem/ssl/certificate.key ] ; then
     mkdir -p /sketch/kaithem/ssl/
     #Look at this race condition here! Someone could steal that private key before we chmod it!
 
+    mkdir /dev/shm/kkeytmp
+    cd /dev/shm/kkeytmp
 
-    openssl req -x509 -out /sketch/kaithem/ssl/certificate.cert -keyout /sketch/kaithem/ssl/certificate.key \
-    -newkey rsa:2048 -nodes -sha256 \
-    -subj '/CN=localhost' -extensions EXT -config <( \
-    printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
-        
-    #Copy it so it's trusted by browsers
-    mkdir -p /sketch/config/sslcerts.local/
-    mkdir -p /sketch/config/sslcerts.local/ember-kaithem
-    #Yes, the filename mismatch is intentional!!
-    cp /sketch/kaithem/ssl/certificate.cert /sketch/config/sslcerts.local/ember-kaithem/kaithem_localhost.crt
+######################
+# Create CA-signed certs
+######################
+
+NAME=localhost
+# Generate a private key
+openssl genrsa -out localhost.key 2048
+# Create a certificate-signing request
+openssl req -nodes -new -key localhost.key -out localhost.csr -subj "/C=US/ST=Washington/L=Seattle/O=EmberOS Autogen/OU=A Bash Script/CN=localhost"
+
+# Create a config file for the extensions
+cat << 'EOF2' > localhost.ext
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = localhost # Be sure to include the domain name here because Common Name is not so commonly honoured by itself
+DNS.2 = *.localhost # Optionally, add additional domains (I've added a subdomain here)
+IP.1 = 127.0.0.1 # Optionally, add an IP address (if the connection which you have planned requires it)
+EOF2
+# Create the signed certificate
+openssl x509 -req -in localhost.csr -CA /sketch/config/emberCA.pem -CAkey /sketch/config.private/emberCA.key -CAcreateserial \
+-out localhost.crt -days 825 -sha256 -extfile localhost.ext
+
+mv localhost.key /sketch/kaithem/ssl/certificate.key
+mv localhost.crt /sketch/kaithem/ssl/certificate.cert
+cd /
+rm -rf /dev/shm/kkeytmp/
 fi
 EOF
 
 chmod 744 /usr/bin/manage_sketch_folder.sh
 
-
+ln -s /sketch/config/emberCA.pem /sketch/public.www/emberCA.pem
 
 cat << EOF > /etc/systemd/system/manage_sketch_folder.service
 [Unit]
@@ -522,6 +583,7 @@ mk_pi_persist_dir .local/share/Zeal
 
 mkdir -p /sketch/home/pi/.local/share/Zeal
 
+mk_pi_persist_dir .config/vlc
 mk_pi_persist_dir .config/deluge
 mk_pi_persist_dir .config/ardour5
 mk_pi_persist_dir .config/sigrok
@@ -559,7 +621,8 @@ mk_pi_persist_dir  .syncthing
 mk_pi_persist_dir  .syncthing-gtk
 mk_pi_persist_dir .local/share/fonts
 
-#Give pi a place to share public stuff, if desired
+#Give pi a place to share public stuff, if desired.  We will handle this later with
+#a mountpoint.
 mkdir -p /sketch/public.files/pi
 mkdir -p /sketch/public.media/pi
 
@@ -714,7 +777,6 @@ mkdir -p /public.temp
 mkdir -p /sketch/public.www/
 mkdir -p /sketch/public.files/
 
-echo "Welcome! This file is /sketch/public.www/index.html. You can alt+f4 out to a graphical desktop."> /sketch/public.www/index.html
 
 mkdir -p /sketch/public.www
 
@@ -770,8 +832,4 @@ EOF
 
 ln -s /sketch/home/pi/.xonshrc /home/pi/.xonshrc
 
-! sudo usermod -a -G dialout pi
-! sudo usermod -a -G serial pi
-! sudo usermod -a -G audio pi
-! sudo usermod -a -G pulse-access pi
-! sudo usermod -G bluetooth -a pi
+

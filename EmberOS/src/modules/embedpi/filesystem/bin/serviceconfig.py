@@ -13,7 +13,7 @@ config = configparser.ConfigParser()
 #Copy any files sketch-provided unit files
 for i in sorted(os.listdir(SKETCH_UNITS)):
     #Filter stuff that shouldn't be there
-    if not (i.endswith(".rst") or i.endswith(".md") or i.endswith(".txt") or os.isdir(os.path.join(SKETCH_UNITS,i))):
+    if not (i.endswith(".rst") or i.endswith(".md") or i.endswith(".txt") or os.path.isdir(os.path.join(SKETCH_UNITS,i))):
         shutil.copy(os.path.join(SKETCH_UNITS,i),  "/run/systemd/system")
 
 for i in sorted(list(os.listdir(SKETCH_CONFIG)), reverse=True):
