@@ -177,7 +177,7 @@ apt-get -y install xserver-xorg-legacy
 sed -i \
     's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
 
-echo "need_root_rights=yes" >> /etc/X11/Xwrapper.config
+echo "needs_root_rights=yes" >> /etc/X11/Xwrapper.config
 
 #The special /sketch partition is for everything that is not part of the image. It is made after the fact.
 ! mkdir /sketch

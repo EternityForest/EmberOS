@@ -13,5 +13,6 @@ https-port : 8001
 http-port : 8002
 
 audio-paths:
+    - /usr/share/tuxpaint/sounds
     - /sketch/public.media
     - __default__

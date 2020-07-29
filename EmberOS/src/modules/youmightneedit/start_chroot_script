@@ -138,7 +138,7 @@ sudo apt-get -y install xboxdrv xserver-xorg-input-wacom
 
 
 #Batteries included, allow messing with kiosk browser media right from the device
-apt-get -y install lame gnome-disk-utility unclutter imagemagick p7zip p7zip-full testdisk qdirstat
+apt-get -y install lame gnome-disk-utility unclutter imagemagick p7zip ark testdisk qdirstat
 
 
 #Ham radio stuff
@@ -301,9 +301,11 @@ apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3
 
 #Audio handling
 apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid  jack-tools jack-stdio
-apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly zynaddsubfx qsynth vmpk
+apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly zynaddsubfx qsynth vmpk autotalent x42-plugins
 apt-get -y install -y fluidsynth pulseaudio-module-jack pulseaudio-module-bluetooth pulseaudio-module-zeroconf pulsemixer bluealsa 
 apt-get -y install jaaa qjackctl ffmpeg
+
+systemctl disable bluealsa
 
 #Voice recognition and sythesis
 apt-get -y install pocketsphinx  gstreamer1.0-pocketsphinx pocketsphinx pocketsphinx-en-us flite
