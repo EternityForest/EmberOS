@@ -315,7 +315,7 @@ apt-get -y install pocketsphinx  gstreamer1.0-pocketsphinx pocketsphinx pocketsp
 
 
 #Mega GUI apps
-apt-get -y install deluge ardour gimp audacity kodi kodi-pvr-mythtv kodi-pvr-dvbviewer kodi-pvr-iptvsimple audacious audacious-plugins gwenview calibre zeal tuxguitar filezilla gelemental kstars vlc
+apt-get -y install deluge ardour gimp audacity kodi kodi-pvr-mythtv kodi-pvr-dvbviewer kodi-pvr-iptvsimple audacious audacious-plugins gwenview calibre zeal tuxguitar filezilla gelemental kstars vlc inkscape
 
 
 #Communication and chat
@@ -353,7 +353,7 @@ apt-get -y install nmap robotfindskitten ncdu mc curl fatrace gstreamer1.0-tools
 
 apt-get -y remove qpdfview
 #Sigh. Vim is huge but some people really love it...
-apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs git-repair xloadimage iotop zenity
+apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs git-repair xloadimage iotop zenity rename sshpass
 
 #Enable builtin wordnet, disable the wiktionary service by default because that uses
 #Network
@@ -362,7 +362,7 @@ cp /filesystem/goldendict_config /sketch/home/pi/.goldendict/config
 
 
 gtk-update-icon-cache
-
+tuc
 
 
 

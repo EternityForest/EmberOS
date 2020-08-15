@@ -593,7 +593,6 @@ mk_pi_persist_dir  .pychess
 
 mk_pi_persist_dir .local/share/marble
 mk_pi_persist_dir .local/share/Zeal
-mk_pi_persist_dir .local/share/gaiasky/data
 
 mkdir -p /sketch/home/pi/.local/share/Zeal
 
@@ -632,7 +631,15 @@ mk_pi_persist_dir  .flrig
 mk_pi_persist_dir  .flmsg
 mk_pi_persist_dir  .flamp
 mk_pi_persist_dir  .syncthing
+mk_pi_persist_dir  .nano
 mk_pi_persist_dir  .syncthing-gtk
+mk_pi_persist_dir  .arduino15
+
+#Make the dir for arduino, but we're gonna specifically redirect the log dir to a volatile folder.
+mkdir -p /sketch/home/pi/.arduino15/logs
+mkdir -p /home/pi/logs/
+ln -s /home/pi/logs/arduino15.log /sketch/home/pi/.arduino15/logs/application.log
+
 mk_pi_persist_dir .local/share/fonts
 
 #Give pi a place to share public stuff, if desired.  We will handle this later with
@@ -845,8 +852,18 @@ import re
 import random
 import os
 import sys
+import struct
 EOF
 
 ln -s /sketch/home/pi/.xonshrc /home/pi/.xonshrc
 
+
+cat << EOF > /sketch/home/pi/.vimrc
+EOF
+ln -s /sketch/home/pi/.vimrc /home/pi/.vimrc
+
+cat << EOF > /sketch/home/pi/.bashrc
+EOF
+
+ln -s /sketch/home/pi/.bashrc /home/pi/.bashrc
 
