@@ -700,7 +700,7 @@ EOF
 
 
 
-
+#Compress the RAM, because we have no real swap space
 chmod 755 /usr/bin/ember-activate-zram.sh
 systemctl enable ember-activate-zram.service
 

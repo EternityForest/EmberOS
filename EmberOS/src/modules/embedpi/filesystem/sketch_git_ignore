@@ -18,6 +18,10 @@ kaithem/modules/6*
 kaithem/modules/7*
 kaithem/modules/8*
 kaithem/modules/9*
+kaithem/logs/**
+
+#Presumable we wouldn't want the logs dir
+logs/**
 
 
 home/pi/.local/share/marble/**
@@ -42,7 +46,6 @@ config/apache2/mods-available
 
 # Standard apache2 stuff. I wish there was a better way to do this.
 # But everything has to be in this file so we can rsync it.
-
 config/apache2/mods-enabled/access_compat.load
 config/apache2/mods-enabled/authz_core.load
 config/apache2/mods-enabled/autoindex.load
