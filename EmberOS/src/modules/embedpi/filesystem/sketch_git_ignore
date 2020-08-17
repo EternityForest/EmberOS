@@ -32,6 +32,7 @@ opt/rpitx/**
 opt/kouchat/**
 share/wikis/archlinux/**
 cache/**
+.emberos/cache/**
 config/ca-certificates.conf
 config/sslcerts/**
 config/timezones/**
