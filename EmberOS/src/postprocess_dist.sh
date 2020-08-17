@@ -68,6 +68,8 @@ mount -o compression ${POSTPROCESS_LOOP}p3 workspace/postprocess_sketch/
 rsync -a -f"+ */" -f"- *" workspace/original_root/ workspace/postprocess_root/
 
 
+
+
 #Copy all files from root, compressing as we go if we were using a compression friendly FS
 rsync -az --exclude='sketch/*' --exclude='/tmp/*' --exclude='/var/tmp/*' workspace/original_root/ workspace/postprocess_root/
 
@@ -78,16 +80,33 @@ sed -i '/mmcblk0p2/c\\/dev\/mmcblk0p2  \/               btrfs    defaults,noatim
 #Copy the sketch stuff
 rsync -az workspace/original_root/sketch/ workspace/postprocess_sketch/
 
-#NTFS supports compression too, we will use it on some of the PDFs
-rsync -a --include='*/' --exclude='*' sketch_included_data/sketch/ workspace/postprocess_sketch/
+#NTFS supports compression too, we will use it on some of the PDFs. In theory this skips all files and only gets dirs so we
+rsync -a -f"+ */" -f"- *" sketch_included_data/sketch/ workspace/postprocess_sketch/
+
+#Set compression attrs
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/articles/
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/articles/**
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/clipart/
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/clipart/**
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/textbooks/
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/textbooks/**
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/manuals/
+
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/home/pi/.local/share/Zeal/**
+
+
 
 #Now transfer the actual files over
-rsync -az sketch_included_data/sketch/ workspace/postprocess_sketch/
+#Note I, to force overwrite so we can compress, if For some reason the only copy dirs thing isn't working.
+rsync -az -I sketch_included_data/sketch/ workspace/postprocess_sketch/
 rsync -az sketch_included_data/root.opt/ workspace/postprocess_root/opt/
+
+#Make it not a submodule
+rm workspace/postprocess_sketch/opt/kaithem/.git
 
 cd workspace/postprocess_sketch/
 git init
-git add **
+git add -A
 
 git config user.email "emberos@example.com"
 git config user.name "EmberOS" 

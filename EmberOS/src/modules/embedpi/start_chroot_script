@@ -573,6 +573,11 @@ mk_pi_persist_dir  Drawer
 mk_pi_persist_dir  Games
 mk_pi_persist_dir  Sync
 mk_pi_persist_dir  Programs
+mk_pi_persist_dir  DOSbox
+mkdir -p /home/pi/persist/DOSbox/c
+
+mk_pi_persist_dir  .dosbox
+
 mk_pi_persist_dir  "Calibre Library"
 mk_pi_persist_dir  .config/calibre
 mk_pi_persist_dir  .config/Zeal
@@ -634,6 +639,16 @@ mk_pi_persist_dir  .syncthing
 mk_pi_persist_dir  .nano
 mk_pi_persist_dir  .syncthing-gtk
 mk_pi_persist_dir  .arduino15
+
+
+cat << EOF > /usr/bin/save-chrome-state
+#!/bin/bash
+
+mkdir -p ~/.home-template/.config/chromium
+rsync -a ~/.config/chromium/ ~/.home-template/.config/chromium/
+EOF
+
+chmod 755 /usr/bin/save-chrome-state
 
 #Make the dir for arduino, but we're gonna specifically redirect the log dir to a volatile folder.
 mkdir -p /sketch/home/pi/.arduino15/logs
@@ -862,8 +877,8 @@ cat << EOF > /sketch/home/pi/.vimrc
 EOF
 ln -s /sketch/home/pi/.vimrc /home/pi/.vimrc
 
-cat << EOF > /sketch/home/pi/.bashrc
-EOF
+mv /home/pi/.bashrc /sketch/home/pi/.bashrc 
+
 
 ln -s /sketch/home/pi/.bashrc /home/pi/.bashrc
 

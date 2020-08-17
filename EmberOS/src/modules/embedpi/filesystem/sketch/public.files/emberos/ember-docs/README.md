@@ -9,12 +9,22 @@ dillo, claws-mail, minecraft, mathematica, sonicpi, all but one version of Scrat
 We now use xonshell for the default shell. It is mostly bash compatible, but
 also supports python. To use bash by default instead, do `chsh -s /bin/bash`
 
+In addition, two BASIC interpreters are provided, brandy(BBC Basic V), which runs a graphical window, and  bwbasic, which can run in several modes.
+
 ## Getting online
 Look in /sketch/networks, edit the wifi file as appropriate, or just connect ethernet.
 
 These are NetworkManager files, so wifi will automatically reconnect for you, and you can configure almost any kind of network you want.
 
 You can also go to the command line and use "nmtui" to connect.
+
+## Chrome bookmarks
+
+Chromium runs entirely in a RAM based folder, bookmarks are not persistant. This is because chrome
+has a habit of heavy writes to disk. However you can manually call save-chrominum-state to copy this
+to persistant storage.
+
+You can also make ~/.config/chromium a symlink to a folder in persist, but that may wear out the SD card eventually.
 
 ## Making a backup
 

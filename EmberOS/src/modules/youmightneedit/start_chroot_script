@@ -358,14 +358,10 @@ apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs
 
 #Enable builtin wordnet, disable the wiktionary service by default because that uses
 #Network
-! rm /home/pi/.goldendict/config
 cp /filesystem/goldendict_config /sketch/home/pi/.goldendict/config
 
 
 gtk-update-icon-cache
-tuc
-
-
 
 
 apt-get autoremove -y --purge
