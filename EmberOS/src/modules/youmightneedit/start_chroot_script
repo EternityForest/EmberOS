@@ -58,7 +58,8 @@ apt-get -y install smbclient samba samba-common-bin cifs-utils minidlna
 
 unpack /filesystem/bin /usr/bin/ root
 chmod 755 /usr/bin/wikioffline
-
+mkdir -p /sketch/public.www/webmap
+unpack /filesystem/webmap /sketch/public.www/webmap
 
 cat << EOF > /etc/systemd/system/zimserver.service
 [Unit]

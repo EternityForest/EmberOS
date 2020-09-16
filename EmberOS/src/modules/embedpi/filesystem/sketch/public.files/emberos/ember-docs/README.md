@@ -268,21 +268,14 @@ This is provided by `ember-manage-audio.service`
 
 ## Serving OpenStreetMap Maps
 
-Enable tilestache in 99-defults in the autostart config.  The maps are stored at 
-`/home/pi/.local/share/marble/maps/earth`, which is the same folder that marble uses.
+Thanks to a symlink in /sketch/www, you can get map tiles at the url /maptiles/earth/openstreetmap/{z}/{x}/{y}.png if apache is enabled.
 
-This is possible because the both use a relatively simple raw tile format.
+ The maps are stored at 
+`/home/pi/.local/share/marble/maps/earth`, which is the same folder that marble. To get new maps, browse them in Marble,
+or rsync from a laptop, they're all stored in .local/share in the same format and can just be copied over.
 
-Tilestache is not currently capable of downloading maps from openstreetmap because
-of user agent header issues. However, maps downloaded via Marble will be available at:
-`http://localhost:8083/openstreetmap/0/0/0.png`.
+EmberOS includes maps of the entire world, at a fairly low resolution.
 
-You can use this to power any local applications that need a mapserver. Low resolution
-maps up to zoom level 6 are included, anything more would use too much storage.
-
-Be careful not to get blocked from the tile server by hitting them too hard when downloading.
-
-You can configure tilestache with `/sketch/config/tilestache.cfg`
 
 
 ## Installing NextCloud
