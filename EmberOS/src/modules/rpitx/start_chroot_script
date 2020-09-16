@@ -3,35 +3,38 @@
 set -x
 set -e
 
-mkdir -p /sketch/opt/rpitx
 
-sudo apt-get install -y libsndfile1-dev git
-sudo apt-get install -y imagemagick libfftw3-dev
-sudo apt-get install -y rtl-sdr buffer
+## RPITX HAS BEEN DISABLED FOR NOW. I never actually did get it to work I don't think.
 
-#Hacktasktic awfulness
-mv filesystem/csdr /filesystem/rpitx/
+# mkdir -p /sketch/opt/rpitx
 
-cd /filesystem/rpitx/
-patch -i csdrpizero.diff csdr/Makefile
-cd csdr/
+# sudo apt-get install -y libsndfile1-dev git
+# sudo apt-get install -y imagemagick libfftw3-dev
+# sudo apt-get install -y rtl-sdr buffer
 
-make
-make install
+# #Hacktasktic awfulness
+# mv filesystem/csdr /filesystem/rpitx/
 
+# cd /filesystem/rpitx/
+# patch -i csdrpizero.diff csdr/Makefile
+# cd csdr/
 
-mv /filesystem/librpitx /filesystem/rpitx/src
-cd /filesystem/rpitx/src/librpitx/src
-make
-
-mv /filesystem/ft8_lib /filesystem/rpitx/src/pift8
-
-cd /filesystem/rpitx/src/
-
-make
-sudo make install
+# make
+# make install
 
 
-rsync -a --exclude="src" --exclude="csdr" /filesystem/rpitx/ /sketch/opt/rpitx
+# mv /filesystem/librpitx /filesystem/rpitx/src
+# cd /filesystem/rpitx/src/librpitx/src
+# make
 
-! rm -r /sketch/opt/rpitx/ft8_lib
+# mv /filesystem/ft8_lib /filesystem/rpitx/src/pift8
+
+# cd /filesystem/rpitx/src/
+
+# make
+# sudo make install
+
+
+# rsync -a --exclude="src" --exclude="csdr" /filesystem/rpitx/ /sketch/opt/rpitx
+
+# ! rm -r /sketch/opt/rpitx/ft8_lib
