@@ -8,7 +8,7 @@ echo "postprocessing `ls -t workspace/*.img | head -1`"
 
 ORIGINAL_LOOP=$(losetup -P -r --find --show `ls -t workspace/*.img | head -1`)
 
-dd if=/dev/zero bs=1M count=7104 >> workspace/emberos_postprocessed.img
+dd if=/dev/zero bs=1M count=7054 >> workspace/emberos_postprocessed.img
 
 POSTPROCESS_LOOP=`losetup -P --find --show workspace/emberos_postprocessed.img`
 
@@ -24,9 +24,9 @@ mount ${ORIGINAL_LOOP}p2 workspace/original_root/
 #We should be able to get a
 parted --script ${POSTPROCESS_LOOP} \
     mklabel msdos \
-    mkpart primary fat32 4MiB 320MiB \
-    mkpart primary btrfs 320MiB 5604MiB \
-    mkpart primary NTFS 5604MiB 7100MiB \
+    mkpart primary fat32 4MiB 256MiB \
+    mkpart primary btrfs 256MiB 5300MiB \
+    mkpart primary NTFS 5300MiB 7050MiB \
     set 1 boot on
     set 2 boot on
     set 1 lba on
@@ -42,7 +42,7 @@ sudo mkfs.vfat -F 32 -n 'boot' ${POSTPROCESS_LOOP}p1
 #mkfs.f2fs -l "root" -O encrypt,compression,extra_attr -t 0 ${POSTPROCESS_LOOP}p2
 #mkfs.ext4 -L "root" ${POSTPROCESS_LOOP}p2 
 mkfs.btrfs -L "root" ${POSTPROCESS_LOOP}p2 
-mkfs.ntfs -L "sketch" ${POSTPROCESS_LOOP}p3
+mkfs.ntfs -C -L "sketch" ${POSTPROCESS_LOOP}p3
 
 mkdir -p workspace/postprocess_root/
 mkdir -p workspace/postprocess_boot/
@@ -60,7 +60,7 @@ sed -i 's/fsck.repair=yes/fsck.repair=no/g' workspace/postprocess_boot/cmdline.t
 
 #Maximum zstd compression ratio
 mount -o compress-force=zlib:9 ${POSTPROCESS_LOOP}p2 workspace/postprocess_root/
-mount -o compression ${POSTPROCESS_LOOP}p3 workspace/postprocess_sketch/
+mount -t ntfs-3g -o compression ${POSTPROCESS_LOOP}p3 workspace/postprocess_sketch/
 
 
 
@@ -91,9 +91,20 @@ setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/
 setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/textbooks/
 setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/textbooks/**
 setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/manuals/
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/books/
 
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/icons/
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/icons/**
 setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/home/pi/.local/share/Zeal/**
 
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.media/emberos/Music/
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.media/emberos/Music/**
+
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.media/emberos/sounds/
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.media/emberos/sounds/**
+
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/fonts/
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/fonts/**
 
 
 #Now transfer the actual files over

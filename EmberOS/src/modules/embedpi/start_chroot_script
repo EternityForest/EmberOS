@@ -170,6 +170,13 @@ apt-get -y install -y python3-yaml
 apt-get -y install -y fvwm fvwm-icons
 
 
+
+#Make xorg.conf.d configurable.  Needed because the new raspi OS needs it to be writable, for auto config of some kind of GL driver.
+mkdir -p /usr/share/X11/xorg.conf.d/
+mkdir -p /sketch/config/xorg.conf.d/
+rsync -a /usr/share/X11/xorg.conf.d/ /sketch/config/xorg.conf.d/
+
+
 #Without this we have all kinds of issues doing startx
 apt-get -y install xserver-xorg-legacy
 #Allow non-console startx, needed to make kiosk browsing work
@@ -264,9 +271,6 @@ EOF
 
 ln -s /var/public.files /sketch/public.www/public_files
 ln -s /var/public.media /sketch/public.www/public_media
-
-#Make map tiles serveable
-ln -s /home/pi/.local/share/marble/maps/ /sketch/public.www/maptiles
 
 #Generate an RSA key whenever it does not exist, if we can
 #Then move whatever kets we find into the SSH ramdisk.
@@ -529,6 +533,20 @@ EOF
 mkdir -p /home/pi/public.files
 mkdir -p /home/pi/public.media
 
+
+# We are going to share our cached marble maps tiles with the world
+mkdir -p /home/pi/public.files/marblemaps
+cat << EOF > /home/pi/public.files/marblemaps_readme.md
+The marblemaps folder is a bind mount controlled by the emberos-public-maptiles.yaml folder.  It is just a public view of
+/sketch/home/pi/.local/share/marble/maps.
+
+Note that this could be a privacy concern for some, as your cached map tiles are made public, letting others know where you were browsing.
+To stop this binding, delete /sketch/config/filesystem/emberos-public-maptiles.yaml
+
+EOF
+
+
+
 #General purpose private persistant area
 mkdir -p /sketch/home/pi
 mkdir -p /home/pi/persist
@@ -786,15 +804,15 @@ unpack /filesystem/root /
 #In their place in the layering of mounts
 cat << EOF > /usr/bin/writable
 #!/bin/bash
-mount -o remount,rw /
-mount -o remount,rw /boot
-mount -o remount,rw /sketch
+mount -o remount,rw /dev/mmcblk0p2  /
+mount -o remount,rw /dev/mmcblk0p1 /boot
+mount -o remount,rw /dev/mmcblk0p3 /sketch
 EOF
 
 cat << EOF > /usr/bin/readonly
 #!/bin/bash
-mount -o remount,ro /
-mount -o remount,ro /boot
+mount -o remount,ro /dev/mmcblk0p2 /
+mount -o remount,ro /dev/mmcblk0p1 /boot
 EOF
 
 chmod 755 /usr/bin/writable

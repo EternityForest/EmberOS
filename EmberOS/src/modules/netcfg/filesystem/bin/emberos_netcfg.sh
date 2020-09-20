@@ -49,6 +49,7 @@ else
 
     #They are the same
     rm /dev/shm/emberssl.hash
+    mkdir -p /home/pi/.pki/nssdb
 
     #Load from 
     mount -t tmpfs -o size=5m tmpfs /etc/pki/nssdb

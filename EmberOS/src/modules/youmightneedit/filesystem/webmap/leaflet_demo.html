@@ -21,9 +21,11 @@
 
 <h2>World Map</h2>
 
-<p>Map tile pattern for embedding: /maptiles/earth/openstreetmap/{z}/{x}/{y}.png</p>
+<p>Map tile pattern for embedding: /public_files/pi/marblemaps/earth/openstreetmap/{z}/{x}/{y}.png</p>
 
-<p>Maps are stored in /home/pi/.local/share/marble/maps/.   This app does not automatically fetch maps from any internet service and only shows what is on the server.</p>
+<p>Maps are stored in /home/pi/.local/share/marble/maps/, and made publically viewable by a bind mount.  This takes advantage of the fact that KDE marble uses a very simple on-disk format.</p>
+	
+</p>This app does not automatically fetch maps from any internet service and only shows what is on the server.</p>
 
 <p>To update or get new maps, either browse around using Marble, or rsync from /home/USERNAME/.local/share/marble/maps/ on a real computer.</p>
 
@@ -32,7 +34,7 @@
 
 	var mymap = L.map('mapid').setView([51.505, -0.09], 6);
 
-	L.tileLayer('/maptiles/earth/openstreetmap/{z}/{x}/{y}.png', {
+	L.tileLayer('/public_files/pi/marblemaps/earth/openstreetmap/{z}/{x}/{y}.png', {
 		maxZoom: 8,
 		attribution: 'OSM Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
 			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',

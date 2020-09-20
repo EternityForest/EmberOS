@@ -33,8 +33,8 @@ See [Here](EmberOS/src/modules/embedpi/filesystem/sketch/public.files/emberos/em
 * As little configuration as possible for common tasks, everything should just work.
 * Convenient platform for experimenting with your setup, includes all tools for minor tweaks to just about everything without needing a desktop computer.
 * Things that require updates to keep working(Timezones, SSL, etc) are managed via /sketch for easy updates.
-
 * Basically anything that's more of a "device" than a computer, that needs to be reliable and doesn't store too much data.
+* Still fit on (most) 8GB SD cards with at least a few dozen MB to spare, for very simple applications
 
 ![EmberOS](img/screenshot.webp)
 

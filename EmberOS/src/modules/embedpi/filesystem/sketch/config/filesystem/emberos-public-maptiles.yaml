@@ -1,0 +1,4 @@
+/sketch/home/pi/.local/share/marble/maps:
+    bindat: /sketch/public.files/pi/marblemaps
+    mode: '755'
+    user: pi

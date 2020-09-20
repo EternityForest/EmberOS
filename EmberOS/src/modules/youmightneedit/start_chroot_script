@@ -192,6 +192,7 @@ apt-get -y install nim elixir gforth lua5.3
 #Python Bluez API
 pip3 install tcpbridge
 
+
 # tflite tensorflow
 pip3 install 	https://dl.google.com/coral/python/tflite_runtime-2.1.0.post1-cp37-cp37m-linux_armv7l.whl
 
@@ -206,8 +207,12 @@ pip3 install nimporter
 pip3 install pyfirmata
 pip3 install python-can
 pip3 install pynput
+pip3 install enum-compat
+pip3 install pynput
+pip3 install simpleaudio
+pip3 install yeelight
 
-sudo apt-get -y install python3-smbus python3-msgpack python3-paho-mqtt python3-gevent python3-falcon python3-mako python3-typeguard
+sudo apt-get -y install python3-smbus python3-msgpack python3-paho-mqtt python3-gevent python3-falcon python3-mako python3-typeguard python3-paramiko
 
 pip3 install zimply
 pip3 install pycryptodome
@@ -298,7 +303,7 @@ apt-get -y install python3-pyqt5 python3-pyqt5.qtserialport python3-pyqt5.qtsvg 
 apt-get -y install python3-pyqt5.qtsql python3-pyqt5.qtwebkit python3-pyqt5.qtopengl python3-pyqt5.qtsensors libinput-tools
 apt-get -y install python3-tz python3-dateutil lm-sensors python3-lxml python3-six python3-requests avahi-discover python3-psutil backintime-qt4
 
-apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3-libnacl  python3-libusb1 python3-fuse python3-bluez
+apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3-libnacl  python3-libusb1 python3-fuse python3-bluez python3-cairosvg  python3-ifaddr python3-pymodbus
 
 
 #Audio handling
