@@ -10,6 +10,14 @@ set -e
 echo "samba-common samba-common/dhcp boolean true" | sudo debconf-set-selections
 echo "samba-common samba-common/do_debconf boolean true" | sudo debconf-set-selections
 
+
+#Add this if it ever gets support
+#apt-get -y install rtl8812au-dkms
+
+#Too big for github, you have to put the file there manually
+apt-get -y install /filesystem/debs/voice2json_2.0_armhf.deb
+
+
 #Non-superusers can't capture packets
 echo "wireshark-common wireshark-common/install-setuid boolean false" | sudo debconf-set-selections
 
@@ -21,8 +29,70 @@ echo "wireshark-common wireshark-common/install-setuid boolean false" | sudo deb
 # ln -s /opt/ipfs-installer/ipfs-rpi-0.1.1/install /usr/bin/install-ipfs-rpi
 # sudo systemctl disable ipfs-daemon.service
 
-
 apt-get -y install -y wireshark
+
+
+# Currently broken, doesn't want to build
+# #install driver for a very common cheap USB wifi chip
+# #TODO: change this if we ever upgrade to 64 bit
+# apt-get install -y raspberrypi-kernel-headers dkms
+
+# mkdir -p /var/lib/rtl8812au
+# unpack /filesystem/rtl8812au /var/lib/rtl8812au
+
+# cd /var/lib/rtl8812au
+# sed -i 's/CONFIG_PLATFORM_I386_PC = y/CONFIG_PLATFORM_I386_PC = n/g' Makefile
+# sed -i 's/CONFIG_PLATFORM_ARM_RPI = n/CONFIG_PLATFORM_ARM_RPI = y/g' Makefile
+# #You never know when power save is going to crash everything
+# sed -i 's/CONFIG_POWER_SAVING = y/CONFIG_POWER_SAVING = n/g' Makefile
+
+
+# make dkms_install
+
+# #Autoload so it just works
+# echo 8812au | sudo tee -a /etc/modules
+
+#UPnP rendering
+mkdir -p /opt/gmrender-resurrect
+
+
+sudo apt-get -y install libupnp-dev libgstreamer1.0-dev \
+gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
+gstreamer1.0-libav gstreamer1.0-pulseaudio uuid-runtime
+
+
+unpack /filesystem/gmrender-resurrect /opt/gmrender-resurrect
+cd /opt/gmrender-resurrect
+./autogen.sh
+./configure
+make
+make install
+
+cat << EOF > /usr/bin/ember-launch-gmrender
+UPNP_UUID=`ip link show | awk '/ether/ {print "salt:)-" $2}' | head -1 | md5sum | awk '{print $1}'`
+gmrender -f "$(cat /etc/hostname)" -u "$UPNP_UUID"
+EOF
+
+cat << EOF > /etc/systemd/system/gmrender.service
+[Unit]
+Description=Act as a UPNP media rendering server
+After=systemd-remount-fs.service network-online.target
+RequiresMountsFor=/etc/ /sketch/ /home/
+
+[Service]
+Type=simple
+ExecStart=gmrender.service
+User=pi
+WorkingDirectory=~
+
+[Install]
+WantedBy=sysinit.target
+EOF
+
+
+
+apt-get -y install gnuradio gnuradio-dev rtl-sdr gr-osmosdr gr-limesdr gr-dab gr-rds gr-air-modes
 
 
 # Printerie
@@ -52,14 +122,16 @@ cat << EOF > /sketch/config/filesystem/emberos_cups.yaml
 /sketch/ssh/root: /root/.ssh/
 EOF
 
-
-
 apt-get -y install smbclient samba samba-common-bin cifs-utils minidlna
 
 unpack /filesystem/bin /usr/bin/ root
 chmod 755 /usr/bin/wikioffline
 mkdir -p /sketch/public.www/webmap
 unpack /filesystem/webmap /sketch/public.www/webmap
+
+
+
+
 
 cat << EOF > /etc/systemd/system/zimserver.service
 [Unit]
@@ -80,7 +152,9 @@ EOF
 
 
 
-apt-get -y install mosquitto libpng16-16 chromium-browser rpi-chromium-mods batmand batctl 
+apt-get -y install mosquitto libpng16-16 chromium-browser rpi-chromium-mods batmand batctl dhtnode ntpdate
+systemctl disable dhtnode.service
+
 echo "persistence false" > /etc/mosquitto/conf.d/emberos.conf
 
 systemctl disable mosquitto.service
@@ -111,11 +185,10 @@ mkdir -p /sketch/home/pi/.syncthing-gtk
 
 cat << EOF > /usr/bin/get-youtube-dl
 #!/bin/bash
-#This CD trick lets us avoid an unneccessary download
-cd /sketch/bin/
-wget -N -S --backups=1 https://yt-dl.org/downloads/latest/youtube-dl
-chmod 755 youtube-dl
+cd /sketch/bin/youtube-dl
+./youtube-dl -U
 EOF
+
 chmod 755 /usr/bin/get-youtube-dl
 
 
@@ -175,12 +248,22 @@ update-icon-caches /usr/share/icons/*
 
 apt-get -y install python3 synaptic conky-all grsync screengrab shared-mime-info rdiff-backup 
 
-apt-get -y install python3-setproctitle python3-cffi python3-dbus python3-pydbus python3-scipy python3-numpy python3-sympy python3-smbus python3-pyaudio python3-pexpect python3-pydub python3-kivy
-
+apt-get -y install python3-setproctitle python3-cffi python3-dbus python3-pydbus python3-scipy python3-numpy python3-sympy python3-smbus python3-pyaudio python3-pexpect python3-pydub 
 #All the different FSes that you might want to have
 apt-get -y install btrfs-progs nilfs-tools f2fs-tools xfsprogs exfat-utils btrfsmaintenance
 
 
+#These are Kivy dependancies
+apt-get -y install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
+   pkg-config libgl1-mesa-dev libgles2-mesa-dev \
+   python3-setuptools libgstreamer1.0-dev git-core \
+   gstreamer1.0-plugins-{bad,base,good,ugly} \
+   gstreamer1.0-{omx,alsa} python3-dev libmtdev-dev \
+   xclip xsel libjpeg-dev
+
+
+#This isn't working, so it will have to wait.
+pip3 install kivy
 
 #This language is included because of it's excellent dynamic imports in python
 #Elixir is included because it seems to be the one most practical functional type things
@@ -199,6 +282,7 @@ pip3 install 	https://dl.google.com/coral/python/tflite_runtime-2.1.0.post1-cp37
 pip3 install baresipy
 pip3 install yappi
 pip3 install automationhat
+pip3 install btdht
 
 pip3 install cherrypy
 pip3 install adafruit-blinka
@@ -211,6 +295,10 @@ pip3 install enum-compat
 pip3 install pynput
 pip3 install simpleaudio
 pip3 install yeelight
+pip3 install upnpclient
+pip3 install sqlite3worker
+pip3 install deepspeech
+
 
 sudo apt-get -y install python3-smbus python3-msgpack python3-paho-mqtt python3-gevent python3-falcon python3-mako python3-typeguard python3-paramiko
 
@@ -291,7 +379,8 @@ EOF
 apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,pgsql,zip,xml,gd,sqlite3,json}
 apt-get install libapache2-mod-php -y
 
-
+#Needed for .htaccess
+! a2enmod rewrite
 #All the compilerie you might want
 apt-get -y install python3-dev build-essential gcc g++ cmake make libtool m4 autoconf
 
@@ -305,10 +394,22 @@ apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3
 
 
 #Audio handling
-apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid  jack-tools jack-stdio
-apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly zynaddsubfx qsynth vmpk autotalent x42-plugins
-apt-get -y install -y fluidsynth pulseaudio-module-jack pulseaudio-module-bluetooth pulseaudio-module-zeroconf pulsemixer bluealsa 
+apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid  jack-tools jack-stdio libgstreamer1.0-dev gstreamer1.0-libav
+apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly zynaddsubfx vmpk autotalent x42-plugins
+#Pulse bluetooth is already set up
+apt-get -y install -y pulseaudio-module-jack pulseaudio-module-zeroconf pulsemixer 
 apt-get -y install jaaa qjackctl ffmpeg
+
+
+sudo apt-get install build-essential autoconf automake libtool pkg-config
+
+#Save over 100MB by using the Sketch folder instead
+apt-get -y install fluidsynth  --no-install-recommends
+apt-get -y install qsynth  --no-install-recommends
+
+mkdir -p /usr/share/soundfonts/
+#Use the soundfont that will be in the sketch folder
+ln -s /var/public.files/emberos/SoundFonts/MuseScore_General.sf3 /usr/share/soundfonts/default.sf3
 
 systemctl disable bluealsa
 
@@ -334,9 +435,10 @@ sudo systemctl disable mumble-server.service
 
 apt-get -y install npm
 npm install -g --unsafe-perm node-red
-npm install -g lodash react chalk request commander moment debug vue webpack inquirer rxjs axios prop-types uuid core-js cheerio ws sass-loader redis
 
-npm install -g --unsafe-perm fs-extra shelljs
+#TODO: these extremely common node libs should probably be there but this line fails
+#npm install -g lodash react chalk request commander moment debug vue webpack inquirer rxjs axios prop-types uuid core-js cheerio ws sass-loader redis
+#npm install -g --unsafe-perm fs-extra shelljs
 
 #Coding font
 apt-get -y install -y fonts-hack

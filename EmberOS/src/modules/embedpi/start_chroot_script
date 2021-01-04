@@ -14,6 +14,17 @@ source /common.sh
 install_cleanup_trap
 
 
+
+
+#Eliminate the apt-daily updates that can't work anyway on read only roots,
+#And were the suspected cause of periodic crashes in real deployments
+sudo systemctl mask apt-daily-upgrade
+sudo systemctl mask apt-daily
+sudo systemctl disable apt-daily-upgrade.timer
+sudo systemctl disable apt-daily.timer
+
+
+
 ! sudo usermod -a -G dialout pi
 ! sudo usermod -a -G serial pi
 ! sudo usermod -a -G pulse-access pi
@@ -31,6 +42,8 @@ apt update
 #Enable initramfs which also gives the rescue shell, but mainly we need it to allow BTRFS
 sudo apt-get -y install initramfs-tools btrfs-tools
 
+#Get new kernel
+sudo apt-get -y install raspberrypi-bootloader raspberrypi-kernel
 
 # Do these need to be added too???
 # zstd_decompress
@@ -39,6 +52,8 @@ sudo apt-get -y install initramfs-tools btrfs-tools
 # lzo_compress
 # zlib_deflate
 # sha256_generic
+
+
 
 
 cat << EOF > /etc/initramfs-tools/modules
@@ -263,10 +278,6 @@ cat << EOF > /sketch/public.www/index.html
 <a href="/webmap/leaflet_demo.html">World Maps</a>
 
 
-<h3>Utility</h3>
-<p>Note: Don't trust this cert unless you are accessing it via a safe network</p>
-<a href="/emberCA.pem">Security certificate for this node</a>
-
 EOF
 
 ln -s /var/public.files /sketch/public.www/public_files
@@ -285,6 +296,9 @@ cat << 'EOF' > /usr/bin/manage_sketch_folder.sh
 set -e
 
 mkdir -p /sketch/config
+
+dbus-uuidgen --ensure=/sketch/config/machine-id
+
 
 mkdir -p /dev/shm/roothome
 mkdir -p /dev/shm/roothome_work
@@ -401,7 +415,6 @@ EOF
 
 chmod 744 /usr/bin/manage_sketch_folder.sh
 
-ln -s /etc/sketchconfig/emberCA.pem /sketch/public.www/emberCA.pem
 
 cat << EOF > /etc/systemd/system/manage_sketch_folder.service
 [Unit]
@@ -425,6 +438,8 @@ chmod 744 /etc/systemd/system/manage_sketch_folder.service
 systemctl enable /etc/systemd/system/manage_sketch_folder.service
 
 
+! rm /etc/machine-id
+ln -s /sketch/config/machine-id /etc/machine-id
 
 
 
@@ -480,6 +495,41 @@ cat << EOF > /sketch/config/filesystem/emberos_bluetooth.yaml
         var.lib.bluetooth: /var/lib/bluetooth
 EOF
 
+
+#This allows builtin webapps
+cat << EOF > /sketch/config/filesystem/emberos-chromiumpolicy.yaml
+/sketch/config/chromium/:
+    bindat: /etc/chromium
+    user: root
+    mode: '0755'
+EOF
+
+mkdir -p /etc/chromium/
+mkdir -p /sketch/config/chromium/policies
+mkdir -p /sketch/config/chromium/policies/managed
+mkdir -p /sketch/config/chromium/policies/recommended
+
+# override-insecure-http.local bypasses restrictions on insecure origins.  The intended use case is
+# to enable local RTC signalling.  If an attacker can trick you into going to a bad site on this domain,
+# they have already won and could just trick you into going to their site.  If incompetent people use this
+# for bad things, and they're on your lan.. you've already lost.  And it is fairly obviously a shady looking url.
+cat << EOF > /sketch/config/chromium/policies/recommended/emberos-policy.json
+{
+  "AudioCaptureAllowedUrls": ["http://localhost","http://localhost:8002"],
+  "VideoCaptureAllowedUrls": ["http://localhost","http://localhost:8002"],
+  "VideoCaptureAllowedUrls": ["http://localhost","http://localhost:8002"],
+  "AutoplayWhitelist":       ["http://localhost","http://localhost:8002", "http://localhost:1880", "http://*.local"],
+  "OverrideSecurityRestrictionsOnInsecureOrigin": ["*.override-insecure-http.local","override-insecure-http.local"]
+
+}
+EOF
+
+# ! rm /var/lib/systemd/timers
+
+# mkdir -p  /sketch/cache/systemd.timers
+# mkdir -p  /var/lib/systemd/
+
+# ln -s /sketch/cache/systemd.timers /var/lib/systemd/timers
 
 cat << EOF > /sketch/config/filesystem/emberos_sshconf.yaml
 /sketch/ssh/etc.ssh:
@@ -623,8 +673,13 @@ mk_pi_persist_dir  .goldendict
 mk_pi_persist_dir  .stellarium
 mk_pi_persist_dir  .pychess
 
+#Reserved for future use
+mk_pi_persist_dir  .drayerdb
+
 mk_pi_persist_dir .local/share/marble
 mk_pi_persist_dir .local/share/Zeal
+mk_pi_persist_dir .local/share/mime
+#mk_pi_persist_dir .local/share/systemd/timers
 
 mkdir -p /sketch/home/pi/.local/share/Zeal
 
@@ -648,7 +703,7 @@ mk_pi_persist_dir .config/spacefm
 mk_pi_persist_dir .wiki_indexes
 
 #Youtube client
-mk_pi_persist_dir tartube_data
+mk_pi_persist_dir tartube-data
 
 mk_pi_persist_dir  .fonts
 mk_pi_persist_dir  .home_template
@@ -666,7 +721,7 @@ mk_pi_persist_dir  .syncthing
 mk_pi_persist_dir  .nano
 mk_pi_persist_dir  .syncthing-gtk
 mk_pi_persist_dir  .arduino15
-
+mk_pi_persist_dir  .config/voice2json
 
 cat << EOF > /usr/bin/save-chrome-state
 #!/bin/bash
@@ -850,6 +905,9 @@ apt-get -y install apache2
 
 #Enable .htaccess
 cp /filesystem/apache2.conf /etc/apache2/apache2.conf
+mkdir -p /etc/apache2/sites-available/
+cp /filesystem/apache-0-defaults /etc/apache2/sites-available/000-default.conf
+
 
 #Give www-data a "window into the root filesystem"
 cat << EOF > /sketch/config/filesystem/emberos-www.yaml

@@ -1,6 +1,6 @@
 ![EmberOS](img/logo.webp)
 
-This is a customPiOs tool for setting up a pi image suitable for consumer-grade embedded use. 
+This is a customPiOs distro for setting up a pi image suitable for consumer-grade embedded use, based on heaviliy modified Raspi OS.
 
 It has a variety of preinstalled applications and can be configured almost entirely via a special windows-accessible /sketch partition.
 
@@ -13,14 +13,18 @@ It would be possible to remove some things and shrink it, but I don't suggest th
 a 16GB card will make wear leveling more effective and give your app room to expand.
 
 As a notable feature, the entire sketch partition is a Git repository, so you will
-be able to track changes to the system(A sane .gitignore is included).
+be able to track changes to the system(A sane .gitignore is included).  There is also the included pullBack script
+to automatically take a backup from a remote system onto your Linux PC.
 
 
-As another notable feature, the root filesystem uses BTRFS(Since the July 12 build), which allows us to compress things. BTRFS has a very high write amplification,
-so I don't suggest using it on SD cards in non-mostly-readonly configurations, however it should not be a problem for this.
+As another notable feature, the root filesystem uses BTRFS(Since the July 12 build), which allows us to compress things.
 
 
-*Important: If you ever update the kernel, you have to run* `mkinitramfs -o /boot/initramfs-emberos.gz`
+It is not really recommended that you use tools like dist-upgrade to move between releases.  Although it is based on standard Raspi OS,
+the sketch partition feature makes it much easier toi fresh reinstall, and copy over all sketch partition contents,
+
+*Important: If you ever update the kernel on very old versions, you have to run* `mkinitramfs -o /boot/initramfs-emberos.gz`
+*Also Important: There are no auto-updates, as they can cause stability issues, some applicatins may need to set that up.
 
 See [Here](EmberOS/src/modules/embedpi/filesystem/sketch/public.files/emberos/ember-doc/README.md) for info on how to do common stuff.
 
@@ -110,6 +114,9 @@ Put a fresh zipped raspbian full image in the src/images dir
 
 Run sudo ./build_dist in the src dir. This may take over an hour, and 
 you need internet access the whole time.
+
+You will need to put the proper deb package at filesystem/debs/voice2json_2.0_armhf.deb in the youmightneedit module.
+Get it here: http://voice2json.org/install.html
 
 
 Unpack latest Included Data torrent's sketch folder over to src/sketch_included_data/sketch.

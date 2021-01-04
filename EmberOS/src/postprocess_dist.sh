@@ -24,9 +24,9 @@ mount ${ORIGINAL_LOOP}p2 workspace/original_root/
 #We should be able to get a
 parted --script ${POSTPROCESS_LOOP} \
     mklabel msdos \
-    mkpart primary fat32 4MiB 256MiB \
-    mkpart primary btrfs 256MiB 5300MiB \
-    mkpart primary NTFS 5300MiB 7050MiB \
+    mkpart primary fat32 4MiB 192MiB \
+    mkpart primary btrfs 192MiB 5200MiB \
+    mkpart primary NTFS 5200MiB 7048MiB \
     set 1 boot on
     set 2 boot on
     set 1 lba on
@@ -69,13 +69,15 @@ rsync -a -f"+ */" -f"- *" workspace/original_root/ workspace/postprocess_root/
 
 
 
-
 #Copy all files from root, compressing as we go if we were using a compression friendly FS
 rsync -az --exclude='sketch/*' --exclude='/tmp/*' --exclude='/var/tmp/*' workspace/original_root/ workspace/postprocess_root/
 
 #Change the fstab to look for a btrfs, and to enable compression on everything.
 sed -i '/mmcblk0p2/c\\/dev\/mmcblk0p2  \/               btrfs    defaults,noatime,ro,compress-force=zstd  0       1' workspace/postprocess_root/etc/fstab
 
+#Use BTRFS deduplication to save a bit of space
+rmlint -T df --config=sh:handler=clone workspace/postprocess_boot/cmdline.txt
+./rmlint.sh  
 
 #Copy the sketch stuff
 rsync -az workspace/original_root/sketch/ workspace/postprocess_sketch/

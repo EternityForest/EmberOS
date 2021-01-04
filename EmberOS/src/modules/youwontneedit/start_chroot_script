@@ -1,8 +1,13 @@
 #!/bin/bash
-! apt purge -y ^wolfram-engine$ ^sonic-pi-samples$ ^midori$ ^netsurf-gtk$
+! apt purge -y wolfram-engine wolframscript thonny
+! apt purge -y sonic-pi-samples
 
 #Everyhting aside from scratch3 official can go
-! apt purge -y ^nuscratch$  ^scratch2$ ^scratch$  ^minecraft-pi$ ^python-minecraftpi$
+! apt purge -y nuscratch
+! apt purge -y scratch2
+! apt purge -y scratch
+! apt purge -y minecraft-pi
+! apt purge -y python-minecraftpi
 
 ! apt purge -y ^dillo$  ^idle3$  ^smartsim$ ^sonic-pi$  ^epiphany-browser$  ^python-minecraftpi$ ^bluej$ 
 ! apt purge -y ^greenfoot$  ^greenfoot-unbundled$  ^claws-mail$ ^claws-mail-i18n$

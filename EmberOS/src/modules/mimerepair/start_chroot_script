@@ -6,4 +6,5 @@ set -e
 source /common.sh
 
 unpack /filesystem/mime/ /usr/share/mime/
+sudo update-mime-database /usr/share/mime
 chmod -R 755 /usr/share/mime

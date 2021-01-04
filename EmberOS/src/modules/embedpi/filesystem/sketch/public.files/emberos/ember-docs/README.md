@@ -26,6 +26,11 @@ to persistant storage.
 
 You can also make ~/.config/chromium a symlink to a folder in persist, but that may wear out the SD card eventually.
 
+## Media Streaming
+
+All you need to do to enable using the Pi as a UPnP renderer is enable gmediarender in the autostart/99-defaults config file.  It will advertise itself
+with whatever hostname you have selected.
+
 ## Making a backup
 
 To pull everything on a remote EmberOS machine's sketch folder(Aside from things that are listed in the /sketch/.gitignore file),
@@ -48,8 +53,10 @@ onto a username to share it. Text length is limited, but it is a very easy and
 reliable choice.
 
 #### Jami 
-Provides decentralized chat, video, and file sharing, but no group chat. Android
+Provides decentralized chat, video, and file sharing. Recently, many features including group chat have been added. Android
 is well supported. It is already configured for persistant storage.
+
+Try this one!
 
 #### Retroshare 
 

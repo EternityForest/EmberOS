@@ -44,6 +44,8 @@ share/emberos/**
 share/ember-doc/**
 config/apache2/mods-available
 
+# We probably don't want to be syncing every
+home/pi/tartube-data/**
 
 # Standard apache2 stuff. I wish there was a better way to do this.
 # But everything has to be in this file so we can rsync it.
