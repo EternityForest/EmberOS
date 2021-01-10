@@ -84,3 +84,22 @@ config/filesystem/emberos*
 
 #This is there so rsync doesn't try an sync it
 .git
+
+
+#It is rather unfortunate that voice2json mixes up their 
+home/pi/.config/voice2json/acoustic_model/**
+home/pi/.config/voice2json/base_dictionary.txt.gz
+home/pi/.config/voice2json/base_language_model.txt.gz
+home/pi/.config/voice2json/clean.sh  
+home/pi/.config/voice2json/espeak_phonemes.txt
+home/pi/.config/voice2json/frequent_words.txt
+home/pi/.config/voice2json/g2p.fst.gz
+home/pi/.config/voice2json/ipa_phonemes.txt
+home/pi/.config/voice2json/LICENSE
+home/pi/.config/voice2json/marytts/**
+home/pi/.config/voice2json/marytts_phonemes.txt
+home/pi/.config/voice2json/phoneme_examples.txt
+home/pi/.config/voice2json/README
+home/pi/.config/voice2json/SOURCE
+home/pi/.config/voice2json/stop_words.txt
+home/pi/.config/voice2json/test/**

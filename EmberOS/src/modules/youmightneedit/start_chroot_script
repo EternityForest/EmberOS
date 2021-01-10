@@ -5,6 +5,9 @@ set -x
 set -e
 
 
+apt-get -y install npm
+npm install -g --unsafe-perm dat 
+npm install -g --unsafe-perm node-red
 
 #I don't think this makes a difference, we provide our own samba conf
 echo "samba-common samba-common/dhcp boolean true" | sudo debconf-set-selections
@@ -69,6 +72,8 @@ cd /opt/gmrender-resurrect
 make
 make install
 
+pip3 install hardline
+
 cat << EOF > /usr/bin/ember-launch-gmrender
 UPNP_UUID=`ip link show | awk '/ether/ {print "salt:)-" $2}' | head -1 | md5sum | awk '{print $1}'`
 gmrender -f "$(cat /etc/hostname)" -u "$UPNP_UUID"
@@ -82,7 +87,7 @@ RequiresMountsFor=/etc/ /sketch/ /home/
 
 [Service]
 Type=simple
-ExecStart=gmrender.service
+ExecStart=gmrender
 User=pi
 WorkingDirectory=~
 
@@ -91,6 +96,33 @@ WantedBy=sysinit.target
 EOF
 
 
+cat << EOF > /etc/systemd/system/hardlinep2p.service
+[Unit]
+Description=HardlineP2P allows accessing and service self-hosted resources without manual DNS or cert setup.
+After=systemd-remount-fs.service network-online.target
+RequiresMountsFor=/etc/ /sketch/ /home/
+
+[Service]
+Type=simple
+ExecStart=hardlined
+Restart=on-failure
+RestartSec=5s
+
+
+[Install]
+WantedBy=sysinit.target
+EOF
+
+mkdir -p /sketch/config/hardline.services/
+mkdir -p /etc/hardline/services/
+
+cat << EOF > /sketch/config/filesystem/emberos_hardline.yaml
+/sketch/config/hardline.services/:
+    mode: '0770'
+    user: root
+    group: root
+    bindat: /etc/hardline/services
+EOF
 
 apt-get -y install gnuradio gnuradio-dev rtl-sdr gr-osmosdr gr-limesdr gr-dab gr-rds gr-air-modes
 
@@ -433,8 +465,7 @@ sudo systemctl disable mumble-server.service
 
 
 
-apt-get -y install npm
-npm install -g --unsafe-perm node-red
+
 
 #TODO: these extremely common node libs should probably be there but this line fails
 #npm install -g lodash react chalk request commander moment debug vue webpack inquirer rxjs axios prop-types uuid core-js cheerio ws sass-loader redis
@@ -449,7 +480,7 @@ apt-get -y install -y fonts-hack
 
 sudo apt-get -y install python3-opencv libhdf5-dev libhdf5-serial-dev libatlas-base-dev libjasper-dev libqtgui4 libqt4-test
 
-apt-get -y install spacefm fslint pulseview chkservice matchbox-keyboard
+apt-get -y install nemo fslint pulseview chkservice matchbox-keyboard
 
 #apt-get -y install -y krita
 

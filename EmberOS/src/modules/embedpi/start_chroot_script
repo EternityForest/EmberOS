@@ -36,14 +36,19 @@ sudo systemctl disable apt-daily.timer
 echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99-force-ipv4
 
 apt update -y --allow-releaseinfo-change
-apt update
+
+#This is entirely to trick openjre, which doesn't actually need /proc I don't think, but has an old test that fails without it.
+mkdir -p /proc
+mount -t tmpfs -o size=10M tmpfs /proc
+
+apt-get -y full-upgrade
 
 
 #Enable initramfs which also gives the rescue shell, but mainly we need it to allow BTRFS
 sudo apt-get -y install initramfs-tools btrfs-tools
 
 #Get new kernel
-sudo apt-get -y install raspberrypi-bootloader raspberrypi-kernel
+sudo apt-get -y install raspberrypi-bootloader raspberrypi-kernel rpi-eeprom
 
 # Do these need to be added too???
 # zstd_decompress
@@ -283,8 +288,65 @@ EOF
 ln -s /var/public.files /sketch/public.www/public_files
 ln -s /var/public.media /sketch/public.www/public_media
 
+
+
+
+mkdir -p /sketch/runonce
+
+cat << 'EOF' > /sketch/runonce/README.md
+## RunOnce
+
+Files ending with .sh or in this folder will be ran and then deleted when the system boots.  They will run after filesystems have loaded.
+They will must have the proper shebang line.
+EOF
 #Generate an RSA key whenever it does not exist, if we can
 #Then move whatever kets we find into the SSH ramdisk.
+
+
+cat << 'EOF' > /bin/ember-do-runonce.py
+#/usr/bin/python3
+
+import os
+import subprocess
+import traceback
+
+d ="/sketch/runonce/"
+for i in list(os.listdir(d)):
+    print("running: "+i)
+    if i.endswith(".sh"):
+        try:
+            subprocess.call([os.path.join(d,i)])
+            os.remove(os.path.join(d,i))
+        except:
+            print(traceback.format_exc())
+EOF
+
+chmod 755 /bin/ember-do-runonce.py
+
+cat << EOF > /etc/systemd/system/ember-do-runonce.service
+[Unit]
+Description=Manage things from sketch folder
+After=systemd-remount-fs.service time-sync.target network-online.target sysinit.target
+RequiresMountsFor=/etc/ /sketch/ /home/
+
+[Service]
+Type=oneshot
+ExecStart=/bin/ember-do-runonce.py
+
+[Install]
+WantedBy=sysinit.target
+
+EOF
+systemctl enable ember-do-runonce.service
+
+
+#At first boot we need to run this updater.
+cat << 'EOF' > /sketch/runonce/update-eeprom.sh
+#/bin/bash
+rpi-eeprom-update -a
+EOF
+
+
 
 cat << 'EOF' > /usr/bin/manage_sketch_folder.sh
 #!/bin/bash
@@ -585,15 +647,8 @@ mkdir -p /home/pi/public.media
 
 
 # We are going to share our cached marble maps tiles with the world
-mkdir -p /home/pi/public.files/marblemaps
-cat << EOF > /home/pi/public.files/marblemaps_readme.md
-The marblemaps folder is a bind mount controlled by the emberos-public-maptiles.yaml folder.  It is just a public view of
-/sketch/home/pi/.local/share/marble/maps.
-
-Note that this could be a privacy concern for some, as your cached map tiles are made public, letting others know where you were browsing.
-To stop this binding, delete /sketch/config/filesystem/emberos-public-maptiles.yaml
-
-EOF
+# Bit of a privacy issue as it reveals where you have been looking
+mkdir -p /var/www/html/marblemaps
 
 
 
@@ -676,6 +731,11 @@ mk_pi_persist_dir  .pychess
 #Reserved for future use
 mk_pi_persist_dir  .drayerdb
 
+
+
+#Used to cache information about visited peers
+mk_pi_persist_dir  .hardlinep2p
+
 mk_pi_persist_dir .local/share/marble
 mk_pi_persist_dir .local/share/Zeal
 mk_pi_persist_dir .local/share/mime
@@ -722,6 +782,8 @@ mk_pi_persist_dir  .nano
 mk_pi_persist_dir  .syncthing-gtk
 mk_pi_persist_dir  .arduino15
 mk_pi_persist_dir  .config/voice2json
+mk_pi_persist_dir  .config/backintime
+mk_pi_persist_dir  .config/filezilla
 
 cat << EOF > /usr/bin/save-chrome-state
 #!/bin/bash

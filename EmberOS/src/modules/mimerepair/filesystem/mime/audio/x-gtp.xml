@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="audio/x-gtp">
-  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
-  <comment>GuitarPro file</comment>
-  <glob pattern="*.gtp"/>
-  <glob pattern="*.gp3"/>
-  <glob pattern="*.gp4"/>
-  <glob pattern="*.gp5"/>
-</mime-type>

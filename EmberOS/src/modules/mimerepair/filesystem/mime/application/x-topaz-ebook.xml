@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-topaz-ebook">
-  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
-  <comment>Amazon Topaz ebook format</comment>
-  <glob pattern="*.tpz"/>
-  <glob pattern="*.azw1"/>
-</mime-type>

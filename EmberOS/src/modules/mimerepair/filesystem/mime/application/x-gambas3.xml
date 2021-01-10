@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-gambas3">
-  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
-  <sub-class-of type="application/x-executable"/>
-  <comment>Gambas 3 executable</comment>
-  <comment xml:lang="fr">Exécutable Gambas 3</comment>
-  <glob pattern="*.gambas"/>
-</mime-type>

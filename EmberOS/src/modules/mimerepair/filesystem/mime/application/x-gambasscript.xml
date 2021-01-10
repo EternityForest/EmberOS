@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-gambasscript">
-  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
-  <sub-class-of type="application/x-executable"/>
-  <sub-class-of type="text/plain"/>
-  <comment>Gambas script</comment>
-  <comment xml:lang="fr">Script Gambas</comment>
-  <glob pattern="*.g"/>
-</mime-type>

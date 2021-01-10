@@ -8,7 +8,7 @@ echo "postprocessing `ls -t workspace/*.img | head -1`"
 
 ORIGINAL_LOOP=$(losetup -P -r --find --show `ls -t workspace/*.img | head -1`)
 
-dd if=/dev/zero bs=1M count=7054 >> workspace/emberos_postprocessed.img
+dd if=/dev/zero bs=1M count=7412 >> workspace/emberos_postprocessed.img
 
 POSTPROCESS_LOOP=`losetup -P --find --show workspace/emberos_postprocessed.img`
 
@@ -26,7 +26,7 @@ parted --script ${POSTPROCESS_LOOP} \
     mklabel msdos \
     mkpart primary fat32 4MiB 192MiB \
     mkpart primary btrfs 192MiB 5200MiB \
-    mkpart primary NTFS 5200MiB 7048MiB \
+    mkpart primary NTFS 5200MiB 7400MiB \
     set 1 boot on
     set 2 boot on
     set 1 lba on
@@ -62,56 +62,34 @@ sed -i 's/fsck.repair=yes/fsck.repair=no/g' workspace/postprocess_boot/cmdline.t
 mount -o compress-force=zlib:9 ${POSTPROCESS_LOOP}p2 workspace/postprocess_root/
 mount -t ntfs-3g -o compression ${POSTPROCESS_LOOP}p3 workspace/postprocess_sketch/
 
-
-
-#Copy over empty directory structure first, we used to set chattrs for compression but we don't need to with btrfs
-rsync -a -f"+ */" -f"- *" workspace/original_root/ workspace/postprocess_root/
-
-
+#Set compression attrs, on everything.  This will cause all new dubdirs to be recursively marked for compression.
+#Must happen before we put anything in
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/
 
 #Copy all files from root, compressing as we go if we were using a compression friendly FS
 rsync -az --exclude='sketch/*' --exclude='/tmp/*' --exclude='/var/tmp/*' workspace/original_root/ workspace/postprocess_root/
+
 
 #Change the fstab to look for a btrfs, and to enable compression on everything.
 sed -i '/mmcblk0p2/c\\/dev\/mmcblk0p2  \/               btrfs    defaults,noatime,ro,compress-force=zstd  0       1' workspace/postprocess_root/etc/fstab
 
 #Use BTRFS deduplication to save a bit of space
-rmlint -T df --config=sh:handler=clone workspace/postprocess_boot/cmdline.txt
-./rmlint.sh  
+jdupes --recurse --dedupe --size workspace/postprocess_root/
+  
 
-#Copy the sketch stuff
+
+
+#Copy the sketch stuff from the master image
 rsync -az workspace/original_root/sketch/ workspace/postprocess_sketch/
 
-#NTFS supports compression too, we will use it on some of the PDFs. In theory this skips all files and only gets dirs so we
-rsync -a -f"+ */" -f"- *" sketch_included_data/sketch/ workspace/postprocess_sketch/
-
-#Set compression attrs
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/articles/
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/articles/**
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/clipart/
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/clipart/**
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/textbooks/
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/textbooks/**
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/manuals/
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/books/
-
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/icons/
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/icons/**
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/home/pi/.local/share/Zeal/**
-
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.media/emberos/Music/
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.media/emberos/Music/**
-
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.media/emberos/sounds/
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.media/emberos/sounds/**
-
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/fonts/
-setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files/emberos/fonts/**
+#Delete and /sketch in root since that is just a mountpoint now
+! rm -rf workspace/postprocess_root/sketch
+mkdir -p workspace/postprocess_root/sketch
 
 
-#Now transfer the actual files over
-#Note I, to force overwrite so we can compress, if For some reason the only copy dirs thing isn't working.
-rsync -az -I sketch_included_data/sketch/ workspace/postprocess_sketch/
+
+#Now transfer the actual files over, into the dirs marked for compression
+rsync -az sketch_included_data/sketch/ workspace/postprocess_sketch/
 rsync -az sketch_included_data/root.opt/ workspace/postprocess_root/opt/
 
 #Make it not a submodule

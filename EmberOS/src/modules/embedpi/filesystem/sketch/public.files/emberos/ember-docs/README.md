@@ -21,8 +21,9 @@ You can also go to the command line and use "nmtui" to connect.
 ## Chrome bookmarks
 
 Chromium runs entirely in a RAM based folder, bookmarks are not persistant. This is because chrome
-has a habit of heavy writes to disk. However you can manually call save-chrominum-state to copy this
-to persistant storage.
+has a habit of heavy writes to disk, and EmberOS is designed for always-on kios style use.
+
+However you can manually call save-chrominum-state to copy this to persistant storage.
 
 You can also make ~/.config/chromium a symlink to a folder in persist, but that may wear out the SD card eventually.
 
@@ -39,12 +40,61 @@ use the tools/pullBack.sh script, and modify the hostname and password as needed
 Note that only the root .gitignore works for this, which is why the file comes preloaded with so many
 entries.
 
+
+
+## Making a server you can access from the internet
+
+EmberOS includes HardlineP2P.  Put a file named WhateverName.ini in /sketch/config/hardline.services/, with content like:
+https://github.com/EternityForest/hardlinep2p
+
+```
+[Service]
+#The service you want to expose
+service=localhost
+port=80
+
+#Use absolute paths for non-example applications. 
+#The service file, and all it's associated files like the hash get created on-demand.
+#Look in myservice.cert.hash to find the hash ID for the URL.
+certfile=myservice.cert
+
+[Info]
+title="My Awesome Service"
+```
+
+Then (re)boot up, and visit  `hfhfdysvtziz6-e868423731872b8235a0adc9102bb45bb9e8321e.localhost:7009`(replace `hfhfdysvtziz6-e868423731872b8235a0adc9102bb45bb9e8321e` with your cert.hash file contents),
+on any device with the HardlineP2P app enabled, including another EmberOS computer.  You may need to open port 7008 on your router, if it is missing UPnP, but you should see that service,
+even offline.
+
+Autostart/99-defaults.ini can be used to disable/enable hardline if needed.
+
+Note that enabling any services will probably use 300MB-1GB per month of data due to OpenDHT being used, but a public DHT proxy is used if you're just accessing services.
+
+Services still work on the LAN, even if you have no network access, and the technology does not use the blockchain.
+
+### Android Apps
+
+Look for HardlineP2P in the play store!
+
+While installling apps from untrusted sources is considered a bad plan, the Hardlinep2p APKs are included in the sketch public data, in case you should find yourself without acccess to the play store,
+and needing to configure a device.
+
+
+
+
 ## Offline Comms
 
 A primary goal for EmberOS, although it is meant mostly as an embedded OS for "large" devices, is that in a pinch, if it is all you've got, you should be able
 to cobble together whatever you need.
 
 To that end, an unusually high number of communication options are included.
+
+#### Mesh Networking
+
+Yggdrasil is included, but not enabled by default.  You will need to add a few public peers to the configuration, or just let it autodiscover peers on the LAN.
+
+The firewalld config blocks most incoming connections, including SSH, so you will need to change that.
+
 
 #### Kouchat 
 
@@ -79,6 +129,16 @@ is included with some distros, and also provides many other chat services includ
 #### Deluge
 
 For sharing larger files, you will probably get better results just making a torrent, and sending the torrent file through Kouchat.
+
+#### Dat
+
+For sharing collections of files that can change over time, unlike fixed release torrents, we include Dat: https://docs.dat.foundation/
+Dat requires some very basic command line use, but is near-ideal for publishing files, and for keeping things in sync with public files.
+
+#### SyncThing
+
+For 2-way sync between multiple machines, like keeping a music collection on a Kodi box in sync with a PC, there is SyncThing.
+
 
 ### The Home Dir and normal desktop use
 
@@ -344,5 +404,5 @@ Almost nothing ever writes to sketch randomly by itself, so it sould not cause d
 
 ## Updating Kaithem
 The whole install as found in the repo is in /sketch/opt/kaithem.  Just
-copy the entire contents of the repo there.
+copy the entire contents of the repo there, or do a git pull --rebase right in that folder.
 

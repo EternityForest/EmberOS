@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-apple-packetlogger">
-  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
-  <comment>Packet Capture (macOS PacketLogger)</comment>
-  <generic-icon name="application-wireshark-doc"/>
-  <glob pattern="*.pklg"/>
-  <glob pattern="*.pklg.gz"/>
-</mime-type>

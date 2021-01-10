@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-gambasserverpage">
-  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
-  <sub-class-of type="application/x-executable"/>
-  <sub-class-of type="text/plain"/>
-  <comment>Gambas server page</comment>
-  <comment xml:lang="fr">Page serveur Gambas</comment>
-</mime-type>

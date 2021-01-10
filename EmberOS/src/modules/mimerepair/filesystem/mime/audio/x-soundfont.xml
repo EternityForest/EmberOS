@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="audio/x-soundfont">
-  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
-  <glob pattern="*.sf2"/>
-  <glob pattern="*.sfz"/>
-  <glob pattern="*.sf3"/>
-  <comment>SoundFont archive sfArk</comment>
-  <glob pattern="*.sfArk"/>
-</mime-type>

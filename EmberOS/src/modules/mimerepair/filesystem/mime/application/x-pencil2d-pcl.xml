@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-pencil2d-pcl">
-  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
-  <comment>Pencil2D Animation File</comment>
-  <comment xml:lang="de">Pencil2D-Animationsdatei</comment>
-  <glob pattern="*.pcl"/>
-</mime-type>
