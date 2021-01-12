@@ -304,7 +304,7 @@ EOF
 
 
 cat << 'EOF' > /bin/ember-do-runonce.py
-#/usr/bin/python3
+#!/usr/bin/python3
 
 import os
 import subprocess
@@ -648,7 +648,10 @@ mkdir -p /home/pi/public.media
 
 # We are going to share our cached marble maps tiles with the world
 # Bit of a privacy issue as it reveals where you have been looking
-mkdir -p /var/www/html/marblemaps
+mkdir -p /sketch/public.www/marblemaps
+cat << EOF > /sketch/public.www/marblemaps/README.md
+Don't put things here, it is just used as a mountpoint.
+EOF
 
 
 
