@@ -34,7 +34,7 @@ echo "wireshark-common wireshark-common/install-setuid boolean false" | sudo deb
 
 if [ -z "$EMBER_MICRO" ]
 then
-apt-get -y install -y wireshark
+apt-get -y install wireshark
 fi
 
 # Currently broken, doesn't want to build
@@ -211,7 +211,7 @@ sudo apt-get update
 
 if [ -z "$EMBER_MICRO" ]
 then
-sudo apt-get install syncthing-gtk retroshare -y
+sudo apt-get -y install syncthing-gtk retroshare 
 fi
 
 mkdir -p /sketch/home/pi/.syncthing
@@ -258,7 +258,7 @@ apt-get -y install fldigi flrig flmsg flamp chirp librtlsdr0
 
 if [ -z "$EMBER_MICRO" ]
 then
-apt-get -y cubicsdr xastir antennavis
+apt-get install -y cubicsdr xastir antennavis
 fi
 
 if [ -z "$EMBER_MICRO" ]
@@ -269,7 +269,7 @@ fi
 
 if [ -z "$EMBER_MICRO" ]
 then
-apt-get -y wxhexeditor d-feet
+apt-get install -y wxhexeditor d-feet
 fi
 
 # GUI Utils
