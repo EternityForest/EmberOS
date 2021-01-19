@@ -8,7 +8,7 @@ echo "postprocessing `ls -t workspace/*.img | head -1`"
 
 ORIGINAL_LOOP=$(losetup -P -r --find --show `ls -t workspace/*.img | head -1`)
 
-dd if=/dev/zero bs=1M count=7412 >> workspace/emberos_postprocessed.img
+dd if=/dev/zero bs=1M count=9212 >> workspace/emberos_postprocessed.img
 
 POSTPROCESS_LOOP=`losetup -P --find --show workspace/emberos_postprocessed.img`
 
@@ -25,8 +25,8 @@ mount ${ORIGINAL_LOOP}p2 workspace/original_root/
 parted --script ${POSTPROCESS_LOOP} \
     mklabel msdos \
     mkpart primary fat32 4MiB 192MiB \
-    mkpart primary btrfs 192MiB 5200MiB \
-    mkpart primary NTFS 5200MiB 7400MiB \
+    mkpart primary btrfs 192MiB 6400MiB \
+    mkpart primary NTFS 6400MiB 9200MiB \
     set 1 boot on
     set 2 boot on
     set 1 lba on
@@ -59,12 +59,21 @@ sed -i 's/fsck.repair=yes/fsck.repair=no/g' workspace/postprocess_boot/cmdline.t
 
 
 #Maximum zstd compression ratio
-mount -o compress-force=zlib:9 ${POSTPROCESS_LOOP}p2 workspace/postprocess_root/
+mount -o compress-force=zstd:15 ${POSTPROCESS_LOOP}p2 workspace/postprocess_root/
 mount -t ntfs-3g -o compression ${POSTPROCESS_LOOP}p3 workspace/postprocess_sketch/
 
 #Set compression attrs, on everything.  This will cause all new dubdirs to be recursively marked for compression.
 #Must happen before we put anything in
 setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/
+
+mkdir -p workspace/postprocess_sketch/public.media
+mkdir -p workspace/postprocess_sketch/public.files
+mkdir -p workspace/postprocess_sketch/public.www
+mkdir -p workspace/postprocess_sketch/home
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.media
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.files
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/public.www
+setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/home
 
 #Copy all files from root, compressing as we go if we were using a compression friendly FS
 rsync -az --exclude='sketch/*' --exclude='/tmp/*' --exclude='/var/tmp/*' workspace/original_root/ workspace/postprocess_root/

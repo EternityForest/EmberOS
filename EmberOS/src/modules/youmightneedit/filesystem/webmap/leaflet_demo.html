@@ -21,7 +21,7 @@
 
 <h2>World Map</h2>
 
-<p>Map tile pattern for embedding: '/var/www/html/marblemaps/earth/opentopomap/{z}/{x}/{y}.png'
+<p>Map tile URL pattern for embedding: '/marblemaps/earth/opentopomap/{z}/{x}/{y}.png'
 </p>
 
 <p>Maps are stored in /var/www/html/marblemaps, and made publically viewable by a bind mount.  This takes advantage of the fact that KDE marble uses a very simple on-disk format.</p>
@@ -36,7 +36,7 @@ because the info is shared.</p>
 
 	var mymap = L.map('mapid').setView([51.505, -0.09], 6);
 
-	L.tileLayer('/var/www/html/marblemaps/earth/opentopomap/{z}/{x}/{y}.png', {
+	L.tileLayer('/marblemaps/earth/opentopomap/{z}/{x}/{y}.png', {
 		maxZoom: 8,
 		attribution: 'OSM Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
 			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',

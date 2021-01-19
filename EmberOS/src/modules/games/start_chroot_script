@@ -4,7 +4,12 @@ set -x
 set -e
 
 #Games
-apt-get -y install ace-of-penguins ltris mednaffe kolourpaint scratch3 pychess brandy bwbasic
+apt-get -y install mednaffe  brandy bwbasic kolourpaint
+
+if [ -z "$EMBER_MICRO" ]
+then
+apt-get -y install scratch3 pychess ace-of-penguins ltris
+fi
 
 #It seems to have a rather odd save location
 mkdir -p /sketch/home/pi/.tuxpaint

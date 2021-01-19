@@ -7,10 +7,10 @@ It has a variety of preinstalled applications and can be configured almost entir
 Notably, everything except /sketch boots as read-only, and there is an Apache2 server and a chromium based kiosk browser enabled by default.
 
 This is a "batteries included" distro, meant to be usable in odd places when you might not
-even have internet access. As such, it includes a lot of stuff, and requires an 8GB card.
+even have internet access. As such, it includes a lot of stuff.   It is available in two versions, MAX and Micro.
 
-It would be possible to remove some things and shrink it, but I don't suggest this, as 
-a 16GB card will make wear leveling more effective and give your app room to expand.
+
+
 
 As a notable feature, the entire sketch partition is a Git repository, so you will
 be able to track changes to the system(A sane .gitignore is included).  There is also the included pullBack script
@@ -23,10 +23,21 @@ As another notable feature, the root filesystem uses BTRFS(Since the July 12 bui
 It is not really recommended that you use tools like dist-upgrade to move between releases.  Although it is based on standard Raspi OS,
 the sketch partition feature makes it much easier toi fresh reinstall, and copy over all sketch partition contents,
 
-*Important: If you ever update the kernel on very old versions, you have to run* `mkinitramfs -o /boot/initramfs-emberos.gz`
-*Also Important: There are no auto-updates, as they can cause stability issues, some applicatins may need to set that up.
+*Also Important: There are no auto-updates, as they can cause stability issues, some applications may need to set that up.
 
 See [Here](EmberOS/src/modules/embedpi/filesystem/sketch/public.files/emberos/ember-doc/README.md) for info on how to do common stuff.
+
+## MAX and Micro
+
+Micro will do 99% of what MAX will, but fits on an 8GB card, whereas MAX requires a 16GB card. The difference is that
+Micro does not include many of the larger GUI apps, nor does it include all the thousands of sound effects, music files, and other content in MAX.
+
+It still includes basically all headless functionality in MAX.
+
+If this will be a desktop-like machine, cyberdeck, Kodi box, etc, you probably want the full version.
+
+Otherwise, you may want Micro, for faster flashing, and to fit on cheaper SD cards.
+
 
 ### Goals
 
@@ -38,7 +49,7 @@ See [Here](EmberOS/src/modules/embedpi/filesystem/sketch/public.files/emberos/em
 * Convenient platform for experimenting with your setup, includes all tools for minor tweaks to just about everything without needing a desktop computer.
 * Things that require updates to keep working(Timezones, SSL, etc) are managed via /sketch for easy updates.
 * Basically anything that's more of a "device" than a computer, that needs to be reliable and doesn't store too much data.
-* Still fit on (most) 8GB SD cards with at least a few dozen MB to spare, for very simple applications
+* Still fit on 8GB SD cards
 
 ![EmberOS](img/screenshot.webp)
 
@@ -125,6 +136,13 @@ Now run the postprocess script inside src.
 
 You will find the postprocessed file in the workspace. You will then need to rename it to whatever you want, and you should
 be ready to flash!
+
+
+## Building the Micro Edition
+
+sudo ./build_dist micro_variant
+Use the micro variant postprocess script.
+
 
 
 ### The Bindings Manager

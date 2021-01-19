@@ -342,7 +342,7 @@ systemctl enable ember-do-runonce.service
 
 #At first boot we need to run this updater.
 cat << 'EOF' > /sketch/runonce/update-eeprom.sh
-#/bin/bash
+#!/bin/bash
 rpi-eeprom-update -a
 EOF
 
