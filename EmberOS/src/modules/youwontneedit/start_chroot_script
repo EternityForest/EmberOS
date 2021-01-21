@@ -23,5 +23,8 @@ if [ -z "$EMBER_MICRO" ]
 then
 echo "Not in micro mode"
 else
+! apt purge -y scratch3
+! apt purge -y libreoffice
+
 sudo locale-gen --purge en_US.UTF-8 en_GB.UTF-8 en_HK.UTF-8 zh_CN.UTF-8 zh_TW.UTF-8 hi_IN.UTF-8 ru_RU.UTF-8 es_ES.UTF-8 es_MX.UTF-8 fr_FR.UTF-8 af_ZA.UTF-8 ar_SA.UTF-8
 fi

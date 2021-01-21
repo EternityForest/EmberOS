@@ -356,49 +356,9 @@ pip3 install zimply
 pip3 install pycryptodome
 pip3 install pi3d
 
-mkdir -p /sketch/share/tilestache_cache
-
-#TODO: It really sucks that you can't actually download maps automatically
-cat << EOF > /sketch/config/tilestache.cfg
-{
-  "cache": {
-      "name": "Disk",
-      "path": "/home/pi/.local/share/marble/maps/earth",
-      "dirs": "portable",
-      "gzip": []
-    },
-  "layers":
-  {
-    "openstreetmap":
-    {
-      "provider":
-      {
-        "name": "proxy", 
-        "url": "https://tile.openstreetmap.org.dummydomain/{Z}/{X}/{Y}.png"
-      }
-    }
-  }
-}
-EOF
-
-cat << EOF > /etc/systemd/system/tilestache.service
-[Unit]
-Description=Serve map tiles. Format is tilestache@port.service
-After=systemd-remount-fs.service network-online.target
-RequiresMountsFor=/etc/ /sketch/
-
-[Service]
-Type=simple
-ExecStart=tilestache-server.py -p %i -c /etc/sketchconfig/tilestache.cfg
-User=pi
-
-[Install]
-WantedBy=sysinit.target
-EOF
 
 
-
-apt-get -y install postgresql libpq-dev postgresql-client postgresql-contrib postgresql-client-common tilestache
+apt-get -y install postgresql libpq-dev postgresql-client postgresql-contrib postgresql-client-common
 mkdir -p /sketch/postgresql
 mkdir -p /sketch/config/postgresql
 mkdir -p /var/lib/postgresql
