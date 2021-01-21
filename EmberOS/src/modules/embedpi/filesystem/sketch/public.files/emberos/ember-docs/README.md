@@ -255,19 +255,18 @@ And add the keys to /sketch/ssh/root/
 
 ## Changing the Kiosk UI
 
-Everything is defines in /sketch/kioskUI.conf, a standard FVWM config file that launches fullscreen chrome by default, but can be customized
-to do just about anything.
+Previously, EmberOS used FVWM config files.  This is no more, everything is standard PIXEL desktop, as FVWM's performance was a bit dissapointing.
 
-Look at the very bottom for the lines that deal with launching apps.
+.config/autostart is symlinked to the persist folder.  To run things at boot, just use .desktop files in /sketch/home/pi/.config/autostart
+
+You can just modify the defaults to do what you want.
 
 ## Changing the timezone
 /sketch/timezone is a text file that should just contain an Olson timezone name like "Us/Pacific" without quotes.
 
 ## Running a script without SSH
 
-At boot, if there is a file named `/sketch/provisioning.sh`, it will be ran, then renamed to `/sketch/provisioning.sh.RAN`, and any output logged
-to `/sketch/provisioning.sh.log`
-
+At boot, we execute any executables in `/sketch/runonce/`, then delete them.
 
 ## Using
 

@@ -473,7 +473,7 @@ apt-get -y install pocketsphinx  gstreamer1.0-pocketsphinx pocketsphinx pocketsp
 #Mega GUI apps
 if [ -z "$EMBER_MICRO" ]
 then
-apt-get -y install ardour audacious audacious-plugins tuxguitar calibre zeal filezilla gelemental kstars inkscape gimp nemo fslint pulseview synaptic qdirstat gwenview
+apt-get -y install ardour audacious audacious-plugins tuxguitar calibre zeal filezilla gelemental kstars inkscape gimp fslint pulseview synaptic qdirstat gwenview
 fi
 
 apt-get -y install deluge audacity kodi kodi-pvr-mythtv kodi-pvr-dvbviewer kodi-pvr-iptvsimple vlc 

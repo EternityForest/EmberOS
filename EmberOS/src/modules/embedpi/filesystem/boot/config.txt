@@ -56,6 +56,12 @@ dtparam=spi=on
 # Enable audio (loads snd_bcm2835)
 dtparam=audio=on
 
+# Uncomment one of these based on which RTC you have
+
+#dtoverlay=i2c-rtc,ds1307
+#dtoverlay=i2c-rtc,pcf8523
+#dtoverlay=i2c-rtc,ds3231
+
 # select initramfs based on version
 [pi0]
 initramfs initramfs-emberos.gz followkernel

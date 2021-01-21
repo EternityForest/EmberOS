@@ -6,6 +6,4 @@ usermod --shell /usr/bin/xonsh pi
 rm -rf /tmp/*
 rm -rf /var/tmp/*
 rm -rf /var/log/*
-apt-get reinstall shared-mime-info
-update-mime-database /usr/share/mime
-chmod -R o+r /usr/share/mime
+apt-get -y reinstall shared-mime-info

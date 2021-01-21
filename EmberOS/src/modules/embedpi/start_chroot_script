@@ -14,7 +14,8 @@ source /common.sh
 install_cleanup_trap
 
 
-
+#Disable the feature that automatically starts the setup wizard, this would be bad for kiosk use.
+rm /etc/xdg/autostart/piwiz.desktop
 
 #Eliminate the apt-daily updates that can't work anyway on read only roots,
 #And were the suspected cause of periodic crashes in real deployments
@@ -59,7 +60,7 @@ sudo apt-get -y install raspberrypi-bootloader raspberrypi-kernel rpi-eeprom
 # sha256_generic
 
 
-
+systemctl set-default multi-user.target
 
 cat << EOF > /etc/initramfs-tools/modules
 btrfs
@@ -185,9 +186,6 @@ apt-get -y install -y ntfs-3g git
 apt-get -y install -y bindfs fuse3
 #Needed for reading config files
 apt-get -y install -y python3-yaml
-
-#For the GUI
-apt-get -y install -y fvwm fvwm-icons
 
 
 
@@ -579,7 +577,6 @@ cat << EOF > /sketch/config/chromium/policies/recommended/emberos-policy.json
 {
   "AudioCaptureAllowedUrls": ["http://localhost","http://localhost:8002"],
   "VideoCaptureAllowedUrls": ["http://localhost","http://localhost:8002"],
-  "VideoCaptureAllowedUrls": ["http://localhost","http://localhost:8002"],
   "AutoplayWhitelist":       ["http://localhost","http://localhost:8002", "http://localhost:1880", "http://*.local"],
   "OverrideSecurityRestrictionsOnInsecureOrigin": ["*.override-insecure-http.local","override-insecure-http.local"]
 
@@ -787,6 +784,9 @@ mk_pi_persist_dir  .arduino15
 mk_pi_persist_dir  .config/voice2json
 mk_pi_persist_dir  .config/backintime
 mk_pi_persist_dir  .config/filezilla
+mk_pi_persist_dir  .config/autostart
+mk_pi_persist_dir  .home-template
+mk_pi_persist_dir .config/pcmanfm/LXDE
 
 cat << EOF > /usr/bin/save-chrome-state
 #!/bin/bash
@@ -890,8 +890,8 @@ cat << EOF > /boot/cmdline.txt
 dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2  rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait quiet splash plymouth.ignore-serial-consoles ro
 EOF
 ! rm etc/rc3.d/S01resize2fs_once
-#Don't try to launch graphically by default
-systemctl set-default multi-user.target
+
+
 
 
 mkdir -p /sketch/cache/apt/archives
@@ -940,6 +940,7 @@ chmod 755 /usr/bin/readonly
 
 
 #Hackishly patch this to call readonly first
+
 cat << EOF > /lib/systemd/system/regenerate_ssh_host_keys.service
 [Unit]
 Description=Regenerate SSH host keys

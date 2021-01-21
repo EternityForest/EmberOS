@@ -11,25 +11,20 @@ unpack /filesystem/pi /sketch/home/pi
 ln -s /home/pi/persist/.conkyrc /home/pi/.conkyrc
 
 
-unpack /filesystem/bin /usr/bin root
-unpack /filesystem/systemd /usr/lib/systemd/system/ root
 
-unpack /filesystem/sketch /sketch root
-
-unpack /filesystem/share /usr/share
-#This just makes menus work in a sane fashion
-mkdir -p /home/pi/.fvwm
-unpack /filesystem/pifvwm /home/pi/.fvwm pi
-
-#In case something messed it up and thinks it should be root owned
-! chown pi -R /home/pi/.fvwm
-
-chmod +x /usr/bin/startkiosk
-chmod +x /usr/bin/kioskwrapper
+cat << EOF > /sketch/home/pi/.config/autostart/ember-kiosk.desktop
+[Desktop Entry]
+Name=EmberDefaultKiosk
+Type=Application
+Exec=/usr/bin/chromium-browser http://localhost --window-size=1920,1080 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null --autoplay-policy=no-user-gesture-required --no-default-browser-check --disk-cache-size=96000000 --no-first-run --simulate-outdated-no-au='Tue, 31 Dec 2099 23:59:59 GMT' &
+Terminal=false
+EOF
 
 
-cat << 'EOF' > /sketch/pre_gui.sh
-#!/bin/bash
-#This script runs just before the GUI loads
-dbus-launch
+cat << EOF > /sketch/home/pi/.config/autostart/unclutter.desktop
+[Desktop Entry]
+Name=Unclutter
+Type=Application
+Exec=unclutter
+Terminal=false
 EOF
