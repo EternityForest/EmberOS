@@ -101,6 +101,10 @@ mkdir -p workspace/postprocess_root/sketch
 rsync -az sketch_included_data/sketch/ workspace/postprocess_sketch/
 rsync -az sketch_included_data/root.opt/ workspace/postprocess_root/opt/
 
+#No, I do not have the slightest idea why all attempts to fix this in the actual build fail.
+rsync -az sketch_included_data/mime/ workspace/postprocess_root/usr/share/mime/
+chmod -R 755 workspace/postprocess_root/usr/share/mime/
+
 #Make it not a submodule
 rm workspace/postprocess_sketch/opt/kaithem/.git
 

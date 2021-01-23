@@ -102,6 +102,11 @@ rsync -az --exclude="home/pi/.local/share/Zeal/Zeal/docsets/**" --exclude="publi
 
 rsync -az --exclude='arduino-1.8.13' sketch_included_data/root.opt/ workspace-micro_variant/postprocess_root/opt/
 
+#No, I do not have the slightest idea why all attempts to fix this in the actual build fail.
+rsync -az sketch_included_data/mime/ workspace/postprocess_root/usr/share/mime/
+chmod -R 755 workspace/postprocess_root/usr/share/mime/
+
+
 #Make it not a submodule
 rm workspace-micro_variant/postprocess_sketch/opt/kaithem/.git
 
