@@ -4,6 +4,8 @@ source /common.sh
 set -x
 set -e
 
+#HPs scanner drivers
+sudo apt-get -y hplip hplip-gui sane sane-utils libsane-extras xsane
 
 apt-get -y install npm
 npm install -g --unsafe-perm dat 
@@ -256,10 +258,7 @@ apt-get -y install lame gnome-disk-utility unclutter imagemagick p7zip ark testd
 #Ham radio stuff
 apt-get -y install fldigi flrig flmsg flamp chirp librtlsdr0
 
-if [ -z "$EMBER_MICRO" ]
-then
-apt-get install -y cubicsdr xastir antennavis
-fi
+
 
 if [ -z "$EMBER_MICRO" ]
 then
@@ -433,7 +432,7 @@ apt-get -y install pocketsphinx  gstreamer1.0-pocketsphinx pocketsphinx pocketsp
 #Mega GUI apps
 if [ -z "$EMBER_MICRO" ]
 then
-apt-get -y install ardour audacious audacious-plugins tuxguitar calibre zeal filezilla gelemental kstars inkscape gimp fslint pulseview synaptic qdirstat gwenview
+apt-get -y install ardour audacious audacious-plugins tuxguitar calibre zeal filezilla gelemental kstars inkscape gimp fslint pulseview synaptic qdirstat gwenview guake skanlite
 fi
 
 apt-get -y install deluge audacity kodi kodi-pvr-mythtv kodi-pvr-dvbviewer kodi-pvr-iptvsimple vlc 
@@ -491,6 +490,14 @@ apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs
 #Enable builtin wordnet, disable the wiktionary service by default because that uses
 #Network
 cp /filesystem/goldendict_config /sketch/home/pi/.goldendict/config
+
+
+#Do this last, it has a manual prompt
+
+if [ -z "$EMBER_MICRO" ]
+then
+apt-get install -y cubicsdr xastir antennavis
+fi
 
 
 gtk-update-icon-cache

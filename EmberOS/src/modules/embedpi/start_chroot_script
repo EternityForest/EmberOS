@@ -45,11 +45,13 @@ mount -t tmpfs -o size=10M tmpfs /proc
 apt-get -y full-upgrade
 
 
+
 #Enable initramfs which also gives the rescue shell, but mainly we need it to allow BTRFS
 sudo apt-get -y install initramfs-tools btrfs-tools
 
 #Get new kernel
 sudo apt-get -y install raspberrypi-bootloader raspberrypi-kernel rpi-eeprom
+
 
 # Do these need to be added too???
 # zstd_decompress
@@ -808,7 +810,7 @@ mk_pi_persist_dir .config/lxpanel
 mk_pi_persist_dir .config/lxsession
 mk_pi_persist_dir .config/lxterminal
 mk_pi_persist_dir .config/menus
-
+mk_pi_persist_dir .config/guake
 
 mk_pi_persist_dir .local/share/desktop-directories
 mk_pi_persist_dir .local/share/applications
