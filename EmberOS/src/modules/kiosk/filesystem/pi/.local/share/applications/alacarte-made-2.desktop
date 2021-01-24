@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=
+Terminal=true
+Name=Remount Root Readonly
+Exec=lxterminal -e sudo readonly
+Type=Application
+Icon=gnome-panel-launcher
+Categories=System

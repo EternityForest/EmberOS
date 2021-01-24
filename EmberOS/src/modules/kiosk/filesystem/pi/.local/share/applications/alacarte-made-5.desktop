@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=
+Terminal=false
+Name=Main Webpage
+Exec=chromium-browser localhost
+Type=Application
+Icon=gnome-panel-launcher
+Categories=Network;Utility;

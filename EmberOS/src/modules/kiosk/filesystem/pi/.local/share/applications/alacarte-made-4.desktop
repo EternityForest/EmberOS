@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=
+Terminal=false
+Name=Included Media(Music, SFX)
+Exec=pcmanfm /var/public.media/emberos
+Type=Application
+Icon=gnome-panel-launcher
+Categories=Utility;Education;Audio

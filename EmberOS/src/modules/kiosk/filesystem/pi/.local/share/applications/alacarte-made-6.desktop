@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=
+Terminal=false
+Name=Circuit Simulator
+Exec=chromium-browser http://localhost/public_files/emberos/webapps/falstad-simulator-offline-html5/src/circuitjs.html
+Type=Application
+Icon=gnome-panel-launcher
+Categories=Electronics;Education

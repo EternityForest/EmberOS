@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=
+Terminal=true
+Name=Launch NodeRed Daemon
+Exec=systemctl start nodered
+Type=Application
+Icon=gnome-panel-launcher
+Categories=Development

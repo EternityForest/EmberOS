@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=
+Terminal=false
+Name=Launch NodeRed GUI
+Exec=chromium-browser localhost:1880
+Type=Application
+Icon=gnome-panel-launcher
+Categories=Development

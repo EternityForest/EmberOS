@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=
+Terminal=false
+Name=Launch Kaithem GUI
+Exec=chromium-browser localhost:8002
+Type=Application
+Icon=gnome-panel-launcher
+Categories=Development

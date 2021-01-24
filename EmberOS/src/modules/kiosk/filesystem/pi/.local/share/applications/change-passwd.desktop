@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=
+Terminal=true
+Name=Change My Password
+Exec=lxterminal -e passwd
+Type=Application
+Icon=gnome-panel-launcher
+Categories=Settings

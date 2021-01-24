@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=Arduino Help
+Terminal=false
+Name=Arduino Help
+Exec=chromium-browser /opt/arduino-1.8.13/reference/www.arduino.cc/en/Reference/HomePage.html
+Type=Application
+Icon=gnome-panel-launcher
+Categories=Electronics;Development

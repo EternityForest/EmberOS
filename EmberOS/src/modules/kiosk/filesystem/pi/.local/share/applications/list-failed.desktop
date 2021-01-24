@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=
+Terminal=false
+Name=List Failed Services
+Exec=xterm -hold -e systemctl --failed
+Type=Application
+Icon=gnome-panel-launcher
+Categories=System

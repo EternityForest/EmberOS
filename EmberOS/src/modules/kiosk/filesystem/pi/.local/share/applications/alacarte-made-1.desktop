@@ -1,0 +1,9 @@
+[Desktop Entry]
+Comment=
+Terminal=true
+Name=Remount root writable
+Exec=lxterminal -e sudo writable
+Type=Application
+Icon=gnome-panel-launcher
+Categories=System
+

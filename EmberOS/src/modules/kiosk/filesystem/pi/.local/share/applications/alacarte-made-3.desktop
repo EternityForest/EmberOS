@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=
+Terminal=false
+Name=Included Files(Books, clipart, etc)
+Exec=pcmanfm /var/public.files/emberos
+Type=Application
+Icon=gnome-panel-launcher
+Categories=Utility;Education;

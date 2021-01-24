@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=It's Neofetch Time!
+Terminal=false
+Name=Neofetch system info
+Exec=xterm -hold -e neofetch
+Type=Application
+Icon=gnome-panel-launcher
+Categories=System;Utility

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=
+Terminal=false
+Name=Edit Startup Services
+Exec=lxterminal -e sudo mousepad /etc/sketchconfig/autostart/99-defaults.ini
+Type=Application
+Icon=gnome-panel-launcher
+Categories=System

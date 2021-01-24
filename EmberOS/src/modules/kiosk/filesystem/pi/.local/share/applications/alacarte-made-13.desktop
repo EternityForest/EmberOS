@@ -1,0 +1,7 @@
+[Desktop Entry]
+Comment=
+Name=Fortune
+Exec=zenity --notification --text="$(genfortune)"
+Type=Application
+Icon=gnome-panel-launcher
+Categories=Game

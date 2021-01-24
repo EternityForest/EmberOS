@@ -684,6 +684,20 @@ mk_pi_persist_dir () {
   ln -s "/home/pi/persist/$1" "/home/pi/$1"
 }
 
+cat << EOF > /usr/bin/make-persistent-pi-folder
+#!/bin/bash
+
+mkdir -p "/sketch/home/pi/$1"
+mkdir -p "/home/pi/$1"
+
+#Move to sketch, delete original
+! cp -ar "/home/pi/$1/." "/sketch/home/pi/$1"
+! rm -r  "/home/pi/$1"
+ln -s "/home/pi/persist/$1" "/home/pi/$1"
+EOF
+
+chmod 755  /usr/bin/make-persistent-pi-folder
+
 
 mkdir -p /home/pi/.local/share
 chown pi /home/pi/.local/share
@@ -789,7 +803,15 @@ mk_pi_persist_dir  .config/backintime
 mk_pi_persist_dir  .config/filezilla
 mk_pi_persist_dir  .config/autostart
 mk_pi_persist_dir  .home-template
-mk_pi_persist_dir .config/pcmanfm/LXDE
+mk_pi_persist_dir .config/pcmanfm/LXDE-pi
+mk_pi_persist_dir .config/lxpanel
+mk_pi_persist_dir .config/lxsession
+mk_pi_persist_dir .config/lxterminal
+mk_pi_persist_dir .config/menus
+
+
+mk_pi_persist_dir .local/share/desktop-directories
+mk_pi_persist_dir .local/share/applications
 
 cat << EOF > /usr/bin/save-chrome-state
 #!/bin/bash

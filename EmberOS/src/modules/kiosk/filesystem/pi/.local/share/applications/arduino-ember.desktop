@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=Arduino
+Terminal=false
+Name=Arduino IDE
+Exec=/opt/arduino-1.8.13/arduino
+Type=Application
+Icon=gnome-panel-launcher
+Categories=Electronics;Development

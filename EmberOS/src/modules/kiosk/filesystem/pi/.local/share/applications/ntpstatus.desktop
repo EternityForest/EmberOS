@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=NTP Info
+Terminal=false
+Name=Chrony NTP Time Sync Status
+Exec=xterm -hold -e chronyc sources
+Type=Application
+Icon=gnome-panel-launcher
+Categories=System;Utility

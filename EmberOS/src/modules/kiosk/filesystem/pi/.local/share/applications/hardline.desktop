@@ -1,0 +1,7 @@
+[Desktop Entry]
+Comment=
+Name=HardlineP2P Service Browser
+Exec=hardline-gui
+Type=Application
+Icon=gnome-panel-launcher
+Categories=Network;Utility;
