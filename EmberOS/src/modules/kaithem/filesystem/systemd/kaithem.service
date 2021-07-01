@@ -1,14 +1,15 @@
 [Unit]
 Description=KaithemAutomation python based automation server
-After=basic.target time-sync.target sysinit.service
+After=basic.target time-sync.target sysinit.service zigbee2mqtt.service
 Type=simple
 
 
 [Service]
 TimeoutStartSec=0
-ExecStart=/sketch/opt/kaithem/kaithem/kaithem.py -c /sketch/kaithem/config.yaml
+ExecStart=/opt/kaithem/kaithem/kaithem.py -c /sketch/kaithem/config.yaml
 Restart=on-failure
 RestartSec=15
+OOMScoreAdjust=-800
 
 [Install]
 WantedBy=multi-user.target

@@ -1,7 +1,8 @@
 [Desktop Entry]
 Comment=
 Name=HardlineP2P Service Browser
-Exec=hardline-gui
+Exec=lxterminal -e "xonsh -c hardline-gui"
 Type=Application
 Icon=gnome-panel-launcher
 Categories=Network;Utility;
+Terminal=false

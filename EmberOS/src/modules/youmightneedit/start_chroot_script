@@ -5,7 +5,7 @@ set -x
 set -e
 
 #HPs scanner drivers
-sudo apt-get -y hplip hplip-gui sane sane-utils libsane-extras xsane
+sudo apt-get -y install hplip hplip-gui sane sane-utils libsane-extras xsane
 
 apt-get -y install npm
 npm install -g --unsafe-perm dat 
@@ -22,6 +22,9 @@ echo "samba-common samba-common/do_debconf boolean true" | sudo debconf-set-sele
 #Too big for github, you have to put the file there manually
 apt-get -y install /filesystem/debs/voice2json_2.0_armhf.deb
 
+#Gonna do ThingMagic's Mercury API to enable RFID reading
+apt-get install -y unzip patch xsltproc gcc libreadline-dev python3-dev python3-setuptools
+pip3 install python-mercuryapi
 
 #Non-superusers can't capture packets
 echo "wireshark-common wireshark-common/install-setuid boolean false" | sudo debconf-set-selections
@@ -33,6 +36,395 @@ echo "wireshark-common wireshark-common/install-setuid boolean false" | sudo deb
 # #Give user a way to update
 # ln -s /opt/ipfs-installer/ipfs-rpi-0.1.1/install /usr/bin/install-ipfs-rpi
 # sudo systemctl disable ipfs-daemon.service
+
+
+
+## MotionEye
+
+apt-get -y install motion python-pip python-dev libssl-dev libcurl4-openssl-dev libjpeg-dev libz-dev
+pip install motioneye
+mkdir -p /etc/motioneye
+mkdir -p /sketch/config/motioneye
+mkdir -p /sketch/motioneye
+mkdir -p /var/lib/motioneye
+
+cat << EOF > /sketch/config/filesystem/emberos-motioneye.yaml
+/sketch/config:
+    mode: '0755'
+    user: root
+    group: root
+    bindat: /etc/motioneye
+EOF
+
+cat << EOF > /sketch/config/filesystem/emberos-motioneye.yaml
+
+# path to the configuration directory (must be writable by motionEye)
+conf_path /etc/motioneye
+
+# path to the directory where pid files go (must be writable by motionEye)
+run_path /var/run
+
+# path to the directory where log files go (must be writable by motionEye)
+log_path /var/log
+
+# default output path for media files (must be writable by motionEye)
+media_path /sketch/motioneye
+
+# the log level (use quiet, error, warning, info or debug)
+log_level info
+
+# the IP address to listen on
+# (0.0.0.0 for all interfaces, 127.0.0.1 for localhost)
+listen 127.0.0.1
+
+# the TCP port to listen on
+port 8765
+
+# path to the motion binary to use (automatically detected if commented)
+#motion_binary /usr/bin/motion
+
+# whether motion HTTP control interface listens on
+# localhost or on all interfaces
+motion_control_localhost true
+
+# the TCP port that motion HTTP control interface listens on
+motion_control_port 7999
+
+# interval in seconds at which motionEye checks if motion is running
+motion_check_interval 10
+
+# whether to restart the motion daemon when an error occurs while communicating with it
+motion_restart_on_errors false
+
+# interval in seconds at which motionEye checks the SMB mounts
+mount_check_interval 300
+
+# interval in seconds at which the janitor is called
+# to remove old pictures and movies
+cleanup_interval 43200
+
+# timeout in seconds to wait for response from a remote motionEye server
+remote_request_timeout 10
+
+# timeout in seconds to wait for mjpg data from the motion daemon
+mjpg_client_timeout 10
+
+# timeout in seconds after which an idle mjpg client is removed
+# (set to 0 to disable)
+mjpg_client_idle_timeout 10
+
+# enable SMB shares (requires motionEye to run as root) 
+smb_shares false
+
+# the directory where the SMB mount points will be created
+smb_mount_root /media
+
+# path to the wpa_supplicant.conf file
+# (enable this to configure wifi settings from the UI)
+#wpa_supplicant_conf /etc/wpa_supplicant.conf
+
+# path to the localtime file
+# (enable this to configure the system time zone from the UI)
+#local_time_file /etc/localtime
+
+# enables shutdown and rebooting after changing system settings
+# (such as wifi settings or time zone)
+enable_reboot false
+
+# timeout in seconds to use when talking to the SMTP server
+smtp_timeout 60
+
+# timeout in seconds to wait for media files list
+list_media_timeout 120
+
+# timeout in seconds to wait for media files list, when sending emails
+list_media_timeout_email 10
+
+# timeout in seconds to wait for zip file creation
+zip_timeout 500
+
+# timeout in seconds to wait for timelapse creation
+timelapse_timeout 500
+
+# enable adding and removing cameras from UI
+add_remove_cameras true
+
+# enables HTTP basic authentication scheme (in addition to, not instead of the signature mechanism)
+http_basic_auth false
+
+# overrides the hostname (useful if motionEye runs behind a reverse proxy)
+# server_name motionEye
+EOF
+
+cp /usr/local/share/motioneye/extra/motioneye.systemd-unit-local /etc/systemd/system/motioneye.service
+
+
+## Zigbee2MQTT
+
+# Setup Node.js repository
+sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+
+# NOTE 1: If you see the message below please follow: https://gist.github.com/Koenkk/11fe6d4845f5275a2a8791d04ea223cb.
+# ## You appear to be running on ARMv6 hardware. Unfortunately this is not currently supported by the NodeSource Linux distributions. Please use the 'linux-armv6l' binary tarballs available directly from nodejs.org for Node.js 4 and later.
+# IMPORTANT: In this case instead of the apt-get install mentioned below; do: sudo apt-get install -y git make g++ gcc
+
+# NOTE 2: On x86, Node.js 10 may not work. It's recommended to install an unofficial Node.js 14 build which can be found here: https://unofficial-builds.nodejs.org/download/release/ (e.g. v14.16.0)
+
+# Install Node.js;
+sudo apt-get install -y nodejs git make g++ gcc
+
+# Verify that the correct nodejs and npm (automatically installed with nodejs)
+# version has been installed
+node --version  # Should output v10.X, v12.X, v14.X or v15.X
+npm --version  # Should output 6.X or 7.X
+
+# Clone Zigbee2MQTT repository
+sudo git clone https://github.com/Koenkk/zigbee2mqtt.git /opt/zigbee2mqtt
+sudo chown -R pi:pi /opt/zigbee2mqtt
+
+# Install dependencies (as user "pi")
+cd /opt/zigbee2mqtt
+npm ci --production
+
+mkdir -p /sketch/zigbee2mqtt
+mkdir -p /opt/zigbee2mqtt/data
+
+
+rsync -av /opt/zigbee2mqtt/data/ /sketch/zigbee2mqtt
+
+
+#Writable zigbee2mqtt
+cat << EOF > /sketch/config/filesystem/emberos-zigbee2mqtt.yaml
+/sketch/zigbee2mqtt:
+    mode: '0700'
+    user: pi
+    group: pi
+    bindat: /opt/zigbee2mqtt/data
+EOF
+
+cat << EOF > /etc/systemd/system/zigbee2mqtt.service
+[Unit]
+Description=zigbee2mqtt
+After=network.target fs_bindings.service mosquitto.service
+
+[Service]
+ExecStart=/usr/bin/npm start
+WorkingDirectory=/opt/zigbee2mqtt
+StandardOutput=null
+# Or use StandardOutput=null if you don't want Zigbee2MQTT messages filling syslog, for more options see systemd.exec(5)
+StandardError=inherit
+Restart=always
+RestartSec=30
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat << EOF > /sketch/zigbee2mqtt/configuration.yaml
+# Optional: Home Assistant integration (MQTT discovery) (default: false)
+homeassistant: true
+
+# Optional: allow new devices to join.
+# WARNING: Disable this after all devices have been paired! (default: false)
+permit_join: false
+
+# Required: MQTT settings
+mqtt:
+  # Required: MQTT base topic for Zigbee2MQTT MQTT messages
+  base_topic: zigbee2mqtt
+  # Required: MQTT server URL (use mqtts:// for SSL/TLS connection)
+  server: 'mqtt://localhost:1883'
+  # Optional: absolute path to SSL/TLS certificate of CA used to sign server and client certificates (default: nothing)
+  #ca: '/etc/ssl/mqtt-ca.crt'
+  # Optional: absolute paths to SSL/TLS key and certificate for client-authentication (default: nothing)
+  #key: '/etc/ssl/mqtt-client.key'
+  #cert: '/etc/ssl/mqtt-client.crt'
+  # Optional: MQTT server authentication user (default: nothing)
+  #user: my_user
+  # Optional: MQTT server authentication password (default: nothing)
+  #password: my_password
+  # Optional: MQTT client ID (default: nothing)
+  #client_id: 'MY_CLIENT_ID'
+  # Optional: disable self-signed SSL certificates (default: true)
+  reject_unauthorized: true
+  # Optional: Include device information to mqtt messages (default: false)
+  include_device_information: true
+  # Optional: MQTT keepalive in seconds (default: 60)
+  keepalive: 60
+  # Optional: MQTT protocol version (default: 4), set this to 5 if you
+  # use the 'retention' device specific configuration
+  version: 4
+  # Optional: Disable retain for all send messages. ONLY enable if you MQTT broker doesn't
+  # support retained message (e.g. AWS IoT core, Azure IoT Hub, Google Cloud IoT core, IBM Watson IoT Platform).
+  # Enabling will break the Home Assistant integration. (default: false)
+  force_disable_retain: false
+
+# Required: serial settings
+serial:
+  # Required: location of the adapter (e.g. CC2531).
+  # To autodetect the port, set 'port: null'.
+  #Maybe use /dev/ttyACM0 if autodetect fails
+  port: null
+  # Optional: disable LED of the adapter if supported (default: false)
+  disable_led: false
+  # Optional: adapter type, not needed unless you are experiencing problems (default: shown below, options: zstack, deconz)
+  adapter: null
+
+# Optional: Block devices from the network (by ieeeAddr) (default: empty)
+# Previously called 'ban' (which is deprecated)
+#blocklist:
+#  - '0x000b57fffec6a5b2'
+
+# Optional: Allow only certain devices to join the network (by ieeeAddr)
+# Note that all devices not on the passlist will be removed from the network!
+# (default: empty)
+# Previously called 'whitelist' (which is deprecated)
+#passlist:
+#  - '0x000b57fffec6a5b3'
+
+# Optional: advanced settings
+advanced:
+  # Optional: ZigBee pan ID (default: shown below)
+  # Setting pan_id: GENERATE will make Zigbee2MQTT generate a new panID on next startup
+  pan_id: GENERATE
+  # Optional: Zigbee extended pan ID (default: shown below)
+  #ext_pan_id: [0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD]
+  # Optional: ZigBee channel, changing requires re-pairing of all devices. (Note: use a ZLL channel: 11, 15, 20, or 25 to avoid Problems)
+  # (default: 11)
+  channel: 11
+  # Optional: state caching, MQTT message payload will contain all attributes, not only changed ones.
+  # Has to be true when integrating via Home Assistant (default: true)
+  cache_state: true
+  # Optional: persist cached state, only used when cache_state: true (default: true)
+  cache_state_persistent: false
+  # Optional: send cached state on startup, only used when cache_state_persistent: true (default: true)
+  cache_state_send_on_startup: false
+  # Optional: Logging level, options: debug, info, warn, error (default: info)
+  log_level: info
+  # Optional: Location of log directory (default: shown below)
+  log_directory: data/log/%TIMESTAMP%
+  # Optional: Log file name, can also contain timestamp, e.g.: zigbee2mqtt_%TIMESTAMP%.log (default: shown below)
+  log_file: log.txt
+  # Optional: Log rotation (default: shown below)
+  log_rotation: true
+  # Optional: Output location of the log (default: shown below), leave empty to supress logging (log_output: [])
+  # possible options: 'console', 'file', 'syslog'
+  log_output:
+    - console
+  # Create a symlink called "current" in the log directory which points to the latests log directory. (default: false)
+  log_symlink_current: false
+  # Optional: syslog configuration, skip values or entirely to use defaults. Only use when 'syslog' in 'log_output' (see above)
+  log_syslog:
+    host: localhost # The host running syslogd, defaults to localhost.
+    port: 123 # The port on the host that syslog is running on, defaults to syslogd's default port.
+    protocol: tcp4 # The network protocol to log over (e.g. tcp4, udp4, tls4, unix, unix-connect, etc).
+    path:  /dev/log # The path to the syslog dgram socket (i.e. /dev/log or /var/run/syslog for OS X).
+    pid: process.pid # PID of the process that log messages are coming from (Default process.pid).
+    facility: local0 # Syslog facility to use (Default: local0).
+    localhost: localhost # Host to indicate that log messages are coming from (Default: localhost).
+    type: 5424 # The type of the syslog protocol to use (Default: BSD, also valid: 5424).
+    app_name: Zigbee2MQTT # The name of the application (Default: Zigbee2MQTT).
+    eol: '\n' # The end of line character to be added to the end of the message (Default: Message without modifications).
+  # Optional: Baud rate speed for serial port, this can be anything firmware support but default is 115200 for Z-Stack and EZSP, 38400 for Deconz, however note that some EZSP firmware need 57600.
+  baudrate: 115200
+  # Optional: RTS / CTS Hardware Flow Control for serial port (default: false)
+  rtscts: false
+  # Optional: soft reset ZNP after timeout (in seconds); 0 is disabled (default: 0)
+  soft_reset_timeout: 0
+  # Optional: network encryption key, will improve security (Note: changing requires repairing of all devices) (default: shown below)
+  # Setting network_key: GENERATE will make Zigbee2MQTT generate a new network key on next startup
+  network_key: GENERATE
+  # Optional: Add a last_seen attribute to MQTT messages, contains date/time of last Zigbee message
+  # possible values are: disable (default), ISO_8601, ISO_8601_local, epoch (default: disable)
+  last_seen: 'disable'
+  # Optional: Add an elapsed attribute to MQTT messages, contains milliseconds since the previous msg (default: false)
+  elapsed: true
+  # Optional: Availability timeout in seconds, disabled by default (0).
+  # When enabled, devices will be checked if they are still online.
+  # Only AC powered routers are checked for availability. (default: 0)
+  availability_timeout: 0
+  # Optional: Prevent devices from being checked for availability (default: empty)
+  # Previously called 'availability_blacklist' (which is deprecated)
+  #availability_blocklist:
+  #  - DEVICE_FRIENDLY_NAME or DEVICE_IEEE_ADDRESS
+  # Optional: Only enable availability check for certain devices (default: empty)
+  # Previously called 'availability_whitelist' (which is deprecated)
+  #availability_passlist:
+  #  - DEVICE_FRIENDLY_NAME or DEVICE_IEEE_ADDRESS
+  # Optional: Enables report feature, this feature is DEPRECATED since reporting is now setup by default
+  # when binding devices. Docs can still be found here: https://github.com/Koenkk/zigbee2mqtt.io/blob/master/docs/information/report.md
+  report: true
+  # Optional: Home Assistant discovery topic (default: shown below)
+  homeassistant_discovery_topic: 'homeassistant'
+  # Optional: Home Assistant status topic (default: shown below)
+  homeassistant_status_topic: 'homeassistant/status'
+  # Optional: Home Assistant legacy triggers (default: shown below), when enabled:
+  # - Zigbee2mqt will send an empty 'action' or 'click' after one has been send
+  # - A 'sensor_action' and 'sensor_click' will be discoverd
+  homeassistant_legacy_triggers: true
+  # Optional: log timestamp format (default: shown below)
+  timestamp_format: 'YYYY-MM-DD HH:mm:ss'
+  # Optional: configure adapter concurrency (e.g. 2 for CC2531 or 16 for CC26X2R1) (default: null, uses recommended value)
+  adapter_concurrent: null
+  # Optional: disables the legacy api (default: shown below)
+  legacy_api: true
+  # Optional: use IKEA TRADFRI OTA test server, see OTA updates documentation (default: false)
+  ikea_ota_use_test_url: false
+
+# Optional: experimental options
+experimental:
+  # Optional: MQTT output type: json, attribute or attribute_and_json (default: shown below)
+  # Examples when 'state' of a device is published
+  # json: topic: 'zigbee2mqtt/my_bulb' payload '{"state": "ON"}'
+  # attribute: topic 'zigbee2mqtt/my_bulb/state' payload 'ON"
+  # attribute_and_json: both json and attribute (see above)
+  output: 'json'
+  # Optional: Transmit power setting in dBm (default: 5).
+  # This will set the transmit power for devices that bring an inbuilt amplifier.
+  # It can't go over the maximum of the respective hardware and might be limited
+  # by firmware (for example to migrate heat, or by using an unsupported firmware).
+  # For the CC2652R(B) this is 5 dBm, CC2652P/CC1352P-2 20 dBm.
+  #transmit_power: 5
+
+# Optional: networkmap options
+map_options:
+  graphviz:
+    # Optional: Colors to be used in the graphviz network map (default: shown below)
+    colors:
+      fill:
+        enddevice: '#fff8ce'
+        coordinator: '#e04e5d'
+        router: '#4ea3e0'
+      font:
+        coordinator: '#ffffff'
+        router: '#ffffff'
+        enddevice: '#000000'
+      line:
+        active: '#009900'
+        inactive: '#994444'
+
+# Optional: OTA update settings
+ota:
+    # Minimum time between OTA update checks, see https://www.zigbee2mqtt.io/information/ota_updates.html for more info
+    update_check_interval: 1440
+    # Disable automatic update checks, see https://www.zigbee2mqtt.io/information/ota_updates.html for more info
+    disable_automatic_update_check: true
+
+# Optional: see 'Device specific configuration' below
+device_options: {}
+# Optional, see 'External converters configuration' below
+external_converters: []
+
+
+#Restrict the frontend to localhost viewing only.
+frontend:
+  port: 8003
+  host: 127.0.0.1
+
+
+EOF
+
 
 if [ -z "$EMBER_MICRO" ]
 then
@@ -79,10 +471,11 @@ make install
 pip3 install hardline
 
 cat << EOF > /usr/bin/ember-launch-gmrender
-UPNP_UUID=`ip link show | awk '/ether/ {print "salt:)-" $2}' | head -1 | md5sum | awk '{print $1}'`
+#!/bin/bash
+UPNP_UUID=\`ip link show | awk '/ether/ {print "salt:)-" $2}' | head -1 | md5sum | awk '{print $1}'\`
 gmrender -f "$(cat /etc/hostname)" -u "$UPNP_UUID"
 EOF
-
+chmod 755  /usr/bin/ember-launch-gmrender
 cat << EOF > /etc/systemd/system/gmrender.service
 [Unit]
 Description=Act as a UPNP media rendering server
@@ -91,7 +484,7 @@ RequiresMountsFor=/etc/ /sketch/ /home/
 
 [Service]
 Type=simple
-ExecStart=gmrender
+ExecStart=/usr/bin/ember-launch-gmrender
 User=pi
 WorkingDirectory=~
 
@@ -103,7 +496,7 @@ EOF
 cat << EOF > /etc/systemd/system/hardlinep2p.service
 [Unit]
 Description=HardlineP2P allows accessing and service self-hosted resources without manual DNS or cert setup.
-After=systemd-remount-fs.service network-online.target
+After=systemd-remount-fs.service network-online.target fs_bindings.service
 RequiresMountsFor=/etc/ /sketch/ /home/
 
 [Service]
@@ -312,6 +705,7 @@ apt-get -y install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-d
    xclip xsel libjpeg-dev
 
 
+
 pip3 install kivy
 
 #This language is included because of it's excellent dynamic imports in python
@@ -353,8 +747,14 @@ sudo apt-get -y install python3-smbus python3-msgpack python3-paho-mqtt python3-
 
 pip3 install zimply
 pip3 install pycryptodome
-pip3 install pi3d
+pip3 install pynacl
+pip3 install qrcode
 
+pip3 install beautifulsoup4
+pip3 install toml
+
+pip3 install pi3d
+pip3 install npyscreen picotui asciimatics
 
 
 apt-get -y install postgresql libpq-dev postgresql-client postgresql-contrib postgresql-client-common
@@ -502,5 +902,44 @@ fi
 
 gtk-update-icon-cache
 
+#This appears to be missing in the latest raspbian?
+cat << EOF > /etc/systemd/system/nodered.service
+# systemd service file to start Node-RED
+
+[Unit]
+Description=Node-RED graphical event wiring tool
+Wants=network.target
+Documentation=http://nodered.org/docs/hardware/raspberrypi.html
+
+[Service]
+Type=simple
+# Run as normal pi user - change to the user name you wish to run Node-RED as
+User=pi
+Group=pi
+WorkingDirectory=/home/pi
+
+Environment="NODE_OPTIONS=--max_old_space_size=512"
+# uncomment and edit next line if you need an http proxy
+#Environment="HTTP_PROXY=my.httpproxy.server.address"
+# uncomment the next line for a more verbose log output
+#Environment="NODE_RED_OPTIONS=-v"
+# uncomment next line if you need to wait for time sync before starting
+#ExecStartPre=/bin/bash -c '/bin/journalctl -b -u systemd-timesyncd | /bin/grep -q "systemd-timesyncd.* Synchronized to time server"'
+
+ExecStart=/usr/bin/env node-red-pi $NODE_OPTIONS $NODE_RED_OPTIONS
+#ExecStart=/usr/bin/env node $NODE_OPTIONS red.js $NODE_RED_OPTIONS
+# Use SIGINT to stop
+KillSignal=SIGINT
+# Auto restart on crash
+Restart=on-failure
+RestartSec=20
+# Tag things in the log
+SyslogIdentifier=Node-RED
+#StandardOutput=syslog
+
+[Install]
+WantedBy=multi-user.target
+
+EOF
 
 apt-get autoremove -y --purge

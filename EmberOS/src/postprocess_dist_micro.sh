@@ -41,7 +41,7 @@ POSTPROCESS_LOOP=`losetup -P --find --show workspace-micro_variant/emberos_micro
 sudo mkfs.vfat -F 32 -n 'boot' ${POSTPROCESS_LOOP}p1
 #mkfs.f2fs -l "root" -O encrypt,compression,extra_attr -t 0 ${POSTPROCESS_LOOP}p2
 #mkfs.ext4 -L "root" ${POSTPROCESS_LOOP}p2 
-mkfs.btrfs -L "root" ${POSTPROCESS_LOOP}p2 
+mkfs.btrfs -l "root" -O compression,extra_attr -t 0 ${POSTPROCESS_LOOP}p2
 mkfs.ntfs -C -L "sketch" ${POSTPROCESS_LOOP}p3
 
 mkdir -p workspace-micro_variant/postprocess_root/
@@ -59,7 +59,7 @@ sed -i 's/fsck.repair=yes/fsck.repair=no/g' workspace-micro_variant/postprocess_
 
 
 #Maximum zstd compression ratio
-mount -o compress-force=zstd:15 ${POSTPROCESS_LOOP}p2 workspace-micro_variant/postprocess_root/
+mount -o compress-force=zstd:15 ${POSTPROCESS_LOOP}p2 workspace/postprocess_root/
 mount -t ntfs-3g -o compression ${POSTPROCESS_LOOP}p3 workspace-micro_variant/postprocess_sketch/
 
 #Set compression attrs, on everything.  This will cause all new dubdirs to be recursively marked for compression.
@@ -82,11 +82,6 @@ rsync -az --exclude='/tmp/*' --exclude='/var/tmp/*' workspace-micro_variant/orig
 #Change the fstab to look for a btrfs, and to enable compression on everything.
 sed -i '/mmcblk0p2/c\\/dev\/mmcblk0p2  \/               btrfs    defaults,noatime,ro,compress-force=zstd  0       1' workspace-micro_variant/postprocess_root/etc/fstab
 
-#Use BTRFS deduplication to save a bit of space
-jdupes --recurse --dedupe --size workspace-micro_variant/postprocess_root/
-  
-
-
 
 #Copy the sketch stuff from the master image
 rsync -az workspace-micro_variant/original_root/sketch/ workspace-micro_variant/postprocess_sketch/
@@ -98,7 +93,7 @@ mkdir -p workspace-micro_variant/postprocess_root/sketch
 
 
 #Now transfer the actual files over, into the dirs marked for compression
-rsync -az --exclude="home/pi/.local/share/Zeal/Zeal/docsets/**" --exclude="public.files/emberos/clipart/**" --exclude="public.files/emberos/textbooks/**" --exclude="public.files/emberos/fonts/**" --exclude="public.files/emberos/articles/**" --exclude="public.media/emberos/sounds/**" --exclude="public.media/emberos/Music/**" --exclude="public.files/emberos/Stock Photos/**" --exclude="public.files/emberos/books/**" --exclude="public.files/emberos/Textures/**" --exclude="share/wikis/**" --exclude="public.files/emberos/Textures/**" --exclude="public.files/emberos/icons/**" sketch_included_data/sketch/ workspace-micro_variant/postprocess_sketch/
+rsync -az --exclude="home/pi/.local/share/Zeal/Zeal/docsets/**" --exclude="public.files/emberos/clipart/**" --exclude="public.files/emberos/data/**" --exclude="public.files/emberos/textbooks/**" --exclude="public.files/emberos/fonts/**" --exclude="public.files/emberos/articles/**" --exclude="public.media/emberos/sounds/**" --exclude="public.media/emberos/Music/**" --exclude="public.files/emberos/Stock Photos/**" --exclude="public.files/emberos/books/**" --exclude="public.files/emberos/Textures/**" --exclude="share/wikis/**" --exclude="public.files/emberos/Textures/**" --exclude="public.files/emberos/icons/**" sketch_included_data/sketch/ workspace-micro_variant/postprocess_sketch/
 
 rsync -az --exclude='arduino-1.8.13' sketch_included_data/root.opt/ workspace-micro_variant/postprocess_root/opt/
 

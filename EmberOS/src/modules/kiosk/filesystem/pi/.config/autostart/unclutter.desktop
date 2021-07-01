@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=Unclutter
+Type=Application
+Exec=unclutter
+Terminal=false

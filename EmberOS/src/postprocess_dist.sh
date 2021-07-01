@@ -20,7 +20,7 @@ mount ${ORIGINAL_LOOP}p1 workspace/original_boot/
 mount ${ORIGINAL_LOOP}p2 workspace/original_root/
 
 
-#Remove the root, resize boot to end at 320MB so it's a known size
+#Remove the root, resize boot to end at 192MB so it's a known size
 #We should be able to get a
 parted --script ${POSTPROCESS_LOOP} \
     mklabel msdos \
@@ -39,7 +39,7 @@ POSTPROCESS_LOOP=`losetup -P --find --show workspace/emberos_postprocessed.img`
 
 
 sudo mkfs.vfat -F 32 -n 'boot' ${POSTPROCESS_LOOP}p1
-#mkfs.f2fs -l "root" -O encrypt,compression,extra_attr -t 0 ${POSTPROCESS_LOOP}p2
+#mkfs.f2fs -l "root" -O compression,extra_attr -t 0 ${POSTPROCESS_LOOP}p2
 #mkfs.ext4 -L "root" ${POSTPROCESS_LOOP}p2 
 mkfs.btrfs -L "root" ${POSTPROCESS_LOOP}p2 
 mkfs.ntfs -C -L "sketch" ${POSTPROCESS_LOOP}p3
@@ -54,11 +54,12 @@ mount ${POSTPROCESS_LOOP}p1 workspace/postprocess_boot/
 rsync -az workspace/original_boot/ workspace/postprocess_boot/
 
 #Then edit the cmd line. Pretty sure rootfstype is ignored by tmpfs though but whatever.
-sed -i 's/rootfstype=ext4/rootfstype=btrfs/g' workspace/postprocess_boot/cmdline.txt
+sed -i 's/rootfstype=ext4/rootfstype=btrfs,f2fs/g' workspace/postprocess_boot/cmdline.txt
 sed -i 's/fsck.repair=yes/fsck.repair=no/g' workspace/postprocess_boot/cmdline.txt
 
 
 #Maximum zstd compression ratio
+#mount -o compress-force=zstd:15 ${POSTPROCESS_LOOP}p2 workspace/postprocess_root/
 mount -o compress-force=zstd:15 ${POSTPROCESS_LOOP}p2 workspace/postprocess_root/
 mount -t ntfs-3g -o compression ${POSTPROCESS_LOOP}p3 workspace/postprocess_sketch/
 
@@ -82,9 +83,7 @@ rsync -az --exclude='sketch/*' --exclude='/tmp/*' --exclude='/var/tmp/*' workspa
 #Change the fstab to look for a btrfs, and to enable compression on everything.
 sed -i '/mmcblk0p2/c\\/dev\/mmcblk0p2  \/               btrfs    defaults,noatime,ro,compress-force=zstd  0       1' workspace/postprocess_root/etc/fstab
 
-#Use BTRFS deduplication to save a bit of space
-jdupes --recurse --dedupe --size workspace/postprocess_root/
-  
+
 
 
 
@@ -105,8 +104,6 @@ rsync -az sketch_included_data/root.opt/ workspace/postprocess_root/opt/
 rsync -az sketch_included_data/mime/ workspace/postprocess_root/usr/share/mime/
 chmod -R 755 workspace/postprocess_root/usr/share/mime/
 
-#Make it not a submodule
-rm workspace/postprocess_sketch/opt/kaithem/.git
 
 cd workspace/postprocess_sketch/
 git init

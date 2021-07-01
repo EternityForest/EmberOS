@@ -15,7 +15,7 @@ install_cleanup_trap
 
 
 #Disable the feature that automatically starts the setup wizard, this would be bad for kiosk use.
-rm /etc/xdg/autostart/piwiz.desktop
+! rm /etc/xdg/autostart/piwiz.desktop
 
 #Eliminate the apt-daily updates that can't work anyway on read only roots,
 #And were the suspected cause of periodic crashes in real deployments
@@ -42,15 +42,23 @@ apt update -y --allow-releaseinfo-change
 mkdir -p /proc
 mount -t tmpfs -o size=10M tmpfs /proc
 
-apt-get -y full-upgrade
+
 
 
 
 #Enable initramfs which also gives the rescue shell, but mainly we need it to allow BTRFS
-sudo apt-get -y install initramfs-tools btrfs-tools
+sudo apt-get -y install initramfs-tools btrfs-tools f2fs-tools elinks
+
+
+#We switched to this to hopefully get rid of bad behavior when making lower layers writable for updates.
+apt-get -y install fuse-overlayfs
 
 #Get new kernel
-sudo apt-get -y install raspberrypi-bootloader raspberrypi-kernel rpi-eeprom
+sudo apt-get -y install raspberrypi-bootloader rpi-eeprom
+
+
+#TODO why in the toilet does this giver error? Oh well, it's new enought already.
+#sudo apt-get -y install raspberrypi-kernel
 
 
 # Do these need to be added too???
@@ -60,6 +68,12 @@ sudo apt-get -y install raspberrypi-bootloader raspberrypi-kernel rpi-eeprom
 # lzo_compress
 # zlib_deflate
 # sha256_generic
+
+
+
+#Enable acting as a USB composite device on pi zero
+echo libcomposite >> /etc/modules 
+
 
 
 systemctl set-default multi-user.target
@@ -72,6 +86,7 @@ btrfs
 xor
 zlib_deflate
 raid6_pq
+f2fs
 EOF
 mkdir -p /usr/src/initramfs/
 
@@ -91,7 +106,7 @@ mount -t sysfs none /sys
 echo "EmberOS Initramfs running!"
 
 # Mount the root filesystem. NOTE!!!
-mount -t ext4,btrfs -o ro /dev/mmcblk0p2 /mnt/root || rescue_shell
+mount -t ext4,btrfs,f2fs -o ro /dev/mmcblk0p2 /mnt/root || rescue_shell
 
 # Clean up.
 umount /proc
@@ -106,39 +121,17 @@ cat << EOF >  /etc/kernel/postinst.d/rpi-initramfs-tools
 #!/bin/bash -e
 # Environment variables are set by the calling script
 
+set -e
 version="$1"
 bootopt=""
 
+#Ensure the update initramfs exists?
 command -v update-initramfs >/dev/null 2>&1 || exit 0
 
-# passing the kernel version is required
-if [ -z "${version}" ]; then
-        echo >&2 "W: initramfs-tools: ${DPKG_MAINTSCRIPT_PACKAGE:-kernel package} did not pass a version number"
-        exit 2
-fi
 
-# there are only two kernel types: with and without postfix "-v7+" or "-v8+"
-currentversion="$(uname -r)"
+#Previously we only triggered on matching kernel versions.
+#now always trigger, it is less brittle, and the old way was not working at all.
 
-# get §currenttype from $currentversion
-currenttype="<no currenttype>"
-echo $currentversion | grep -Pq '^\d+\.\d+\.\d+\+$'
-[ $? -eq 0 ] && currenttype="+"
-echo $currentversion | grep -Pq '^\d+\.\d+\.\d+-v[78]\+$'
-[ $? -eq 0 ] && currenttype="${currentversion#*-}"
-
-# get $newtype from $version
-newtype="<no newtype>"
-echo $version | grep -Pq '^\d+\.\d+\.\d+\+$'
-[ $? -eq 0 ] && newtype="+"
-echo $version | grep -Pq '^\d+\.\d+\.\d+-v[78]\+$'
-[ $? -eq 0 ] && newtype="${version#*-}"
-
-# we do nothing if the new kernel is not for the same kernel type then the current
-# Note that we build all three, but we only want to trigger on the current
-if [ "$newtype" != "$currenttype" ]; then
-        exit 0
-fi
 
 # absolute file name of kernel image may be passed as a second argument;
 # create the initrd in the same directory
@@ -155,14 +148,27 @@ if [ -n "$DEB_MAINT_PARAMS" ]; then
         fi
 fi
 
-# We don't use set -e, if some of these stop existing, that's fine.
 # Find most recently added kernel folder, assume there are three versions
 KERNELNUM=$(ls -Art /lib/modules | tail -n 1|head -n 1 | cut -d- -f1 | cut -d+ -f1)
-#Build the three versions we will need
-mkinitramfs -o /boot/initramfs-emberos.gz -k ${KERNELNUM}+
-mkinitramfs -o /boot/initramfs-emberos-v7.gz -k ${KERNELNUM}-v7+
-mkinitramfs -o /boot/initramfs-emberos-v7l.gz -k ${KERNELNUM}-v7l+
 
+#For some reason this variable is empty at least when building new images on custompios.
+echo "Got kernel number"
+echo $KERNELNUM
+#Build the three versions we will need
+
+if [ -d "/lib/modules/${KERNELNUM}+" ]; then
+    mkinitramfs -o "/boot/initramfs-emberos.gz" -k ${KERNELNUM}+
+else
+    echo "File not found. This is normal if building custompios, otherwise it may be a big problem"
+fi
+
+if [ -d "/lib/modules/${KERNELNUM}-v7+" ]; then
+    mkinitramfs -o /boot/initramfs-emberos-v7.gz -k ${KERNELNUM}-v7+
+fi
+
+if [ -d "/lib/modules/${KERNELNUM}-v7l+" ]; then
+    mkinitramfs -o /boot/initramfs-emberos-v7l.gz -k ${KERNELNUM}-v7l+
+fi
 EOF
 chmod +x /etc/kernel/postinst.d/rpi-initramfs-tools
 
@@ -181,6 +187,9 @@ cp /boot/config.txt /tmp/bc
 echo "initramfs initramfs-emberos.gz" > /boot/config.txt
 cat /tmp/bc >> /boot/config.txt
 
+
+#Do this after we already replaced initramfs tools with our own one that actually works
+apt-get -y full-upgrade
 
 unpack /filesystem/sketch /sketch
 
@@ -245,7 +254,7 @@ mkdir -p /root/.ssh
 cat << EOF > /etc/fstab
 proc            /proc           proc    defaults          0       0
 /dev/mmcblk0p1  /boot           vfat    defaults,noatime,ro          0       2
-/dev/mmcblk0p2  /               ext4    defaults,noatime,ro  0       1
+/dev/mmcblk0p2  /               f2fs    defaults,noatime,ro,compress  0       1
 /dev/mmcblk0p3 /sketch auto defaults,noatime,nofail,fmask=027,dmask=027,umask=027 0 0
 EOF
 
@@ -486,7 +495,7 @@ cat << EOF > /etc/systemd/system/manage_sketch_folder.service
 Description=Manage things from sketch folder
 After=systemd-remount-fs.service 
 #Before fs_bindings, it sets up the stuff that we are binding.
-Before=sysinit.target fs_bindings.service yggdrasil.service
+Before=sysinit.target fs_bindings.service yggdrasil.service graphical.target multi-user.target
 RequiresMountsFor=/etc/ /sketch/ /home/
 DefaultDependencies=no
 
@@ -755,6 +764,9 @@ mk_pi_persist_dir  .drayerdb
 #Used to cache information about visited peers
 mk_pi_persist_dir  .hardlinep2p
 
+#Reserve in case we ever rename harkdline
+mk_pi_persist_dir  .drayerjournal
+
 mk_pi_persist_dir .local/share/marble
 mk_pi_persist_dir .local/share/Zeal
 mk_pi_persist_dir .local/share/mime
@@ -811,6 +823,8 @@ mk_pi_persist_dir .config/lxsession
 mk_pi_persist_dir .config/lxterminal
 mk_pi_persist_dir .config/menus
 mk_pi_persist_dir .config/guake
+mk_pi_persist_dir .local/lib
+mk_pi_persist_dir .local/bin
 
 mk_pi_persist_dir .local/share/desktop-directories
 mk_pi_persist_dir .local/share/applications

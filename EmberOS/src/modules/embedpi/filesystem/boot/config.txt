@@ -65,6 +65,7 @@ dtparam=audio=on
 # select initramfs based on version
 [pi0]
 initramfs initramfs-emberos.gz followkernel
+dtoverlay=dwc2
 
 [pi1]
 initramfs initramfs-emberos.gz followkernel

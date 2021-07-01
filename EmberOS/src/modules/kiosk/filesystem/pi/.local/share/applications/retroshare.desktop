@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Name=RetroShare
+Comment=Securely communicate with your friends
+Exec=bash -c "export OPENSSL_CONF=''&&retroshare"
+Icon=/usr/share/pixmaps/retroshare.xpm
+Terminal=false
+Type=Application
+Categories=Application;Network;P2P;Feed;Chat;InstantMessaging
+MimeType=x-scheme-handler/retroshare;

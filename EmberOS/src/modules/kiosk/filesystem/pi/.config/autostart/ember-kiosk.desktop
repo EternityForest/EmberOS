@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=EmberDefaultKiosk
+Type=Application
+Exec=/usr/bin/chromium-browser http://localhost --window-size=1920,1080 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null --autoplay-policy=no-user-gesture-required --no-default-browser-check --disk-cache-size=96000000 --no-first-run --simulate-outdated-no-au='Tue, 31 Dec 2099 23:59:59 GMT' &
+Terminal=false

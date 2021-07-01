@@ -13,6 +13,8 @@ ExecStart=/usr/bin/fs_bindings.py > /var/log/fs_bindings
 #We don't want syste
 KillMode=process
 Type=oneshot
+OOMScoreAdjust=-1000
+RemainAfterExit=true
 
 [Install]
 WantedBy=multi-user.target

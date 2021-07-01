@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=
+Terminal=false
+Name=Drayer Journal
+Exec=hardline-gui
+Type=Application
+Icon=gnome-panel-launcher
+Categories=Office;Utility;Education;Network

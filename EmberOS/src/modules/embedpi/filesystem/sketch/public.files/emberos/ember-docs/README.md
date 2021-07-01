@@ -402,6 +402,7 @@ NTFS is a journaling filesystem, so you may or may not actually need true read o
 Almost nothing ever writes to sketch randomly by itself, so it sould not cause disk wear.
 
 ## Updating Kaithem
-The whole install as found in the repo is in /sketch/opt/kaithem.  Just
-copy the entire contents of the repo there, or do a git pull --rebase right in that folder.
+The whole install as found in the repo is in /opt/kaithem.  Just do a git pull --rebase right in that folder after running "sudo writable".
+
+Note that formerly we used /sketch/opt/kaithem.  We don't do this as we now want a cleaner separation between user data and applications.
 

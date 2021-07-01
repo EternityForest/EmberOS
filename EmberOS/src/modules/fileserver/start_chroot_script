@@ -9,7 +9,10 @@ set -e
 
 source /common.sh
 
+# Need for peerJS
+apt-get -y install libavdevice-dev libavfilter-dev libopus-dev libvpx-dev pkg-config libsrtp2-dev
 
+pip3 install peerjs
 
 #This seems to be fairly low resource usage and thus safe to include
 echo "media_dir=/var/public.media/" >> /etc/minidlna.conf

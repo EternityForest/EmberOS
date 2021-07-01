@@ -6,24 +6,27 @@ set -e
 source /common.sh
 
 mkdir -p /sketch/kaithem/
-mkdir -p /sketch/opt/kaithem/
 
-unpack /filesystem/KaithemAutomation/kaithem/var /sketch/kaithem root
 
-unpack /filesystem/KaithemAutomation/ /sketch/opt/kaithem/ root
+#Suck tastic way to do this, it redownloads every time. I hate it but it it simple and reliable.
+#Eventually we will make build cache persistent
+git clone --depth 1 https://github.com/EternityForest/KaithemAutomation.git /build_cache/KaithemAutomation
+
+
+git clone --depth 1 /build_cache/KaithemAutomation /opt/kaithem
+
+git remote remove origin
+git remote add origin https://github.com/EternityForest/KaithemAutomation
+git branch --set-upstream-to=origin/master master
+
+rsync -avz /opt/kaithem/kaithem/var/  /sketch/kaithem/
+
+unpack /filesystem/kaithem_sketch/ /sketch/kaithem/ root
+
 unpack /filesystem/systemd/ /usr/lib/systemd/system/ root
-unpack /filesystem/kaithem_sketch/ /sketch/kaithem root
 
 #Remove dummy keys so the user can add them if missing
 ! rm /sketch/kaithem/ssl/certificate.key
 ! rm /sketch/kaithem/ssl/certificate.cert
 
-#No, I will not pretend to understand why this failed with just the exclamation point
-echo $(rm -rf /sketch/opt/kaithem/screenshots)
-
-
-
-#Purely for convenience since it's already part of kaithem and it's only 3MB, make that soundfont available system wide
-#No need for that anymore, fluidsynth includes a better one anyway
-#mkdir -p /usr/share/sounds/sf2/
-#cp /sketch/opt/kaithem/kaithem/data/sounds/babyfont.sf3 /usr/share/sounds/sf2/babyfont.sf3
+chmod a+x /opt/kaithem/ /opt/kaithem/kaithem/kaithem.py

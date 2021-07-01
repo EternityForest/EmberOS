@@ -7,6 +7,9 @@ def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
 
+#Sorts by which ordrer we should do the bindings.
+#Obviously we need to bind lower lever dirs before higher level ones.
+#Or the lower ones would just cover everything up.
 def bindSortKeyHelper(source,data):
     if isinstance(data,dict):
         if 'bindat' in data:
@@ -119,7 +122,8 @@ as the ordering is defined based on the destinations.
 
 import yaml, subprocess, os
 
-config = {}
+#Our current merged config
+mergedConfig = {}
 
 configdir = "/sketch/config/filesystem/"
 #configdir = "/home/daniel/sandbox/config/"
@@ -144,22 +148,24 @@ for i in os.listdir(configdir):
     try:
         if i.endswith(".yaml"):
             with open(os.path.join(configdir,i)) as f:
-                x = yaml.load(f.read())
-                x2 ={}
+                thisConfig = yaml.load(f.read())
+                topLevelConfigToMerge ={}
                 #Merge all the bindfile lists so we can define bindings for the same dir in multiple folders
-                for j in x:
+                for j in thisConfig:
                     #Normalize
                     if not j.endswith("/"):
                         path=j+"/"
                     else:
                         path = j
+                    
+                    #If it is not a string, that's because it's a simple binding
+                    #Merge logic
+                    if not isinstance(thisConfig[j],str):
+                        if path in mergedConfig:
+                            thisConfig[j]['referenced_by'] = mergedConfig[path]['referenced_by']
 
-                    if not isinstance(x[j],str):
-                        if path in config:
-                            x[j]['referenced_by'] = config[path]['referenced_by']
-
-                            b = config[path].get("bindfiles",{})
-                            newfiles = x[j].get("bindfiles",{})
+                            b = mergedConfig[path].get("bindfiles",{})
+                            newfiles = thisConfig[j].get("bindfiles",{})
 
                             for i in newfiles:
                                 if i in b:
@@ -167,25 +173,25 @@ for i in os.listdir(configdir):
                                 else:
                                     b[i]=newfiles[i]
 
-                            x[j]['bindfiles'] = b
+                            thisConfig[j]['bindfiles'] = b
 
 
                             for key in ['bindat','mode','user','pre_cmd',"post_cmd"]:
-                                if key in config[path]:
-                                    if key in x[j]:
+                                if key in mergedConfig[path]:
+                                    if key in thisConfig[j]:
                                         raise RuntimeError(key+" was already specified for path "+j +" in another file")
                                     else:
-                                       x[j][key] = config[path][key]
+                                       thisConfig[j][key] = mergedConfig[path][key]
 
 
-                    x2[path]=x[j]
-                    if isinstance(x2[path],dict):
-                        if not "referenced_by" in x2[path]:
-                            x2[path]['referenced_by']=[]
+                    topLevelConfigToMerge[path]=thisConfig[j]
+                    if isinstance(topLevelConfigToMerge[path],dict):
+                        if not "referenced_by" in topLevelConfigToMerge[path]:
+                            topLevelConfigToMerge[path]['referenced_by']=[]
                         
-                        x2[path]['referenced_by'].append(i)
+                        topLevelConfigToMerge[path]['referenced_by'].append(i)
 
-                config.update(x2)
+                mergedConfig.update(topLevelConfigToMerge)
     except:
         eprint("Exception loading config file: "+i+"\n\n"+traceback.format_exc())
 
@@ -194,54 +200,57 @@ for i in os.listdir(configdir):
 
 
 #Compute an effective bind point, which may just be the path itself if no bind is done
-for i in sorted(list(config.keys()),key=lambda x:bindSortKeyHelper(x,config[x])):
+for i in sorted(list(mergedConfig.keys()),key=lambda x:bindSortKeyHelper(x,mergedConfig[x])):
     try:
-        d = config[i]
-        if isinstance(d,str):
+        bindingConfig = mergedConfig[i]
+
+        #Simple bindimng
+        if isinstance(bindingConfig,str):
             continue
             
-        if 'bindat' in d:
-            dest = d['bindat']
+        if 'bindat' in bindingConfig:
+            dest = bindingConfig['bindat']
         else:
             dest=i
 
-        #Keep track of where we mounted it    
-        d['mounted_at'] = dest
+        #Keep track of where we are actually going to mount it.
+        bindingConfig['mounted_at'] = dest
     except:
         eprint("Exception \n\n"+traceback.format_exc())
 
 
 
-print(yaml.dump(config))
+print(yaml.dump(mergedConfig))
 
 
 #Shortest first, to do upper dirs
 #Use the length of whereever we are binding to, 
-for i in sorted(list(config.keys()),key=lambda x:bindSortKeyHelper(x,config[x])):
+for i in sorted(list(mergedConfig.keys()),key=lambda x:bindSortKeyHelper(x,mergedConfig[x])):
     try:
-        d = config[i]
-        if isinstance(d,str):
-            print("Simple Binding",d)
+        bindingConfig = mergedConfig[i]
+
+        if isinstance(bindingConfig,str):
+            print("Simple Binding",bindingConfig)
             continue
 
-        if 'bindat' in d:
-            dest = d['bindat']
+        if 'bindat' in bindingConfig:
+            dest = bindingConfig['bindat']
         else:
             dest=i
 
-        if 'pre_cmd' in d:
-            print(d['pre_cmd'])
-            if isinstance(d['pre_cmd'], str):
-                subprocess.call(d['pre_cmd'],shell=True)
+        if 'pre_cmd' in bindingConfig:
+            print(bindingConfig['pre_cmd'])
+            if isinstance(bindingConfig['pre_cmd'], str):
+                subprocess.call(bindingConfig['pre_cmd'],shell=True)
 
-            elif isinstance(d['pre_cmd'], list):
-                for command in d['pre_cmd']:
+            elif isinstance(bindingConfig['pre_cmd'], list):
+                for command in bindingConfig['pre_cmd']:
                     subprocess.check_call(command,shell=True)
 
 
-        if 'mode' in d or 'user' in d or 'bindat' in d:
-            if 'mode' in d:
-                m = str(d['mode'])
+        if 'mode' in bindingConfig or 'user' in bindingConfig or 'bindat' in bindingConfig:
+            if 'mode' in bindingConfig:
+                m = str(bindingConfig['mode'])
                 if len(m)==3:
                     m = '0'+m
 
@@ -252,12 +261,11 @@ for i in sorted(list(config.keys()),key=lambda x:bindSortKeyHelper(x,config[x]))
                 m=None
 
             if not i.startswith("__"):
-                
                 cmd = ['bindfs', '-o','nonempty']
                 if m:
                     cmd.extend(['-p',m])
-                if 'user' in d:
-                        cmd.extend(['-u', d['user']])
+                if 'user' in bindingConfig:
+                        cmd.extend(['-u', bindingConfig['user']])
                 #Mount over itself with the given options
                 cmd.extend([i,dest])
                 print(cmd)
@@ -265,11 +273,11 @@ for i in sorted(list(config.keys()),key=lambda x:bindSortKeyHelper(x,config[x]))
             
             else:
                 if i.startswith("__tmpfsoverlay__"):
-                    tmpfs_overlay(dest, d['user'],d['mode'])
+                    tmpfs_overlay(dest, bindingConfig['user'],bindingConfig['mode'])
         
-        if 'post_cmd' in d:
-            print(d['post_cmd'])
-            subprocess.call(d['post_cmd'],shell=True)
+        if 'post_cmd' in bindingConfig:
+            print(bindingConfig['post_cmd'])
+            subprocess.call(bindingConfig['post_cmd'],shell=True)
 
     except:
         eprint("Exception in config for: "+i+"\n\n"+traceback.format_exc())
@@ -280,24 +288,24 @@ def searchConfig(f):
     if not f.endswith("/"):
         f = f+'/'
 
-    if f in config and not isinstance(config[f],str):
-        return f, config[f]
+    if f in mergedConfig and not isinstance(mergedConfig[f],str):
+        return f, mergedConfig[f]
     
     while len(f)>1:
         #Split does not do what you think it should if path ends in /
         f = os.path.split(f if not f[-1]=='/' else f[:-1])[0]
         if not f.endswith("/"):
             f = f+'/'
-        if f in config and not isinstance(config[f],str):
-            return f,config[f]
+        if f in mergedConfig and not isinstance(mergedConfig[f],str):
+            return f,mergedConfig[f]
     return f,{}
 
 #Now we handle simple bindings, and individual file bindings.
-for i in sorted(list(config.keys()),key=lambda x:bindSortKeyHelper(x,config[x])):   
-    d = config[i]
+for i in sorted(list(mergedConfig.keys()),key=lambda x:bindSortKeyHelper(x,mergedConfig[x])):   
+    bindingConfig = mergedConfig[i]
     
     #Simple bindings
-    if isinstance(d,str):
+    if isinstance(bindingConfig,str):
         try:
             #Bind to the permission-transformed view, not the original
             #Not the search path thing, because we might be in a subfolder of something BindFSed elsewhere,
@@ -308,7 +316,7 @@ for i in sorted(list(config.keys()),key=lambda x:bindSortKeyHelper(x,config[x]))
             l,topConfig = searchConfig(i) or {}
 
             #Start with the path
-            x = i
+            thisConfig = i
 
             mounted =  topConfig.get('mounted_at','/')
 
@@ -316,33 +324,34 @@ for i in sorted(list(config.keys()),key=lambda x:bindSortKeyHelper(x,config[x]))
                 mounted = mounted+'/'
 
             #Now rebase it on wherever the topmost configured parent dir is mounted
-            x = x.replace(l,mounted)
+            thisConfig = thisConfig.replace(l,mounted)
 
-            cmd = ['mount', '--rbind', '-o','nonempty',x, d]
+            cmd = ['mount', '--rbind', '-o','nonempty',thisConfig, bindingConfig]
             print(cmd)
             subprocess.call(cmd)
         except:
-            eprint("Exception in binding for: "+i+" on "+d+"\n\n"+traceback.format_exc())
+            eprint("Exception in binding for: "+i+" on "+bindingConfig+"\n\n"+traceback.format_exc())
 
-    elif 'bindfiles' in d:
-         for j in d['bindfiles']:
+    elif 'bindfiles' in bindingConfig:
+         for j in bindingConfig['bindfiles']:
+            dest=None
             try:
-                dest =  d['bindfiles'][j]
+                dest =  bindingConfig['bindfiles'][j]
                 
                 l,topConfig = searchConfig(i) or {}
-                x = os.path.join(topConfig.get('mounted_at','/'),i)
+                thisConfig = os.path.join(topConfig.get('mounted_at','/'),i)
 
                 mounted =  topConfig.get('mounted_at','/')
 
                 if not mounted.endswith("/"):
                     mounted = mounted+'/'
 
-                x = x.replace(l,mounted)
-                x=os.path.join(x,j)
-                cmd = ['mount', '--rbind', '-o','nonempty',x, dest]
+                thisConfig = thisConfig.replace(l,mounted)
+                thisConfig=os.path.join(thisConfig,j)
+                cmd = ['mount', '--rbind', '-o','nonempty',thisConfig, dest]
                 
                 print(cmd)
                 subprocess.call(cmd)
             except:
-                eprint("Exception in binding for: "+os.path.join(d.get("mounted_at","ERR"),j)+" on "+dest+"\n\n"+traceback.format_exc())
+                eprint("Exception in binding for: "+os.path.join(bindingConfig.get("mounted_at","ERR"),j)+" on "+dest+"\n\n"+traceback.format_exc())
 
