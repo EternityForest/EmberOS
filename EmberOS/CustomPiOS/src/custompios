@@ -91,6 +91,9 @@ pushd $BASE_WORKSPACE
     mount --bind "$BASE_APT_CACHE" $BASE_MOUNT_PATH/var/cache/apt
   fi
 
+  mkdir -p $BASE_WORKSPACE/build_cache
+  mkdir -p $BASE_MOUNT_PATH/build_cache
+  mount --bind $BASE_WORKSPACE/build_cache $BASE_MOUNT_PATH/build_cache
 
   #Edit pi filesystem
   pushd $BASE_MOUNT_PATH

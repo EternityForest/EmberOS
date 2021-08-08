@@ -539,6 +539,8 @@ mkdir -p /root/ssh
 
 cp /filesystem/sketch_git_ignore /sketch/.gitignore
 
+
+
 #All of sketch is now a git repo have fun
 git init /sketch
 
@@ -549,6 +551,14 @@ cp -a /etc/ssh/.  /sketch/ssh/etc.ssh/
 
 mkdir -p  /sketch/ssh/pi
 mkdir -p /sketch/ssh/root
+
+
+mkdir -p /sketch/config/lightdm
+mkdir -p /etc/lightdm
+
+
+cp -a /etc/lightdm.  /sketch/config/lightdm
+
 
 
 mkdir -p /var/lib/bluetooth
@@ -616,6 +626,13 @@ cat << EOF > /sketch/config/filesystem/emberos_sshconf.yaml
     bindat: /home/pi/.ssh
 
 /sketch/ssh/root: /root/.ssh/
+EOF
+
+cat << EOF > /sketch/config/filesystem/emberos_lightdm.yaml
+/sketch/config/lightdm:
+    mode: '0755'
+    user: root
+    bindat: /etc/lightdm
 EOF
 
 cat << EOF > /sketch/config/filesystem/readme.md

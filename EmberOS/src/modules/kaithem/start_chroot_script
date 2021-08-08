@@ -7,17 +7,20 @@ source /common.sh
 
 mkdir -p /sketch/kaithem/
 
-
-#Suck tastic way to do this, it redownloads every time. I hate it but it it simple and reliable.
-#Eventually we will make build cache persistent
+if [ ! -d /build_cache/KaithemAutomation ]
+then
 git clone --depth 1 https://github.com/EternityForest/KaithemAutomation.git /build_cache/KaithemAutomation
-
+else
+cd /build_cache/KaithemAutomation
+git pull --rebase
+fi
 
 git clone --depth 1 /build_cache/KaithemAutomation /opt/kaithem
 
-git remote remove origin
-git remote add origin https://github.com/EternityForest/KaithemAutomation
-git branch --set-upstream-to=origin/master master
+cd /opt/kaithem/
+
+
+git remote set-url origin https://github.com/EternityForest/KaithemAutomation.git
 
 rsync -avz /opt/kaithem/kaithem/var/  /sketch/kaithem/
 
@@ -30,3 +33,9 @@ unpack /filesystem/systemd/ /usr/lib/systemd/system/ root
 ! rm /sketch/kaithem/ssl/certificate.cert
 
 chmod a+x /opt/kaithem/ /opt/kaithem/kaithem/kaithem.py
+
+
+cat << EOF > /sketch/kaithem/registry/data/jacksettings.yaml
+{jackDevice: '', jackMode: dummy, jackPeriodSize: 256, jackPeriods: 2, sharePulse: 'off',
+  usbLatency: -1, usbPeriodSize: 256, usbPeriods: 3, usbQuality: 0, useAdditionalSoundcards: 'yes'}
+EOF

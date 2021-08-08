@@ -5,12 +5,6 @@ set -x
 # Possibly because it's actually a different SD card with the same name. You need to run `ssh-keygen -R HOSTNAME` to clear
 # this.
 
-# You will probably also need to manually SSH to the server at least once, so that SSH has the key cached
-
-
-#Change these to the server you want to back up.   Everything that isn't gitignored in the target's sketch folder will
-#be backed up to a folder named sketch in the current directory.
-
 export remoteServer=embedpi.local
 export remoteLoginUser=pi
 
@@ -28,22 +22,22 @@ export SSHPASS=raspberry
 #Now we use SSHPASS to log on, but after that we use sudo -S to elevate the rsync permissions, cat ing the password file we just made
 function pullFile(){
     
-    rsync --rsh="sshpass -e ssh -l $remoteLoginUser" -av --no-perms --no-owner --no-group $remoteLoginUser@$remoteServer:$1 $2
+    rsync --rsh="sshpass -e ssh -o HostKeyAlias=$remoteServer -o CheckHostIP=no -l $remoteLoginUser" -av --no-perms --no-owner --no-group $remoteLoginUser@$remoteServer:$1 $2
 }
 
 # Usage: pullWithIgnore /home/pi/foo/ foo/ ignore.conf
 #Pull /home/pi/foo to local foo, using local ignore.conf file
 function pullWithIgnore(){
     mkdir -p $2
-    rsync --rsh="sshpass -e ssh -l $remoteLoginUser" -av --no-perms \
+    rsync --rsh="sshpass -e ssh -o HostKeyAlias=$remoteServer -o CheckHostIP=no -l $remoteLoginUser" -av --no-perms \
     --prune-empty-dirs --delete --no-owner --no-group \
     --exclude-from $3 $remoteLoginUser@$remoteServer:$1 $2
 }
 
 
 #Let pi see it with a bind mount
-sshpass -e ssh $remoteLoginUser@$remoteServer  "mkdir -p /dev/shm/sketch_backup_mountpoint/"
-sshpass -e ssh $remoteLoginUser@$remoteServer  "sudo bindfs -u $remoteLoginUser -p 0700 /sketch/ /dev/shm/sketch_backup_mountpoint/"
+sshpass -e ssh -o HostKeyAlias=$remoteServer -o CheckHostIP=no $remoteLoginUser@$remoteServer  "mkdir -p /dev/shm/sketch_backup_mountpoint/"
+sshpass -e ssh -o HostKeyAlias=$remoteServer -o CheckHostIP=no $remoteLoginUser@$remoteServer  "sudo bindfs -u $remoteLoginUser -p 0700 /sketch/ /dev/shm/sketch_backup_mountpoint/"
 
 echo "setup session"
 
@@ -54,10 +48,8 @@ pullWithIgnore  /dev/shm/sketch_backup_mountpoint/ sketch/ remoteIgnoreFile_auto
 echo "got sketch"
 
 #Now get rid of that mountpoint
-sshpass -e ssh $remoteLoginUser@$remoteServer "sudo umount /dev/shm/sketch_backup_mountpoint/ && rmdir /dev/shm/sketch_backup_mountpoint"
+sshpass -e ssh -o HostKeyAlias=$remoteServer -o CheckHostIP=no $remoteLoginUser@$remoteServer "sudo umount /dev/shm/sketch_backup_mountpoint/ && rmdir /dev/shm/sketch_backup_mountpoint"
 echo "Close session"
-
-#rm sketch/kaithem/modules/1*
 # Backup the boot stuff which is sometimes important
 mkdir -p boot
 pullFile /boot/config.txt boot/config.txt
