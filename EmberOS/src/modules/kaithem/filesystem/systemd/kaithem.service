@@ -11,6 +11,20 @@ Restart=on-failure
 RestartSec=15
 OOMScoreAdjust=-800
 Nice=-15
+#Make it try to act like a GUI program if it can because some modules might
+#make use of that.
+Environment="DISPLAY=:0"
+
+#This may cause some issues but I think it's a better way to go purely because of
+#The fact that we can use PipeWire instead of managing jack, without any conflicts.
+
+#Also, node red runs as pi, lets stay standard.
+User=pi
+#Bluetooth scannning and many other things will need this
+#Setting the system time is used for integration with GPS stuff.
+AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_NET_ADMIN CAP_NET_RAW CAP_SYS_TIME
+
+
 
 [Install]
 WantedBy=multi-user.target

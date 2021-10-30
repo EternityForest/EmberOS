@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=Use espruino-web-ide --enable-experimental-web-platform-features to run from CLI
+Terminal=false
+Name=Espruino IDE
+Exec=espruino-web-ide --enable-experimental-web-platform-features
+Type=Application
+Icon=gnome-panel-launcher
+Categories=Development

@@ -38,6 +38,13 @@ If this will be a desktop-like machine, cyberdeck, Kodi box, etc, you probably w
 
 Otherwise, you may want Micro, for faster flashing, and to fit on cheaper SD cards.
 
+## Debian 11 update, Kaithem does not run as root(2021Oct27 and up)
+
+The system no longer uses Pulesaudio and Jack, it uses PipeWire which acts as a drop in replacement for those.
+
+This is probably one of the biggest breaking changes ever. /home/pi/kaithem is bindfs linked to /sketch/kaithem and must be set as the site data dir.
+
+You can still run it as root, but it will cause problems since the pi user owns PipeWire.
 
 ### Goals
 

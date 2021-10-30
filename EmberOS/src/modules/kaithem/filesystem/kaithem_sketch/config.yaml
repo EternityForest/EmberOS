@@ -1,5 +1,5 @@
-site-data-dir: /sketch/kaithem
-ssl-dir: /sketch/kaithem/ssl
+site-data-dir: /home/pi/kaithem
+ssl-dir: /home/pi/kaithem/ssl
 save-before-shutdown: yes
 run-as-user: root
 autosave-state: 6 hours

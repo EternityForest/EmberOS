@@ -34,8 +34,24 @@ unpack /filesystem/systemd/ /usr/lib/systemd/system/ root
 
 chmod a+x /opt/kaithem/ /opt/kaithem/kaithem/kaithem.py
 
+#No idea why this is needed to fix things
+git rm --cached -r .
+git reset --hard
 
+git pull --rebase
+
+mkdir /home/pi/kaithem
+
+#Give www-data a "window into the root filesystem"
+cat << EOF > /sketch/config/filesystem/emberos-pi-kaithem.yaml
+/sketch/kaithem
+    mode: '0750'
+    user:  pi
+    bindat: /home/pi/kaithem
+EOF
+
+#We want to just use Pulse
 cat << EOF > /sketch/kaithem/registry/data/jacksettings.yaml
-{jackDevice: '', jackMode: dummy, jackPeriodSize: 256, jackPeriods: 2, sharePulse: 'off',
-  usbLatency: -1, usbPeriodSize: 256, usbPeriods: 3, usbQuality: 0, useAdditionalSoundcards: 'yes'}
+{jackDevice: '', jackMode: use, jackPeriodSize: 512, jackPeriods: 3, sharePulse: 'off',
+  usbLatency: -1, usbPeriodSize: 512, usbPeriods: 3, usbQuality: 0, useAdditionalSoundcards: 'no'}
 EOF

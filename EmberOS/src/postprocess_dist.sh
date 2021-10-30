@@ -8,7 +8,7 @@ echo "postprocessing `ls -t workspace/*.img | head -1`"
 
 ORIGINAL_LOOP=$(losetup -P -r --find --show `ls -t workspace/*.img | head -1`)
 
-dd if=/dev/zero bs=1M count=9212 >> workspace/emberos_postprocessed.img
+dd if=/dev/zero bs=1M count=10212 >> workspace/emberos_postprocessed.img
 
 POSTPROCESS_LOOP=`losetup -P --find --show workspace/emberos_postprocessed.img`
 
@@ -26,7 +26,7 @@ parted --script ${POSTPROCESS_LOOP} \
     mklabel msdos \
     mkpart primary fat32 4MiB 192MiB \
     mkpart primary btrfs 192MiB 6400MiB \
-    mkpart primary NTFS 6400MiB 9200MiB \
+    mkpart primary NTFS 6400MiB 10200MiB \
     set 1 boot on
     set 2 boot on
     set 1 lba on
@@ -54,7 +54,7 @@ mount ${POSTPROCESS_LOOP}p1 workspace/postprocess_boot/
 rsync -az workspace/original_boot/ workspace/postprocess_boot/
 
 #Then edit the cmd line. Pretty sure rootfstype is ignored by tmpfs though but whatever.
-sed -i 's/rootfstype=ext4/rootfstype=btrfs,f2fs/g' workspace/postprocess_boot/cmdline.txt
+sed -i 's/rootfstype=ext4/rootfstype=btrfs,ext4,f2fs/g' workspace/postprocess_boot/cmdline.txt
 sed -i 's/fsck.repair=yes/fsck.repair=no/g' workspace/postprocess_boot/cmdline.txt
 
 

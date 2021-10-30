@@ -743,12 +743,14 @@ pip3 install sqlite3worker
 pip3 install deepspeech
 pip3 install pyusb
 
-sudo apt-get -y install python3-smbus python3-msgpack python3-paho-mqtt python3-gevent python3-falcon python3-mako python3-typeguard python3-paramiko
+sudo apt-get -y install python3-rtmidi python3-smbus python3-msgpack python3-paho-mqtt python3-gevent python3-falcon python3-mako python3-typeguard python3-paramiko libglib2.0-dev
 
 pip3 install zimply
 pip3 install pycryptodome
 pip3 install pynacl
 pip3 install qrcode
+pip3 install bluepy
+
 
 pip3 install beautifulsoup4
 pip3 install toml
@@ -756,7 +758,7 @@ pip3 install toml
 pip3 install pi3d
 pip3 install npyscreen picotui asciimatics
 pip3 install esptool
-
+apt-get -y install libmpv-dev python3-mpv
 apt-get -y install postgresql libpq-dev postgresql-client postgresql-contrib postgresql-client-common
 mkdir -p /sketch/postgresql
 mkdir -p /sketch/config/postgresql
@@ -832,7 +834,7 @@ apt-get -y install pocketsphinx  gstreamer1.0-pocketsphinx pocketsphinx pocketsp
 #Mega GUI apps
 if [ -z "$EMBER_MICRO" ]
 then
-apt-get -y install ardour audacious audacious-plugins tuxguitar calibre zeal filezilla gelemental kstars inkscape gimp fslint pulseview synaptic qdirstat gwenview guake skanlite
+apt-get -y install ardour audacious audacious-plugins tuxguitar calibre zeal filezilla gelemental kstars inkscape gimp fslint pulseview synaptic qdirstat gwenview guake skanlite code
 fi
 
 apt-get -y install deluge audacity kodi kodi-pvr-mythtv kodi-pvr-dvbviewer kodi-pvr-iptvsimple vlc 
@@ -990,9 +992,10 @@ WantedBy=multi-user.target
 EOF
 
 sudo apt-get install build-essential libudev-dev
-sudo npm install nw -g
-sudo npm install espruino-web-ide -g
 
+# Have to just use the version built into kaithem.
+# sudo npm install nw --unsafe-perm -g
+# sudo npm install espruino-web-ide --unsafe-perm -g
 
 
 apt-get autoremove -y --purge

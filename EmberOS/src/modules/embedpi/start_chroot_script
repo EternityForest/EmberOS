@@ -56,6 +56,18 @@ apt-get -y install fuse-overlayfs
 #Get new kernel
 sudo apt-get -y install raspberrypi-bootloader rpi-eeprom
 
+#Upgrade everything BEFORE we build an initramfs
+apt-get -y full-upgrade
+
+
+#We are going to move to the new debian 11 stuff now.
+#It's a pretty big deal with the new features.
+sed -i 's/buster/bullseye/g' /etc/apt/sources.list
+
+
+#Make sure we can auto reconnect to bluetooth devices
+sed -i 's/AutoEnable=false/AutoEnable=true/g' /etc/bluetooth/main.conf
+
 
 #TODO why in the toilet does this giver error? Oh well, it's new enought already.
 #sudo apt-get -y install raspberrypi-kernel
@@ -80,6 +92,15 @@ systemctl set-default multi-user.target
 
 #No more annoying popup about ssh passwords.
 rm /etc/xdg/lxsession/LXDE-pi/sshpwd.sh
+
+
+cat << EOF > /etc/fstab
+proc            /proc           proc    defaults          0       0
+/dev/mmcblk0p1  /boot           vfat    defaults,noatime,ro          0       2
+/dev/mmcblk0p2  /               btrfs    defaults,noatime,ro,compress  0       1
+/dev/mmcblk0p3 /sketch auto defaults,noatime,nofail,fmask=027,dmask=027,umask=027 0 0
+EOF
+
 
 cat << EOF > /etc/initramfs-tools/modules
 btrfs
@@ -148,33 +169,21 @@ if [ -n "$DEB_MAINT_PARAMS" ]; then
         fi
 fi
 
-# Find most recently added kernel folder, assume there are three versions
-KERNELNUM=$(ls -Art /lib/modules | tail -n 1|head -n 1 | cut -d- -f1 | cut -d+ -f1)
 
-#For some reason this variable is empty at least when building new images on custompios.
-echo "Got kernel number"
-echo $KERNELNUM
-#Build the three versions we will need
 
-if [ -d "/lib/modules/${KERNELNUM}+" ]; then
-    mkinitramfs -o "/boot/initramfs-emberos.gz" -k ${KERNELNUM}+
+if [ -d "/lib/modules/$1" ]; then
+    mkinitramfs -o "/boot/initramfs-emberos.gz" -k $1
 else
     echo "File not found. This is normal if building custompios, otherwise it may be a big problem"
 fi
 
-if [ -d "/lib/modules/${KERNELNUM}-v7+" ]; then
-    mkinitramfs -o /boot/initramfs-emberos-v7.gz -k ${KERNELNUM}-v7+
-fi
-
-if [ -d "/lib/modules/${KERNELNUM}-v7l+" ]; then
-    mkinitramfs -o /boot/initramfs-emberos-v7l.gz -k ${KERNELNUM}-v7l+
-fi
 EOF
 chmod +x /etc/kernel/postinst.d/rpi-initramfs-tools
 
 cp /filesystem/boot/config.txt /boot/config.txt
 
-# Find most recently added kernel folder, assume there are three versions
+# Find most recently added kernel folder, assume there are three versions.  We have to do this because of how we are doing
+#everything inside initramfs
 KERNELNUM=$(ls -Art /lib/modules | tail -n 1|head -n 1 | cut -d- -f1 | cut -d+ -f1)
 #Build the three versions we will need
 mkinitramfs -o /boot/initramfs-emberos.gz -k ${KERNELNUM}+
@@ -188,8 +197,7 @@ echo "initramfs initramfs-emberos.gz" > /boot/config.txt
 cat /tmp/bc >> /boot/config.txt
 
 
-#Do this after we already replaced initramfs tools with our own one that actually works
-apt-get -y full-upgrade
+
 
 unpack /filesystem/sketch /sketch
 
@@ -251,12 +259,7 @@ mkdir -p /root/.ssh
 
 
 ## 
-cat << EOF > /etc/fstab
-proc            /proc           proc    defaults          0       0
-/dev/mmcblk0p1  /boot           vfat    defaults,noatime,ro          0       2
-/dev/mmcblk0p2  /               f2fs    defaults,noatime,ro,compress  0       1
-/dev/mmcblk0p3 /sketch auto defaults,noatime,nofail,fmask=027,dmask=027,umask=027 0 0
-EOF
+
 
 
 mkdir -p  /usr/lib/systemd/system.conf.d/
@@ -557,7 +560,7 @@ mkdir -p /sketch/config/lightdm
 mkdir -p /etc/lightdm
 
 
-cp -a /etc/lightdm.  /sketch/config/lightdm
+cp -a /etc/lightdm/.  /sketch/config/lightdm
 
 
 
@@ -842,6 +845,7 @@ mk_pi_persist_dir .config/menus
 mk_pi_persist_dir .config/guake
 mk_pi_persist_dir .local/lib
 mk_pi_persist_dir .local/bin
+mk_pi_persist_dir  .vscode
 
 mk_pi_persist_dir .local/share/desktop-directories
 mk_pi_persist_dir .local/share/applications
@@ -923,6 +927,12 @@ EOF
 #Compress the RAM, because we have no real swap space
 chmod 755 /usr/bin/ember-activate-zram.sh
 systemctl enable ember-activate-zram.service
+
+
+chmod 755 /usr/bin/bluetooth-autoconnect.py
+#systemctl enable bluetooth-autoconnect.service
+
+
 
 mkdir -p /sketch/config.private
 mkdir -p /etc/sketchconfig.private

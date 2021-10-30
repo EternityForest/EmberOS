@@ -288,6 +288,9 @@ Go to https://hostname.local:8001, and ignore the security warnings you will get
 You can now use it as any other Kaithem instance.  Look at the example module to get started.
 Anything you create gets saved back to that /sketch partition.
 
+Note: This now runs as pi, not root.  The old /sketch/kaithem/ is still the storage dir, but it is bound to /pi/kaithem/
+to make it acessible.
+
 
 ### Firewalling
 
