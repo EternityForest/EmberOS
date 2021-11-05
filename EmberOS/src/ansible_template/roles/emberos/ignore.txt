@@ -1,0 +1,108 @@
+#This file lists the things you probably don't want to be backing up
+#with git or rsync
+public.media/Music/Alexander Nakarada/Adventures of Flying Jack.mp3
+public.media/Music/Alexander Nakarada/README.md
+public.media/Pictures/Wallpaper/september-in-the-forest.jpg
+public.files/emberos/**
+public.media/emberos/**
+kaithem/modules/data/Examples/**
+
+# The old backup data dirs are named after timestamps
+# We don't want those
+kaithem/modules/1*
+kaithem/modules/2*
+kaithem/modules/3*
+kaithem/modules/4*
+kaithem/modules/5*
+kaithem/modules/6*
+kaithem/modules/7*
+kaithem/modules/8*
+kaithem/modules/9*
+kaithem/logs/**
+
+#Presumable we wouldn't want the logs dir
+logs/**
+
+
+#You may want to delete this and sync it if securuty isn't a real issue and you changed something.
+ssh/**
+
+
+home/pi/.local/share/marble/**
+home/pi/.local/share/Zeal/**
+home/pi/.kodi/addons/script.globalsearch/**
+opt/kaithem/**
+opt/rpitx/**
+opt/kouchat/**
+share/wikis/archlinux/**
+cache/**
+.emberos/cache/**
+config/ca-certificates.conf
+config/sslcerts/**
+config/timezones/**
+postgresql/**
+home/pi/Programs/arduino*
+home/pi/Arduino/libraries/**
+share/emberos/**
+share/ember-doc/**
+config/apache2/mods-available/**
+
+# We probably don't want to be syncing every youtube vid...
+home/pi/tartube-data/**
+
+# Standard apache2 stuff. I wish there was a better way to do this.
+# But everything has to be in this file so we can rsync it.
+config/apache2/mods-enabled/access_compat.load
+config/apache2/mods-enabled/authz_core.load
+config/apache2/mods-enabled/autoindex.load
+config/apache2/mods-enabled/env.load
+config/apache2/mods-enabled/mpm_event.load
+config/apache2/mods-enabled/setenvif.conf
+config/apache2/mods-enabled/alias.conf
+config/apache2/mods-enabled/authz_host.load
+config/apache2/mods-enabled/deflate.conf
+config/apache2/mods-enabled/filter.load
+config/apache2/mods-enabled/negotiation.conf
+config/apache2/mods-enabled/setenvif.load
+config/apache2/mods-enabled/alias.load
+config/apache2/mods-enabled/authz_user.load
+config/apache2/mods-enabled/deflate.load
+config/apache2/mods-enabled/mime.conf
+config/apache2/mods-enabled/negotiation.load
+config/apache2/mods-enabled/status.conf
+config/apache2/mods-enabled/authn_core.load
+config/apache2/mods-enabled/auth_basic.load
+config/apache2/mods-enabled/dir.conf
+config/apache2/mods-enabled/mime.load
+config/apache2/mods-enabled/reqtimeout.conf
+config/apache2/mods-enabled/status.load
+config/apache2/mods-enabled/authn_file.load
+config/apache2/mods-enabled/autoindex.conf
+config/apache2/mods-enabled/dir.load
+config/apache2/mods-enabled/mpm_event.conf
+config/apache2/mods-enabled/reqtimeout.load
+
+#Exclude some of the default configs
+config/filesystem/emberos*
+
+#This is there so rsync doesn't try an sync it
+.git
+
+
+#It is rather unfortunate that voice2json mixes up their 
+home/pi/.config/voice2json/acoustic_model/**
+home/pi/.config/voice2json/base_dictionary.txt.gz
+home/pi/.config/voice2json/base_language_model.txt.gz
+home/pi/.config/voice2json/clean.sh  
+home/pi/.config/voice2json/espeak_phonemes.txt
+home/pi/.config/voice2json/frequent_words.txt
+home/pi/.config/voice2json/g2p.fst.gz
+home/pi/.config/voice2json/ipa_phonemes.txt
+home/pi/.config/voice2json/LICENSE
+home/pi/.config/voice2json/marytts/**
+home/pi/.config/voice2json/marytts_phonemes.txt
+home/pi/.config/voice2json/phoneme_examples.txt
+home/pi/.config/voice2json/README
+home/pi/.config/voice2json/SOURCE
+home/pi/.config/voice2json/stop_words.txt
+home/pi/.config/voice2json/test/**

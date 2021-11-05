@@ -1,0 +1,29 @@
+---
+- name: 2 way sync of marble maps with the controller user's home dir. Warning, this never deletes maps could get big.
+  
+  hosts: emberos
+  remote_user: pi
+
+  tasks:
+  - name: Push
+    synchronize:
+      dest: /home/pi/.local/share/marble/maps/
+      src:  /home/{{ lookup('env', 'HOME') }}/.local/share/marble/maps/
+      checksum: yes
+      times: yes
+      mode: push
+      become: yes
+      -rsync_opts:
+        -"--update"
+
+
+  - name: Pull
+    synchronize:
+      dest: /home/{{ lookup('env', 'HOME') }}/.local/share/marble/maps/
+      src:  /home/pi/.local/share/marble/maps/
+      checksum: yes
+      times: yes
+      mode: push
+      become: yes
+      -rsync_opts:
+        -"--update"

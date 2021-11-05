@@ -1,0 +1,11 @@
+
+- name: Set the time to the local time on 
+  
+  hosts: emberos
+  remote_user: pi
+
+  tasks:
+  - name: Push
+    command: "date -s {{ lookup('pipe','date --iso-8601=ns') }}""
+    become: yes
+   

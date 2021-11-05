@@ -1,0 +1,34 @@
+---
+- name: Push backups from all servers
+  
+  hosts: emberos
+  remote_user: pi
+
+  tasks:
+  - name: Push the backup of /boot
+    synchronize:
+      dest: /boot/
+      src: machines/{{ansible_hostname}}/boot/
+      checksum: yes
+      mode: push
+
+      become: yes
+
+  - name: Push the backup of /sketch
+    synchronize:
+      dest: /sketch/
+      src: machines/{{ansible_hostname}}/boot/
+      checksum: yes
+      mode: push
+      become: yes
+  
+  - name: Push the time zones from local controller system time.
+    synchronize:
+      dest: /usr/share/zoneinfo/
+      src:  /usr/share/zoneinfo/
+      checksum: yes
+      times: yes
+      mode: push
+      become: yes
+      -rsync_opts:
+        -"--update"

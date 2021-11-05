@@ -1,0 +1,37 @@
+---
+- name: Pull backup from all servers
+  
+  hosts: emberos
+  remote_user: pi
+
+  tasks:
+  - name: Pull the backup of /boot
+    synchronize:
+      src: /sketch/
+      dest: machines/{{ansible_hostname}}/boot/
+      checksum: yes
+      mode: pull
+      become: yes
+      #Things that presumably *could* be wanted
+      rsync_opts:
+        - "--include=*.ini"
+        - "--include=*.yaml"
+        - "--include=*.txt"
+        - "--include=*.xml"
+        - "--include=*.conf"
+        - "--include=*.png"
+        - "--include=*.jpg"
+        - "--include=*.py"
+        - "--include=*.sh"
+        - "--exclude=*"
+
+  - name: Pull the backup of /sketch
+    synchronize:
+      src: /sketch/
+      dest: machines/{{ansible_hostname}}/boot/
+      checksum: yes
+      mode: pull
+      become: yes
+      #Things that presumably *could* be wanted
+      rsync_opts:
+        - "--exclude-from=ignore.txt"
