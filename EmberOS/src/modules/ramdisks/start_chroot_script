@@ -14,6 +14,8 @@
 
 #This script should set up a tmpfs over everything it can without affecting user experience
 
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmydata
+export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 
 
 # Source error handling, leave this in place
@@ -165,7 +167,6 @@ replace /usr/lib/tmpfiles.d/var.conf "spool\s*0755" "spool 1777"
 
 #Set up symlinks in case we have dhcpcd5
 if [ ! -h /var/lib/dhcpcd5 ] ; then
-rm -r /var/lib/dhcpcd5
 mkdir -p /var/lib/dchp
 ln -s /var/lib/dhcp /var/lib/dhcpcd5
 fi

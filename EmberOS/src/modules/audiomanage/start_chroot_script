@@ -4,6 +4,8 @@
 set -x
 set -e
 
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmydata
+export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 
 source /common.sh
 #mkdir -p /etc/pulse
@@ -80,6 +82,8 @@ EOF
 chmod 744  /etc/systemd/system/ember-manage-audio.service
 systemctl enable ember-manage-audio.service
 
+#No more of this
+#apt-get -y install -y pulseaudio-module-jack pulseaudio-module-zeroconf pulsemixer 
 
 #PipeWire
 
@@ -87,15 +91,46 @@ apt-get install -y pipewire libspa-0.2-jack pipewire-audio-client-libraries libs
 apt-get remove -y pulseaudio-module-bluetooth
 
 touch /etc/pipewire/media-session.d/with-pulseaudio
+sudo cp /usr/share/doc/pipewire/examples/systemd/user/pipewire-pulse.* /etc/systemd/user/
+
+sudo touch /etc/pipewire/media-session.d/with-alsa
+sudo cp /usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d/
+
+su -c 'XDG_RUNTIME_DIR="/run/user/$UID" DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus" systemctl --user  disable pulseaudio.socket' pi
+
+su -c 'XDG_RUNTIME_DIR="/run/user/$UID" DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus" systemctl --user  disable pulseaudio.service' pi
+su -c 'XDG_RUNTIME_DIR="/run/user/$UID" DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus" systemctl --user enable  pipewire-pulse' pi
 
 
-sudo --user pi systemctl --user daemon-reload
-sudo --user pi systemctl --user  disable pulseaudio.service pulseaudio.socket
-sudo --user pi systemctl --user enable pipewire pipewire-pulse
-sudo --user pi systemctl --user enable pipewire pipewire-media-session
-sudo --user pi systemctl --user enable pipewire pipewire
 
-sudo --user pi systemctl --user mask pulseaudio
+cat << EOF > /usr/lib/systemd/user/pipewire-media-session.service
+[Unit]
+Description=Multimedia Service Session Manager
+After=pipewire.service
+BindsTo=pipewire.service
+
+[Service]
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+RestrictNamespaces=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+Type=simple
+ExecStart=/usr/bin/pipewire-media-session
+Restart=on-failure
+Slice=session.slice
+
+[Install]
+WantedBy=pipewire.service
+EOF
+
+su -c 'XDG_RUNTIME_DIR="/run/user/$UID" DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus" systemctl --user enable pipewire-media-session' pi
+su -c 'XDG_RUNTIME_DIR="/run/user/$UID" DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus" systemctl --user enable pipewire' pi
+
+su -c 'XDG_RUNTIME_DIR="/run/user/$UID" DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus" systemctl --user mask pulseaudio' pi
+
+
 touch /etc/pipewire/media-session.d/with-jack
 cp /usr/share/doc/pipewire/examples/ld.so.conf.d/pipewire-jack-*.conf /etc/ld.so.conf.d/
 ldconfig

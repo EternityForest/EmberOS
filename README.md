@@ -34,7 +34,7 @@ Micro does not include many of the larger GUI apps, nor does it include all the 
 
 It still includes basically all headless functionality in MAX.
 
-If this will be a desktop-like machine, cyberdeck, Kodi box, etc, you probably want the full version.
+If this will be a desktop-like machine, cyberdeck, etc, you probably want the full version.
 
 Otherwise, you may want Micro, for faster flashing, and to fit on cheaper SD cards.
 
@@ -130,8 +130,8 @@ Clone this repo with all submodules
 
 Put a fresh zipped raspbian full image in the src/images dir
 
-Run sudo ./build_dist in the src dir. This may take over an hour, and 
-you need internet access the whole time.
+Run sudo eatmydata ./build_dist in the src dir. This may take over an hour, and 
+you need internet access the whole time.  Eatmydata isn't necessary but speeds everything up a lot.
 
 You will need to put the proper deb package at filesystem/debs/voice2json_2.0_armhf.deb in the youmightneedit module.
 Get it here: http://voice2json.org/install.html

@@ -3,194 +3,253 @@ source /common.sh
 
 set -x
 set -e
-
-#HPs scanner drivers
-sudo apt-get -y install hplip hplip-gui sane sane-utils libsane-extras xsane
-
-apt-get -y install npm
-npm install -g --unsafe-perm dat 
-npm install -g --unsafe-perm node-red
-
-#I don't think this makes a difference, we provide our own samba conf
-echo "samba-common samba-common/dhcp boolean true" | sudo debconf-set-selections
-echo "samba-common samba-common/do_debconf boolean true" | sudo debconf-set-selections
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmydata
+export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 
 
-#Add this if it ever gets support
-#apt-get -y install rtl8812au-dkms
-
-#Too big for github, you have to put the file there manually
-apt-get -y install /filesystem/debs/voice2json_2.0_armhf.deb
-
-#Gonna do ThingMagic's Mercury API to enable RFID reading
-apt-get install -y unzip patch xsltproc gcc libreadline-dev python3-dev python3-setuptools
-pip3 install python-mercuryapi
-
-#Non-superusers can't capture packets
-echo "wireshark-common wireshark-common/install-setuid boolean false" | sudo debconf-set-selections
-
-# mkdir -p /opt/ipfs-installer
-# cp -ar /filesystem/ipfs-rpi/. /opt/ipfs-installer
-# cd /opt/ipfs-installer
-# sudo -u pi ./install
-# #Give user a way to update
-# ln -s /opt/ipfs-installer/ipfs-rpi-0.1.1/install /usr/bin/install-ipfs-rpi
-# sudo systemctl disable ipfs-daemon.service
+cd /build_cache
 
 
+#Mega GUI apps
+if [ -z "$EMBER_MICRO" ]
+then
+apt-get -y install ardour audacious audacious-plugins tuxguitar zeal filezilla gelemental kstars inkscape gimp  pulseview synaptic qdirstat gwenview guake skanlite 
+! apt-get -y install fbreader
+! apt-get -y install code
+fi
 
-## MotionEye
 
-apt-get -y install motion python-pip python-dev libssl-dev libcurl4-openssl-dev libjpeg-dev libz-dev
-pip install motioneye
-mkdir -p /etc/motioneye
-mkdir -p /sketch/config/motioneye
-mkdir -p /sketch/motioneye
-mkdir -p /var/lib/motioneye
+#Yeah, dolphin really is there. It's that much better than anything else.
+apt-get -y install deluge audacity vlc dolphin
 
-cat << EOF > /sketch/config/filesystem/emberos-motioneye.yaml
-/sketch/config:
-    mode: '0755'
-    user: root
-    group: root
-    bindat: /etc/motioneye
+
+#See above where we build from source because the dang thing won't let us do it the normal way yet.
+#apt-get -y install kodi kodi-pvr-mythtv kodi-pvr-dvbviewer kodi-pvr-iptvsimple
+
+apt-get -y install chromium-browser libreoffice
+
+#Communication and chat
+apt-get -y install mumble-server baresip twinkle 
+
+if [ -z "$EMBER_MICRO" ]
+then
+apt-get -y install pidgin jami jami-daemon mumble
+fi
+
+! mv /etc/mumble-server.ini /sketch/config/mumble-server.ini
+ln -s /etc/sketchconfig/mumble-server.ini /etc/mumble-server.ini
+sudo systemctl disable mumble-server.service
+
+
+
+
+
+#TODO: these extremely common node libs should probably be there but this line fails
+#npm install -g lodash react chalk request commander moment debug vue webpack inquirer rxjs axios prop-types uuid core-js cheerio ws sass-loader redis
+#npm install -g --unsafe-perm fs-extra shelljs
+
+
+
+
+#Coding font
+apt-get -y install -y fonts-hack
+
+
+
+#OpenCV+deps
+
+sudo apt-get -y install python3-opencv libhdf5-dev libhdf5-serial-dev libatlas-base-dev
+
+apt-get -y install chkservice matchbox-keyboard
+
+#apt-get -y install -y krita
+
+#Education
+apt-get -y install goldendict goldendict-wordnet 
+
+if [ -z "$EMBER_MICRO" ]
+then
+apt-get -y install marble-qt marble-maps marble-plugins
+fi
+
+
+
+apt-get -y install nmap robotfindskitten ncdu mc curl fatrace gstreamer1.0-tools pavucontrol xawtv evince stegosuite
+
+apt-get -y remove qpdfview
+#Sigh. Vim is huge but some people really love it...
+apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs git-repair xloadimage iotop zenity rename sshpass
+
+#Enable builtin wordnet, disable the wiktionary service by default because that uses
+#Network
+cp /filesystem/goldendict_config /sketch/home/pi/.goldendict/config
+
+
+#Do this last, it has a manual prompt
+
+if [ -z "$EMBER_MICRO" ]
+then
+apt-get install -y cubicsdr xastir antennavis
+fi
+
+
+gtk-update-icon-cache
+
+#This appears to be missing in the latest raspbian?
+cat << EOF > /etc/systemd/system/nodered.service
+# systemd service file to start Node-RED
+
+[Unit]
+Description=Node-RED graphical event wiring tool
+Wants=network.target
+Documentation=http://nodered.org/docs/hardware/raspberrypi.html
+
+[Service]
+Type=simple
+# Run as normal pi user - change to the user name you wish to run Node-RED as
+User=pi
+Group=pi
+WorkingDirectory=/home/pi
+
+Environment="NODE_OPTIONS=--max_old_space_size=512"
+# uncomment and edit next line if you need an http proxy
+#Environment="HTTP_PROXY=my.httpproxy.server.address"
+# uncomment the next line for a more verbose log output
+#Environment="NODE_RED_OPTIONS=-v"
+# uncomment next line if you need to wait for time sync before starting
+#ExecStartPre=/bin/bash -c '/bin/journalctl -b -u systemd-timesyncd | /bin/grep -q "systemd-timesyncd.* Synchronized to time server"'
+
+ExecStart=/usr/bin/env node-red-pi $NODE_OPTIONS $NODE_RED_OPTIONS
+#ExecStart=/usr/bin/env node $NODE_OPTIONS red.js $NODE_RED_OPTIONS
+# Use SIGINT to stop
+KillSignal=SIGINT
+# Auto restart on crash
+Restart=on-failure
+RestartSec=20
+# Tag things in the log
+SyslogIdentifier=Node-RED
+#StandardOutput=syslog
+
+[Install]
+WantedBy=multi-user.target
+
 EOF
 
-cat << EOF > /sketch/config/filesystem/emberos-motioneye.yaml
+yarn global add lodash
 
-# path to the configuration directory (must be writable by motionEye)
-conf_path /etc/motioneye
+yarn global add node-red-contrib-ui
+yarn global add --unsafe-perm node-red-node-arduino
+yarn global add node-red-dashboard
+yarn global add --unsafe-perm node-red-node-serialport
+yarn global add node-red-node-smooth
+yarn global add node-red-contrib-sun-position
+yarn global add node-red-contrib-tasmota
+yarn global add node-red-contrib-home-assistant-websocket
 
-# path to the directory where pid files go (must be writable by motionEye)
-run_path /var/run
 
-# path to the directory where log files go (must be writable by motionEye)
-log_path /var/log
 
-# default output path for media files (must be writable by motionEye)
-media_path /sketch/motioneye
 
-# the log level (use quiet, error, warning, info or debug)
-log_level info
 
-# the IP address to listen on
-# (0.0.0.0 for all interfaces, 127.0.0.1 for localhost)
-listen 127.0.0.1
 
-# the TCP port to listen on
-port 8765
 
-# path to the motion binary to use (automatically detected if commented)
-#motion_binary /usr/bin/motion
+if [ ! -d /build_cache/EspruinoHub ]
+then
+git clone --depth 1 https://github.com/espruino/EspruinoHub /build_cache/EspruinoHub
+cd /build_cache/EspruinoHub
+else
+cd /build_cache/EspruinoHub
+git pull --rebase
+fi
 
-# whether motion HTTP control interface listens on
-# localhost or on all interfaces
-motion_control_localhost true
+#Do the yarn install here, inside the cache folder
+yarn install
 
-# the TCP port that motion HTTP control interface listens on
-motion_control_port 7999
+cd /opt
+mkdir -p EspruinoHub
+rsync -avz /build_cache/EspruinoHub/ /opt/EspruinoHub/
 
-# interval in seconds at which motionEye checks if motion is running
-motion_check_interval 10
+chown pi EspruinoHub
 
-# whether to restart the motion daemon when an error occurs while communicating with it
-motion_restart_on_errors false
+cd EspruinoHub
 
-# interval in seconds at which motionEye checks the SMB mounts
-mount_check_interval 300
+# Give Node.js access to Bluetooth
+sudo setcap cap_net_raw+eip $(eval readlink -f `which node`)
 
-# interval in seconds at which the janitor is called
-# to remove old pictures and movies
-cleanup_interval 43200
 
-# timeout in seconds to wait for response from a remote motionEye server
-remote_request_timeout 10
+cat << EOF > /etc/systemd/system/EspruinoHub.service
+[Unit]
+Description=EspruinoHub BLE -> MQTT bridge
+After=nodered.target
+Documentation=https://github.com/espruino/EspruinoHub
 
-# timeout in seconds to wait for mjpg data from the motion daemon
-mjpg_client_timeout 10
+[Service]
+ExecStart=/opt/EspruinoHub/start.sh
+WorkingDirectory=/home/pi/EspruinoHub
+User=pi
+Group=daemon
+Nice=10
+SyslogIdentifier=EspruinoHub
+StandardOutput=syslog
+Restart=on-failure
+KillSignal=SIGINT
 
-# timeout in seconds after which an idle mjpg client is removed
-# (set to 0 to disable)
-mjpg_client_idle_timeout 10
-
-# enable SMB shares (requires motionEye to run as root) 
-smb_shares false
-
-# the directory where the SMB mount points will be created
-smb_mount_root /media
-
-# path to the wpa_supplicant.conf file
-# (enable this to configure wifi settings from the UI)
-#wpa_supplicant_conf /etc/wpa_supplicant.conf
-
-# path to the localtime file
-# (enable this to configure the system time zone from the UI)
-#local_time_file /etc/localtime
-
-# enables shutdown and rebooting after changing system settings
-# (such as wifi settings or time zone)
-enable_reboot false
-
-# timeout in seconds to use when talking to the SMTP server
-smtp_timeout 60
-
-# timeout in seconds to wait for media files list
-list_media_timeout 120
-
-# timeout in seconds to wait for media files list, when sending emails
-list_media_timeout_email 10
-
-# timeout in seconds to wait for zip file creation
-zip_timeout 500
-
-# timeout in seconds to wait for timelapse creation
-timelapse_timeout 500
-
-# enable adding and removing cameras from UI
-add_remove_cameras true
-
-# enables HTTP basic authentication scheme (in addition to, not instead of the signature mechanism)
-http_basic_auth false
-
-# overrides the hostname (useful if motionEye runs behind a reverse proxy)
-# server_name motionEye
+[Install]
+WantedBy=multi-user.target
 EOF
 
-cp /usr/local/share/motioneye/extra/motioneye.systemd-unit-local /etc/systemd/system/motioneye.service
+sudo apt-get install -y build-essential libudev-dev
 
 
-## Zigbee2MQTT
+! apt-get -y install libopus0 libopus-dev
+! apt-get -y install multicat gstreamer1.0-rtsp
+! pip3 install pymumble
 
-# Setup Node.js repository
-sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 
-# NOTE 1: If you see the message below please follow: https://gist.github.com/Koenkk/11fe6d4845f5275a2a8791d04ea223cb.
-# ## You appear to be running on ARMv6 hardware. Unfortunately this is not currently supported by the NodeSource Linux distributions. Please use the 'linux-armv6l' binary tarballs available directly from nodejs.org for Node.js 4 and later.
-# IMPORTANT: In this case instead of the apt-get install mentioned below; do: sudo apt-get install -y git make g++ gcc
+#Make this not fail
+! pip3 install deepspeech-tflite
 
-# NOTE 2: On x86, Node.js 10 may not work. It's recommended to install an unofficial Node.js 14 build which can be found here: https://unofficial-builds.nodejs.org/download/release/ (e.g. v14.16.0)
+# tflite tensorflow
+echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+sudo apt-get update
+sudo apt-get -y install python3-tflite-runtime
 
-# Install Node.js;
-sudo apt-get install -y nodejs git make g++ gcc
 
-# Verify that the correct nodejs and npm (automatically installed with nodejs)
-# version has been installed
-node --version  # Should output v10.X, v12.X, v14.X or v15.X
-npm --version  # Should output 6.X or 7.X
 
-# Clone Zigbee2MQTT repository
-sudo git clone https://github.com/Koenkk/zigbee2mqtt.git /opt/zigbee2mqtt
+cd /build_cache
+
+if [ ! -d /build_cache/zigbee2mqtt ]
+then
+git clone --recursive --depth 1 https://github.com/Koenkk/zigbee2mqtt.git
+else
+cd /build_cache/zigbee2mqtt
+git pull --rebase
+fi
+
+
+#Do all the install work inside the build cache so it persists
+sudo chown -R pi:pi /build_cache/zigbee2mqtt
+# Install dependencies (as user "pi")
+cd /build_cache/zigbee2mqtt
+sudo --user=pi yarn install
+
+
+
+mkdir -p /opt/zigbee2mqtt/
+rsync -avz /build_cache/zigbee2mqtt/ /opt/zigbee2mqtt/
+
 sudo chown -R pi:pi /opt/zigbee2mqtt
 
-# Install dependencies (as user "pi")
-cd /opt/zigbee2mqtt
-npm ci --production
 
 mkdir -p /sketch/zigbee2mqtt
 mkdir -p /opt/zigbee2mqtt/data
 
 
-rsync -av /opt/zigbee2mqtt/data/ /sketch/zigbee2mqtt
+rsync -av /opt/zigbee2mqtt/data/ /sketch/zigbee2mqtt/
+
+
+
+
 
 
 #Writable zigbee2mqtt
@@ -208,7 +267,7 @@ Description=zigbee2mqtt
 After=network.target fs_bindings.service mosquitto.service
 
 [Service]
-ExecStart=/usr/bin/npm start
+ExecStart=/usr/local/bin/yarn run
 WorkingDirectory=/opt/zigbee2mqtt
 StandardOutput=null
 # Or use StandardOutput=null if you don't want Zigbee2MQTT messages filling syslog, for more options see systemd.exec(5)
@@ -426,6 +485,97 @@ frontend:
 EOF
 
 
+
+
+#ispy agentDVR.  The actual files are a large binary and therefore we include them in the torrentable
+#included data
+apt-get install -y libtbb-dev libc6-dev gss-ntlmssp libatlas-base-dev
+
+cat << EOF > /etc/systemd/system/AgentDVR.service
+[Unit]
+Description=AgentDVR
+After=systemd-remount-fs.service network-online.target fs_bindings.service
+
+[Service]
+# see https://www.ispyconnect.com/userguide-agent-service.aspx for instructions
+# systemd will run this executable to start the service. AGENT_LOCATION needs to be the absolute path
+# DOT_NET_LOCATION should point to where the dotnet executable is - this might be different on your computer. 
+# For Raspberry Pi YOUR_USERNAME is usually pi
+#
+# eg for Raspberry Pi:	ExecStart=/usr/share/dotnet/dotnet /home/pi/Desktop/Agent/Agent.dll
+# eg for Linux:			ExecStart=/usr/bin/dotnet /home/sean/Desktop/Agent/Agent.dll
+
+ExecStart=/usr/share/dotnet/dotnet /home/AgentDVR/Agent.dll
+
+# to query logs using journalctl, set a logical name here
+SyslogIdentifier=AgentDVR
+
+# Use your username to keep things simple.
+# If you pick a different user, make sure dotnet and all permissions are set correctly to run the app
+# To update permissions, use 'chown YOUR_USERNAME -R AGENT_LOCATION' to take ownership of the folder and files
+
+User=pi
+
+# ensure the service automatically restarts
+Restart=always
+# amount of time to wait before restarting the service                        
+RestartSec=5
+
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
+#HPs scanner drivers
+sudo apt-get -y install hplip hplip-gui sane sane-utils libsane-extras xsane
+
+apt-get -y install npm
+
+
+#I don't think this makes a difference, we provide our own samba conf
+echo "samba-common samba-common/dhcp boolean true" | sudo debconf-set-selections
+echo "samba-common samba-common/do_debconf boolean true" | sudo debconf-set-selections
+
+
+#Add this if it ever gets support
+#apt-get -y install rtl8812au-dkms
+
+#Too big for github, you have to put the file there manually
+apt-get -y install /filesystem/debs/voice2json_2.0_armhf.deb
+
+#Gonna do ThingMagic's Mercury API to enable RFID reading
+apt-get install -y unzip patch xsltproc gcc libreadline-dev python3-dev python3-setuptools
+
+cd /build_cache
+
+if [ ! -d /build_cache/python-mercuryapi ]
+then
+git clone --recursive --depth 1 https://github.com/gotthardp/python-mercuryapi.git
+cd python-mercuryapi
+else
+cd python-mercuryapi
+git pull --rebase
+fi
+
+make install
+
+#Non-superusers can't capture packets
+echo "wireshark-common wireshark-common/install-setuid boolean false" | sudo debconf-set-selections
+
+# mkdir -p /opt/ipfs-installer
+# cp -ar /filesystem/ipfs-rpi/. /opt/ipfs-installer
+# cd /opt/ipfs-installer
+# sudo -u pi ./install
+# #Give user a way to update
+# ln -s /opt/ipfs-installer/ipfs-rpi-0.1.1/install /usr/bin/install-ipfs-rpi
+# sudo systemctl disable ipfs-daemon.service
+
+
+
+
+
+
 if [ -z "$EMBER_MICRO" ]
 then
 apt-get -y install wireshark
@@ -459,6 +609,8 @@ sudo apt-get -y install libupnp-dev libgstreamer1.0-dev \
 gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
 gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
 gstreamer1.0-libav gstreamer1.0-pulseaudio uuid-runtime
+
+sudo apt-get -y install autoconf autogen automake libtool pkg-config build-essential
 
 
 unpack /filesystem/gmrender-resurrect /opt/gmrender-resurrect
@@ -618,15 +770,19 @@ mkdir -p /sketch/home/pi/.syncthing-gtk
 
 cat << EOF > /usr/bin/get-youtube-dl
 #!/bin/bash
-cd /sketch/bin/youtube-dl
-./youtube-dl -U
+cd /sketch/bin/yt-dlp
+./yt-dlp -U
 EOF
 
 chmod 755 /usr/bin/get-youtube-dl
 
+ln -s /usr/bin.sketch/yt-dlp /usr/bin/youtube-dl
+
+
 
 #HW drivers
 sudo apt-get -y install xboxdrv xserver-xorg-input-wacom
+
 
 
 
@@ -665,7 +821,7 @@ apt-get install -y wxhexeditor d-feet
 fi
 
 # GUI Utils
-apt-get -y install zenmap sqlitebrowser meld git-cola convertall 
+apt-get -y install sqlitebrowser meld git-cola convertall 
 
 
 apt-get -y install transmission-cli xclip  bluetooth bluez blueman
@@ -719,8 +875,6 @@ apt-get -y install nim elixir gforth lua5.3
 pip3 install tcpbridge
 
 
-# tflite tensorflow
-pip3 install 	https://dl.google.com/coral/python/tflite_runtime-2.1.0.post1-cp37-cp37m-linux_armv7l.whl
 
 pip3 install baresipy
 pip3 install yappi
@@ -740,7 +894,6 @@ pip3 install simpleaudio
 pip3 install yeelight
 pip3 install upnpclient
 pip3 install sqlite3worker
-pip3 install deepspeech
 pip3 install pyusb
 
 sudo apt-get -y install python3-rtmidi python3-smbus python3-msgpack python3-paho-mqtt python3-gevent python3-falcon python3-mako python3-typeguard python3-paramiko libglib2.0-dev
@@ -787,7 +940,7 @@ cat << EOF > /sketch/config/filesystem/emberos-postgres.yaml
 EOF
 
 
-apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,mcrypt,pgsql,zip,xml,gd,sqlite3,json}
+apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,pgsql,zip,xml,gd,sqlite3,json}
 apt-get install libapache2-mod-php -y
 
 #Needed for .htaccess
@@ -801,18 +954,18 @@ apt-get -y install python3-pyqt5 python3-pyqt5.qtserialport python3-pyqt5.qtsvg 
 apt-get -y install python3-pyqt5.qtsql python3-pyqt5.qtwebkit python3-pyqt5.qtopengl python3-pyqt5.qtsensors libinput-tools
 apt-get -y install python3-tz python3-dateutil lm-sensors python3-lxml python3-six python3-requests avahi-discover python3-psutil backintime-qt4
 
-apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3-libnacl  python3-libusb1 python3-fuse python3-bluez python3-cairosvg  python3-ifaddr python3-pymodbus
+apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3-libnacl  python3-libusb1 python3-fuse python3-bluez python3-cairosvg  python3-ifaddr python3-pymodbus libbluetooth-dev libcap2-bin
 
+pip3 install beacontools[scan]
 
 #Audio handling
 apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid  jack-tools jack-stdio libgstreamer1.0-dev gstreamer1.0-libav
 apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly zynaddsubfx vmpk autotalent x42-plugins
-#Pulse bluetooth is already set up
-apt-get -y install -y pulseaudio-module-jack pulseaudio-module-zeroconf pulsemixer 
+
 apt-get -y install jaaa qjackctl ffmpeg
 
 
-sudo apt-get install build-essential autoconf automake libtool pkg-config
+sudo apt-get -y install build-essential autoconf automake libtool pkg-config ansible
 
 #Save over 100MB by using the Sketch folder instead
 apt-get -y install fluidsynth  --no-install-recommends
@@ -830,172 +983,6 @@ apt-get -y install pocketsphinx  gstreamer1.0-pocketsphinx pocketsphinx pocketsp
 
 ! adduser pi pulse-access
 
-
-#Mega GUI apps
-if [ -z "$EMBER_MICRO" ]
-then
-apt-get -y install ardour audacious audacious-plugins tuxguitar calibre zeal filezilla gelemental kstars inkscape gimp fslint pulseview synaptic qdirstat gwenview guake skanlite code
-fi
-
-apt-get -y install deluge audacity kodi kodi-pvr-mythtv kodi-pvr-dvbviewer kodi-pvr-iptvsimple vlc 
-
-
-#Communication and chat
-apt-get -y install mumble-server baresip twinkle 
-
-if [ -z "$EMBER_MICRO" ]
-then
-apt-get -y install pidgin jami jami-daemon mumble
-fi
-
-! mv /etc/mumble-server.ini /sketch/config/mumble-server.ini
-ln -s /etc/sketchconfig/mumble-server.ini /etc/mumble-server.ini
-sudo systemctl disable mumble-server.service
-
-
-
-
-
-#TODO: these extremely common node libs should probably be there but this line fails
-#npm install -g lodash react chalk request commander moment debug vue webpack inquirer rxjs axios prop-types uuid core-js cheerio ws sass-loader redis
-#npm install -g --unsafe-perm fs-extra shelljs
-
-#Coding font
-apt-get -y install -y fonts-hack
-
-
-
-#OpenCV+deps
-
-sudo apt-get -y install python3-opencv libhdf5-dev libhdf5-serial-dev libatlas-base-dev libjasper-dev libqtgui4 libqt4-test
-
-apt-get -y install chkservice matchbox-keyboard
-
-#apt-get -y install -y krita
-
-#Education
-apt-get -y install goldendict goldendict-wordnet 
-
-if [ -z "$EMBER_MICRO" ]
-then
-apt-get -y install marble-qt marble-maps marble-plugins
-fi
-
-
-
-apt-get -y install nmap robotfindskitten ncdu mc curl fatrace gstreamer1.0-tools pavucontrol xawtv evince stegosuite
-
-apt-get -y remove qpdfview
-#Sigh. Vim is huge but some people really love it...
-apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs git-repair xloadimage iotop zenity rename sshpass
-
-#Enable builtin wordnet, disable the wiktionary service by default because that uses
-#Network
-cp /filesystem/goldendict_config /sketch/home/pi/.goldendict/config
-
-
-#Do this last, it has a manual prompt
-
-if [ -z "$EMBER_MICRO" ]
-then
-apt-get install -y cubicsdr xastir antennavis
-fi
-
-
-gtk-update-icon-cache
-
-#This appears to be missing in the latest raspbian?
-cat << EOF > /etc/systemd/system/nodered.service
-# systemd service file to start Node-RED
-
-[Unit]
-Description=Node-RED graphical event wiring tool
-Wants=network.target
-Documentation=http://nodered.org/docs/hardware/raspberrypi.html
-
-[Service]
-Type=simple
-# Run as normal pi user - change to the user name you wish to run Node-RED as
-User=pi
-Group=pi
-WorkingDirectory=/home/pi
-
-Environment="NODE_OPTIONS=--max_old_space_size=512"
-# uncomment and edit next line if you need an http proxy
-#Environment="HTTP_PROXY=my.httpproxy.server.address"
-# uncomment the next line for a more verbose log output
-#Environment="NODE_RED_OPTIONS=-v"
-# uncomment next line if you need to wait for time sync before starting
-#ExecStartPre=/bin/bash -c '/bin/journalctl -b -u systemd-timesyncd | /bin/grep -q "systemd-timesyncd.* Synchronized to time server"'
-
-ExecStart=/usr/bin/env node-red-pi $NODE_OPTIONS $NODE_RED_OPTIONS
-#ExecStart=/usr/bin/env node $NODE_OPTIONS red.js $NODE_RED_OPTIONS
-# Use SIGINT to stop
-KillSignal=SIGINT
-# Auto restart on crash
-Restart=on-failure
-RestartSec=20
-# Tag things in the log
-SyslogIdentifier=Node-RED
-#StandardOutput=syslog
-
-[Install]
-WantedBy=multi-user.target
-
-EOF
-
-
-
-npm install -g node-red-contrib-ui
-cd /build_cache
-
-
-if [ ! -d /build_cache/EspruinoHub ]
-then
-git clone --depth 1 https://github.com/espruino/EspruinoHub /build_cache/EspruinoHub
-else
-cd /build_cache/EspruinoHub
-git pull --rebase
-fi
-
-cd /opt
-git clone /build_cache/EspruinoHub
-
-chown pi EspruinoHub
-
-cd EspruinoHub
-npm install
-
-# Give Node.js access to Bluetooth
-sudo setcap cap_net_raw+eip $(eval readlink -f `which node`)
-
-
-cat << EOF > /etc/systemd/system/EspruinoHub.service
-[Unit]
-Description=EspruinoHub BLE -> MQTT bridge
-After=nodered.target
-Documentation=https://github.com/espruino/EspruinoHub
-
-[Service]
-ExecStart=/opt/EspruinoHub/start.sh
-WorkingDirectory=/home/pi/EspruinoHub
-User=pi
-Group=daemon
-Nice=10
-SyslogIdentifier=EspruinoHub
-StandardOutput=syslog
-Restart=on-failure
-KillSignal=SIGINT
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-sudo apt-get install build-essential libudev-dev
-
-# Have to just use the version built into kaithem.
-# sudo npm install nw --unsafe-perm -g
-# sudo npm install espruino-web-ide --unsafe-perm -g
 
 
 apt-get autoremove -y --purge

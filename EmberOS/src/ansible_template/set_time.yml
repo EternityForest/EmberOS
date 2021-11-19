@@ -1,5 +1,5 @@
 
-- name: Set the time to the local time on 
+- name: Set the time to the local time on the controller. 
   
   hosts: emberos
   remote_user: pi

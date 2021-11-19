@@ -9,6 +9,9 @@ set -e
 
 source /common.sh
 
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmydata
+export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
+
 # Need for peerJS
 apt-get -y install libavdevice-dev libavfilter-dev libopus-dev libvpx-dev pkg-config libsrtp2-dev
 

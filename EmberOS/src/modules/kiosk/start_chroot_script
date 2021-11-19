@@ -12,6 +12,15 @@ ln -s /home/pi/persist/.conkyrc /home/pi/.conkyrc
 
 
 
+#For ubuntu server
+# apt install -y xserver-xorg xfce4 xfce4-goodies
+# dpkg-reconfigure lightdm
+
+# sudo apt-get -y install libgles2-mesa libgles2-mesa-dev xorg-dev
+
+
+
+
 cat << EOF > /sketch/home/pi/.config/autostart/ember-kiosk.desktop
 [Desktop Entry]
 Name=EmberDefaultKiosk

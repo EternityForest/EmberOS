@@ -14,6 +14,39 @@ source /common.sh
 install_cleanup_trap
 
 
+
+sudo apt-get -y install eatmydata
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmydata
+export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
+
+
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt update
+
+#Cache pip3 downloading.
+mkdir -p /build_cache/pip3
+mkdir -p /root/.cache/pip
+mount --bind /build_cache/pip3 /root/.cache/pip
+
+
+
+# Install Node.js;
+sudo apt-get install -y nodejs yarn npm git make g++ gcc
+
+mkdir -p /build_cache/yarncache/
+
+
+#Cache while building.  But we will set this back in the end chroot script
+yarn config set cache-folder /build_cache/yarncache
+
+
+
+
+
+
+
+
 #Disable the feature that automatically starts the setup wizard, this would be bad for kiosk use.
 ! rm /etc/xdg/autostart/piwiz.desktop
 
@@ -36,7 +69,13 @@ sudo systemctl disable apt-daily.timer
 #Force IPv4 for apt updates until such a time as ipv6 is supported everywhere.
 echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99-force-ipv4
 
+
+
+
 apt update -y --allow-releaseinfo-change
+#Upgrade everything BEFORE we build an initramfs
+#or don't if it crashe in the quemu on ubuntu
+apt-get -y full-upgrade
 
 #This is entirely to trick openjre, which doesn't actually need /proc I don't think, but has an old test that fails without it.
 mkdir -p /proc
@@ -44,25 +83,33 @@ mount -t tmpfs -o size=10M tmpfs /proc
 
 
 
+#Ye olde dotte nette runnetyme
+
+cd /build_cache
+wget -nc https://download.visualstudio.microsoft.com/download/pr/283d08e5-e71b-404d-869c-e6ad820ade07/b46930dd45fd4d898c7f904fe33e566e/dotnet-runtime-3.1.21-linux-arm.tar.gz
+wget -nc https://download.visualstudio.microsoft.com/download/pr/9092f467-8a52-482b-9295-6870e0e7fa73/a1474c461720fee5d82ba8efcd7ea3ce/aspnetcore-runtime-3.1.21-linux-arm.tar.gz
+mkdir -p /opt/dotnet
+tar zxf dotnet-runtime-3.1.21-linux-arm.tar.gz -C /opt/dotnet
+tar zxf aspnetcore-runtime-3.1.21-linux-arm.tar.gz -C /opt/dotnet
+
+
+apt-get -y install libc6 libgcc1 libgssapi-krb5-2 libicu67 libssl1.1 libstdc++6 zlib1g
 
 
 #Enable initramfs which also gives the rescue shell, but mainly we need it to allow BTRFS
-sudo apt-get -y install initramfs-tools btrfs-tools f2fs-tools elinks
+sudo apt-get -y install initramfs-tools btrfs-progs f2fs-tools elinks
 
 
 #We switched to this to hopefully get rid of bad behavior when making lower layers writable for updates.
 apt-get -y install fuse-overlayfs
 
-#Get new kernel
-sudo apt-get -y install raspberrypi-bootloader rpi-eeprom
-
-#Upgrade everything BEFORE we build an initramfs
-apt-get -y full-upgrade
+#Get new kernel(Actually not full upgrade will handle it)
+#sudo apt-get -y install raspberrypi-bootloader rpi-eeprom
 
 
-#We are going to move to the new debian 11 stuff now.
-#It's a pretty big deal with the new features.
-sed -i 's/buster/bullseye/g' /etc/apt/sources.list
+
+
+
 
 
 #Make sure we can auto reconnect to bluetooth devices
@@ -96,9 +143,9 @@ rm /etc/xdg/lxsession/LXDE-pi/sshpwd.sh
 
 cat << EOF > /etc/fstab
 proc            /proc           proc    defaults          0       0
-/dev/mmcblk0p1  /boot           vfat    defaults,noatime,ro          0       2
-/dev/mmcblk0p2  /               btrfs    defaults,noatime,ro,compress  0       1
-/dev/mmcblk0p3 /sketch auto defaults,noatime,nofail,fmask=027,dmask=027,umask=027 0 0
+UUID=23709a26-1289-4e83-bfe5-2c99d42d276e  /boot           vfat    defaults,noatime,ro          0       2
+UUID=33fc23d5-a31d-45ed-8aec-e85f4fb4a436  /               auto    defaults,noatime,ro,compress  0       1
+UUID=c8dd1d93-222c-42e5-9b03-82c24d2433fd /sketch auto defaults,noatime,nofail,fmask=027,dmask=027,umask=027 0 0
 EOF
 
 
@@ -203,11 +250,11 @@ unpack /filesystem/sketch /sketch
 
 mkdir -p /sketch/opt
 
-apt-get -y install -y ntfs-3g git
+apt-get -y install ntfs-3g git
 #Very important!!! Fuse and Fuse3 have a horrible incompatibility because of -o nonempty
-apt-get -y install -y bindfs fuse3
+apt-get -y install bindfs fuse3
 #Needed for reading config files
-apt-get -y install -y python3-yaml
+apt-get -y install python3-yaml
 
 
 
@@ -227,7 +274,7 @@ sed -i \
 echo "needs_root_rights=yes" >> /etc/X11/Xwrapper.config
 
 #The special /sketch partition is for everything that is not part of the image. It is made after the fact.
-! mkdir /sketch
+mkdir -p /sketch
 
 raspi-config nonint do_ssh 0
 raspi-config nonint do_spi 0
@@ -325,15 +372,21 @@ import os
 import subprocess
 import traceback
 
-d ="/sketch/runonce/"
-for i in list(os.listdir(d)):
-    print("running: "+i)
-    if i.endswith(".sh"):
-        try:
-            subprocess.call([os.path.join(d,i)])
-            os.remove(os.path.join(d,i))
-        except:
-            print(traceback.format_exc())
+d1 ="/sketch/runonce/"
+d2 ="/boot/runonce/"
+
+def runall(d):
+    if os.path.exists(d):
+        for i in list(os.listdir(d)):
+            print("running: "+i)
+            if i.endswith(".sh"):
+                try:
+                    subprocess.call([os.path.join(d,i)])
+                    os.remove(os.path.join(d,i))
+                except:
+                    print(traceback.format_exc())
+runall(d1)
+runall(d2)
 EOF
 
 chmod 755 /bin/ember-do-runonce.py
@@ -583,6 +636,8 @@ cat << EOF > /sketch/config/filesystem/emberos_bluetooth.yaml
 EOF
 
 
+
+
 #This allows builtin webapps
 cat << EOF > /sketch/config/filesystem/emberos-chromiumpolicy.yaml
 /sketch/config/chromium/:
@@ -709,6 +764,11 @@ mk_pi_persist_dir () {
   mkdir -p "/sketch/home/pi/$1"
   mkdir -p "/home/pi/$1"
 
+  #Anything put here during image creation will be moved over to
+  #the sketch partition at the end, we can actually use this right away.
+  mkdir -p "/home/pi/persist/$1"
+  chown -R pi:pi "/home/pi/persist/$1"
+
   #Move to sketch, delete original
   ! cp -ar "/home/pi/$1/." "/sketch/home/pi/$1"
   ! rm -r  "/home/pi/$1"
@@ -821,6 +881,8 @@ mk_pi_persist_dir  .home_template
 mk_pi_persist_dir  .mednafen
 mk_pi_persist_dir  .node-red
 mk_pi_persist_dir  .npm
+mk_pi_persist_dir  .yarn
+
 mk_pi_persist_dir  .nimble
 mk_pi_persist_dir  .viking
 mk_pi_persist_dir  .viking_maps
@@ -835,6 +897,9 @@ mk_pi_persist_dir  .arduino15
 mk_pi_persist_dir  .config/voice2json
 mk_pi_persist_dir  .config/backintime
 mk_pi_persist_dir  .config/filezilla
+mk_pi_persist_dir  .config/yarn
+mk_pi_persist_dir  .cache/yarn
+
 mk_pi_persist_dir  .config/autostart
 mk_pi_persist_dir  .home-template
 mk_pi_persist_dir .config/pcmanfm/LXDE-pi
@@ -846,6 +911,7 @@ mk_pi_persist_dir .config/guake
 mk_pi_persist_dir .local/lib
 mk_pi_persist_dir .local/bin
 mk_pi_persist_dir  .vscode
+mk_pi_persist_dir  AgentDVR
 
 mk_pi_persist_dir .local/share/desktop-directories
 mk_pi_persist_dir .local/share/applications
@@ -898,7 +964,7 @@ mkdir -p /sketch/share/fonts
 mkdir -p /sketch/share/wikis
 mkdir -p /sketch/share/doc/
 
-mkdir /usr/share.sketch
+mkdir -p /usr/share.sketch
 
 cat << EOF > /sketch/config/filesystem/emberos_share.yaml
 /sketch/share/:
@@ -918,8 +984,9 @@ cat << EOF > /sketch/config/filesystem/emberos_opt_bin.yaml
 EOF
 
 #Allow the /sketch/bin to work
-cat << EOF > /usr/lib/environment.d/98-ember-sketch-bin.conf 
-PATH=/usr/bin.sketch:$PATH
+cat << EOF > /usr/lib/environment.d/98-ember-environment.conf 
+PATH=/usr/bin.sketch:$PATH:/opt/dotnet
+DOTNET_ROOT=/opt/dotnet 
 EOF
 
 
@@ -1079,25 +1146,25 @@ EOF
 
 
 cat << EOF > /sketch/home/pi/.xonshrc
-# Import these as a convenience, so you don't have to
-import time
-import math
-import re
-import random
-import os
-import sys
-import struct
+$PROMPT= "{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{curr_branch: {}}{RESET} {BOLD_BLUE}{prompt_end}{RESET}"
+echo "This is Xonsh! An enhanced shell! It is mostly compatible with bash. If something doesn't work like you  expect, you may need to switch to actual bash.
+genfortune
 EOF
 
-ln -s /sketch/home/pi/.xonshrc /home/pi/.xonshrc
+ln -s /home/pi/persist/.xonshrc /home/pi/.xonshrc
+
+cat << EOF > /etc/xonshrc
+$PROMPT= "{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{curr_branch: {}}{RESET} {BOLD_BLUE}{prompt_end}{RESET}"
+genfortune
+EOF
 
 
 cat << EOF > /sketch/home/pi/.vimrc
 EOF
-ln -s /sketch/home/pi/.vimrc /home/pi/.vimrc
+ln -s /home/pi/persist/.vimrc /home/pi/.vimrc
 
 mv /home/pi/.bashrc /sketch/home/pi/.bashrc 
 
 
-ln -s /sketch/home/pi/.bashrc /home/pi/.bashrc
+ln -s /home/pi/persist/.bashrc /home/pi/.bashrc
 

@@ -7,6 +7,9 @@ set -e
 
 source /common.sh
 
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmydata
+export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
+
 
 #Mesh neetworking!!!
 sudo apt-get -y install dirmngr
@@ -35,6 +38,36 @@ sudo dpkg --unpack yggdrasil*.deb
 sudo rm /var/lib/dpkg/info/yggdrasil.postinst -f
 sudo dpkg --configure yggdrasil
 sudo apt-get install -yf #To fix dependencies
+
+mkdir -p /boot/networks/
+
+#This will let u set up networks from /boot as well as /sketch
+cat << 'EOF' > /bin/ember-copy-boot-net.sh
+#!/bin/bash
+
+mkdir -p /run/NetworkManager/system-connections/
+rsync /boot/networks/ /run/NetworkManager/system-connections/
+EOF
+
+chmod 755 /bin/ember-copy-boot-net.sh
+
+cat << EOF > /etc/systemd/system/ember-copy-boot-net.service
+[Unit]
+Description=Manage things from sketch folder
+After=systemd-remount-fs.service
+Before=NetworkManager.service
+RequiresMountsFor=/sketch/ /boot/
+
+[Service]
+Type=oneshot
+ExecStart=/bin/ember-copy-boot-net.sh
+
+[Install]
+WantedBy=sysinit.target
+
+EOF
+systemctl enable ember-copy-boot-net.service
+
 
 
 apt-get -y install network-manager libnss3-tools ca-certificates nftables firewalld avahi-daemon avahi-utils radvd

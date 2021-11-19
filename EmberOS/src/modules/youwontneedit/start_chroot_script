@@ -1,4 +1,8 @@
 #!/bin/bash
+
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmydata
+export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
+
 ! apt purge -y wolfram-engine wolframscript thonny
 ! apt purge -y sonic-pi-samples
 

@@ -106,3 +106,12 @@ home/pi/.config/voice2json/README
 home/pi/.config/voice2json/SOURCE
 home/pi/.config/voice2json/stop_words.txt
 home/pi/.config/voice2json/test/**
+
+home/pi/AgentDVR/**
+#This line lets you back up AgentDVR config
++ home/pi/AgentDVR/Media/**
+- home/pi/AgentDVR/Media/log_*
+
+# This stops backup from pulling actual video files, which you might not want.
+- home/pi/AgentDVR/Media/WebServerRoot/Media/**
+

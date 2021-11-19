@@ -5,15 +5,33 @@
   remote_user: pi
 
   tasks:
+  - name: Create local directory
+    ansible.builtin.file:
+      path: machines/{{ansible_hostname}}/sketch/
+      state: directory
+    register: local_dir
+    delegate_to: localhost
+
+  - name: Create local directory
+    ansible.builtin.file:
+      path: machines/{{ansible_hostname}}/boot/
+      state: directory
+    register: local_dir
+    delegate_to: localhost
+
+
   - name: Pull the backup of /boot
     synchronize:
-      src: /sketch/
+      src: /boot/
       dest: machines/{{ansible_hostname}}/boot/
       checksum: yes
       mode: pull
       become: yes
       #Things that presumably *could* be wanted
+      #See the top 2 lines if you want to not back up the networks.
       rsync_opts:
+        #- "--exclude=networks/**"
+        - "--include=*.nmconnection"
         - "--include=*.ini"
         - "--include=*.yaml"
         - "--include=*.txt"
@@ -28,7 +46,7 @@
   - name: Pull the backup of /sketch
     synchronize:
       src: /sketch/
-      dest: machines/{{ansible_hostname}}/boot/
+      dest: machines/{{ansible_hostname}}/sketch/
       checksum: yes
       mode: pull
       become: yes

@@ -32,13 +32,36 @@ You can also make ~/.config/chromium a symlink to a folder in persist, but that 
 All you need to do to enable using the Pi as a UPnP renderer is enable gmediarender in the autostart/99-defaults config file.  It will advertise itself
 with whatever hostname you have selected.
 
-## Making a backup
+## Making a backup, or quickly deploying new instances.
 
-To pull everything on a remote EmberOS machine's sketch folder(Aside from things that are listed in the /sketch/.gitignore file),
-use the tools/pullBack.sh script, and modify the hostname and password as needed.
+EmberOS formerly had it's own backup system.
 
-Note that only the root .gitignore works for this, which is why the file comes preloaded with so many
-entries.
+Now everything is ansible-based, and we have a quickstart template to very easily back up and restore. 
+
+For every project, copy the src/ansible template into your project folder, and rename it whatever you want.
+
+Add your machines to the inventory.ini file under the \[emberos\] role.
+
+Run the backup playbook and it will pull a backup from each machine, in roles/emberos/HOST/sketch and roles/emberos/HOST/boot.
+
+You can have as many as you want, they stay separated by the actual hostname on the machine(Not the name given in the inventory file!).
+
+To change what is included or excluded, see /roles/emberos/ignore.txt.
+
+Use the deploy.yml to deploy everything.  
+
+
+Note: By default, the backup includes network config from the device and other private data! *It is not meant to share publically!*
+
+If you would like to share a backup as a ready-to-use appliance, you will probably need to modify the playbook to only copy whitelisted things,
+or else you will need to hand edit(Be careful!).
+
+
+I think that only using one role is appropriate here, since emberos isn't a cloud platform and you probably won't have many similar roles,
+but this is just a template to semi-standardize things, edit as needed.
+
+
+
 
 
 
@@ -293,6 +316,7 @@ to make it acessible.
 
 
 ### Firewalling
+ssh/**
 
 EmberOS uses firewalld.  
 
@@ -383,17 +407,13 @@ Should you need something added to your path, and want to include it in the sket
 
 ## Downloading/watching videos
 
-Youtube-dl cannot be included, as APIs change so frequently that it would not do anyone any good.  However, you can use "sudo get-youtube-dl" to automatically get the latest version.
-
-It will be stored in /sketch/bin, due ti the need for frequent easy updates(We consider it more like dynamic data than a real program, because of how often it updates).
-
+yt-dlp is included at /sketch/bin.   You'll probably need to update it.
 
 ## Media Center Use
 
-Kodi is installed! See the KioskUI file, at the bottom there is an example of booting straight to it, which is recommended over the usual systemd way. You may need to manually set the audio output inside Kodi. It defaults to HDMI.
+Kodi is no longer part of the current install. It can be built from source, or you can wait till it is available in the new Raspbian that EmberOS is based on.
 
-I suggest you get a 64GB or up SanDisk Industrial/Automotive/DVR grade SD
-card if you want to use Kodi.
+
 
 ## Making it actually read only
 
