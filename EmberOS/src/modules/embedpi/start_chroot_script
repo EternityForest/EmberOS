@@ -43,8 +43,8 @@ yarn config set cache-folder /build_cache/yarncache
 
 
 
-
-
+# Give option to make some things work headless
+apt-get install xserver-xorg-video-dummy
 
 
 #Disable the feature that automatically starts the setup wizard, this would be bad for kiosk use.
@@ -56,8 +56,16 @@ sudo systemctl mask apt-daily-upgrade
 sudo systemctl mask apt-daily
 sudo systemctl disable apt-daily-upgrade.timer
 sudo systemctl disable apt-daily.timer
+systemctl disable resize2fs_once.service 
 
 
+# We just have SSH on by default
+systemctl disable sshswitch.service
+
+# EEPROM updates need a writable place to back up
+rmdir /var/lib/raspberrypi/bootloader/backup
+sudo mkdir /sketch/.emberos/fw-backup
+sudo ln -s /sketch/.emberos/fw-backup /var/lib/raspberrypi/bootloader/backup
 
 ! sudo usermod -a -G dialout pi
 ! sudo usermod -a -G serial pi
@@ -91,6 +99,10 @@ wget -nc https://download.visualstudio.microsoft.com/download/pr/9092f467-8a52-4
 mkdir -p /opt/dotnet
 tar zxf dotnet-runtime-3.1.21-linux-arm.tar.gz -C /opt/dotnet
 tar zxf aspnetcore-runtime-3.1.21-linux-arm.tar.gz -C /opt/dotnet
+
+wget -nc https://download.visualstudio.microsoft.com/download/pr/e401b906-4681-437b-a1c5-21a2d7e0f83c/824371926ae334ac264b91d8234b350c/dotnet-sdk-3.1.415-linux-arm.tar.gz
+tar zxf dotnet-sdk-3.1.415-linux-arm.tar.gz -C /opt/dotnet
+
 
 
 apt-get -y install libc6 libgcc1 libgssapi-krb5-2 libicu67 libssl1.1 libstdc++6 zlib1g
@@ -341,9 +353,30 @@ cat << EOF > /sketch/public.www/index.html
 <a href="/public_files/emberos/webapps/htck-Bayeux/index.html">Historic tale construction kit</a><br>
 <a href="/public_files/emberos/webapps/miniPaint-master/index.html">Image Editor(In browser)</a><br>
 <a href="/public_files/emberos/webapps/svgedit-master/src/editor/svg-editor.html">SVGEdit Vector Graphics(in browser)</a><br>
-
 <a href="/webmap/leaflet_demo.html">World Maps</a>
 
+<h3>Apps by Azgaar</h3>
+<a href="/" onclick="javascript:event.target.port=5000">Heraldic Device Generator(Some resources are non-commercial only, must be enabled in the sketch autorun config)</a><br>
+
+<h3>Optional Services</h3>
+
+<p>Enable these in /sketch/config/autostart/99-defaults.service</p>
+
+<dl>
+<dt>Rhassspy</dt>
+<dd>Voice recognition on port 12101</dd>
+
+<dt>EspruinoHub</dt>
+<dd>Ble tools on port 1888</dd>
+
+
+<dt>Kaithem</dt>
+<dd>Automation server on port 8002/ 8001 HTTPS</dd>
+
+<dt>Node Red</dt>
+<dd>Ble tools on port 1880</dd>
+
+</dl>
 
 EOF
 
@@ -762,12 +795,11 @@ EOF
 
 mk_pi_persist_dir () {
   mkdir -p "/sketch/home/pi/$1"
-  mkdir -p "/home/pi/$1"
+  sudo --user pi mkdir -p "/home/pi/$1"
 
   #Anything put here during image creation will be moved over to
   #the sketch partition at the end, we can actually use this right away.
-  mkdir -p "/home/pi/persist/$1"
-  chown -R pi:pi "/home/pi/persist/$1"
+  sudo --user pi mkdir -p "/home/pi/persist/$1"
 
   #Move to sketch, delete original
   ! cp -ar "/home/pi/$1/." "/sketch/home/pi/$1"
@@ -775,25 +807,48 @@ mk_pi_persist_dir () {
   ln -s "/home/pi/persist/$1" "/home/pi/$1"
 }
 
-cat << EOF > /usr/bin/make-persistent-pi-folder
+cat << EOF > /usr/bin/make-user-persist-folder
 #!/bin/bash
 
-mkdir -p "/sketch/home/pi/$1"
-mkdir -p "/home/pi/$1"
+  echo "The selected folder will become a symlink to a matching folder in ~/persist.  All existing stuff will be copied."
+  mkdir -p "/sketch~/$1"
+  sudo --user pi mkdir -p "~/$1"
 
-#Move to sketch, delete original
-! cp -ar "/home/pi/$1/." "/sketch/home/pi/$1"
-! rm -r  "/home/pi/$1"
-ln -s "/home/pi/persist/$1" "/home/pi/$1"
+  #Anything put here during image creation will be moved over to
+  #the sketch partition at the end, we can actually use this right away.
+  sudo --user pi mkdir -p "~/persist/$1"
+
+  #Move to sketch, delete original
+  ! cp -ar "~/$1/." "/sketch~/$1"
+  ! rm -r  "~/$1"
+  ln -s "~/persist/$1" "~/$1"
 EOF
 
-chmod 755  /usr/bin/make-persistent-pi-folder
+mkdir -p /home/pi/.config/environment.d/
+cat << EOF > /home/pi/.config/environment.d/99-ember.conf
+#TERRIBLE hacks to ensure features of systemd services always work by making these hardcoded
+XDG_RUNTIME_DIR=/run/user/1000
+PATH=/usr/bin.sketch:$PATH:/opt/dotnet
+DOTNET_ROOT=/opt/dotnet
+DOTNET_CLI_TELEMETRY_OPTOUT=1
+EOF
+
+
+cat << EOF > /etc/security/limits.conf
+@audio   -  rtprio     95
+@audio   -  memlock    unlimited
+@audio   -  priority   -20
+EOF
+
+chmod 755  /usr/bin/make-user-persist-folder
 
 
 mkdir -p /home/pi/.local/share
 chown pi /home/pi/.local/share
 mkdir -p /home/pi/.config
-chown pi /home/pi/.config
+
+
+chown -R pi /home/pi/
 
 #Symlink some directories that are pretty obviously useful to persist
 #But only the super obviously "Manual" ones that aren't messed with by the system
@@ -814,9 +869,14 @@ mk_pi_persist_dir  Games
 mk_pi_persist_dir  Sync
 mk_pi_persist_dir  Programs
 mk_pi_persist_dir  DOSbox
+mk_pi_persist_dir .config/NanoVNASaver
+
 mkdir -p /home/pi/persist/DOSbox/c
 
 mk_pi_persist_dir  .dosbox
+mk_pi_persist_dir  .local/share/xonsh
+mk_pi_persist_dir  .config/xonsh
+
 
 mk_pi_persist_dir  "Calibre Library"
 mk_pi_persist_dir  .config/calibre
@@ -825,6 +885,7 @@ mk_pi_persist_dir  .ipfs
 mk_pi_persist_dir  .go-ipfs
 mk_pi_persist_dir  .local/share/jami
 mk_pi_persist_dir  .local/share/kstars
+mk_pi_persist_dir  .config/environment.d
 
 mkdir -p /sketch/home/pi/.config/
 touch /sketch/home/pi/.config/kstarsrc
@@ -875,7 +936,7 @@ mk_pi_persist_dir .wiki_indexes
 
 #Youtube client
 mk_pi_persist_dir tartube-data
-
+mk_pi_persist_dir .config/rhasspy/profiles
 mk_pi_persist_dir  .fonts
 mk_pi_persist_dir  .home_template
 mk_pi_persist_dir  .mednafen
@@ -986,7 +1047,8 @@ EOF
 #Allow the /sketch/bin to work
 cat << EOF > /usr/lib/environment.d/98-ember-environment.conf 
 PATH=/usr/bin.sketch:$PATH:/opt/dotnet
-DOTNET_ROOT=/opt/dotnet 
+DOTNET_ROOT=/opt/dotnet
+DOTNET_CLI_TELEMETRY_OPTOUT=1
 EOF
 
 
@@ -1133,7 +1195,7 @@ cp -ar /etc/apache2/. /sketch/config/apache2
 
 
 #Switch to xonsh
-apt-get -y install -y elvish fish xonsh xonsh-doc python3-pygments python3-ptk
+apt-get -y install -y elvish fish xonsh xonsh-doc python3-pygments python3-ptk cowsay
 cat << EOF > /etc/shells
 # /etc/shells: valid login shells
 /bin/sh
@@ -1145,17 +1207,23 @@ cat << EOF > /etc/shells
 EOF
 
 
+sudo apt-get -y install lolcat figlet
+
+
 cat << EOF > /sketch/home/pi/.xonshrc
-$PROMPT= "{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{curr_branch: {}}{RESET} {BOLD_BLUE}{prompt_end}{RESET}"
-echo "This is Xonsh! An enhanced shell! It is mostly compatible with bash. If something doesn't work like you  expect, you may need to switch to actual bash.
-genfortune
+\$PROMPT= "{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{curr_branch: {}}{RESET} {BOLD_BLUE}{prompt_end}{RESET}"
+echo "This is Xonsh! An enhanced shell! It is mostly compatible with bash. If something doesn't work like you  expect, you may need to switch to actual bash."
+echo
+hostname | figlet -k -f banner | lolcat
+# genfortune | cowsay -f $(ls /usr/share/cowsay/cows/ | shuf -n1| cut -f 1 -d . | tr -d '\n') | lolcat
+genfortune | cowsay | lolcat
+echo
 EOF
 
 ln -s /home/pi/persist/.xonshrc /home/pi/.xonshrc
 
 cat << EOF > /etc/xonshrc
-$PROMPT= "{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{curr_branch: {}}{RESET} {BOLD_BLUE}{prompt_end}{RESET}"
-genfortune
+\$PROMPT= "{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{curr_branch: {}}{RESET} {BOLD_BLUE}{prompt_end}{RESET}"
 EOF
 
 

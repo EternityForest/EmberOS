@@ -4,7 +4,7 @@ Before=bluetooth.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/bluetooth-autoconnect -d
+ExecStart=/usr/bin/bluetooth-autoconnect.py -d
 
 [Install]
 WantedBy=bluetooth.service

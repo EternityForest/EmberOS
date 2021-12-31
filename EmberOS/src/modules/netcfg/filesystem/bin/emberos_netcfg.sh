@@ -57,9 +57,13 @@ else
     mount -t tmpfs -o size=5m tmpfs /home/pi/.pki/nssdb
     chown -R pi /home/pi/.pki/nssdb/
 
-    #Use the cache
+     #Use the cache. Be sure we can read it.
     rsync -az /sketch/.emberos/cache/etc.ssl/ /etc/ssl/certs/
+    chmod -R 755  /etc/ssl/certs/
+
     rsync -az /sketch/.emberos/cache/etc.pki.nssdb/ /etc/pki/nssdb/
+    chmod -R 755   /etc/pki/nssdb/
+
     rsync -az /etc/pki/nssdb/ /home/pi/.pki/nssdb
 fi
 

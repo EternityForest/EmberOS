@@ -3,15 +3,18 @@
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmydata
 export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 
+
 ! apt purge -y wolfram-engine wolframscript thonny
 ! apt purge -y sonic-pi-samples
 
 #Everyhting aside from scratch3 official can go
 ! apt purge -y nuscratch
 ! apt purge -y scratch2
+! apt purge -y scratch3
 ! apt purge -y scratch
 ! apt purge -y minecraft-pi
 ! apt purge -y python-minecraftpi
+! apt purge -y realvnc-vnc-server
 
 ! apt purge -y ^dillo$  ^idle3$  ^smartsim$ ^sonic-pi$  ^epiphany-browser$  ^python-minecraftpi$ ^bluej$ 
 ! apt purge -y ^greenfoot$  ^greenfoot-unbundled$  ^claws-mail$ ^claws-mail-i18n$

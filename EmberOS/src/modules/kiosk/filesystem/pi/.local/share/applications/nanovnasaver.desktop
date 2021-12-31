@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=NanoVNA Saver lets you control a NanoVNA from a Pi.
+Terminal=false
+Name=ENanoVNA Saver
+Exec=NanoVNASaver
+Type=Application
+Icon=gnome-panel-launcher
+Categories=Development

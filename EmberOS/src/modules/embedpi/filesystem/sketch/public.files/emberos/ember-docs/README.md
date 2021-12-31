@@ -2,7 +2,11 @@
 
 ## Removed packages
 
-dillo, claws-mail, minecraft, mathematica, sonicpi, all but one version of Scratch, and several other apps have been removed. Most things have been replaced with more useful or more free equivalents.
+dillo, claws-mail, minecraft, mathematica, sonicpi, Scratch, and several other apps have been removed. Most things have been replaced with more useful or more free equivalents.
+
+### In previous versions, no longer included
+
+These were removed because they were too big for their usefulness.  Ardour, postgresql
 
 
 ## The command shell

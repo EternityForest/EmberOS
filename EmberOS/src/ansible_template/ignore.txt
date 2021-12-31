@@ -40,7 +40,7 @@ cache/**
 config/ca-certificates.conf
 config/sslcerts/**
 config/timezones/**
-postgresql/**
+postgresql
 home/pi/Programs/arduino*
 home/pi/Arduino/libraries/**
 share/emberos/**
@@ -88,24 +88,45 @@ config/filesystem/emberos*
 #This is there so rsync doesn't try an sync it
 .git
 
+.emberos/cache
+public.www/webmap
 
-#It is rather unfortunate that voice2json mixes up their 
-home/pi/.config/voice2json/acoustic_model/**
-home/pi/.config/voice2json/base_dictionary.txt.gz
-home/pi/.config/voice2json/base_language_model.txt.gz
-home/pi/.config/voice2json/clean.sh  
-home/pi/.config/voice2json/espeak_phonemes.txt
-home/pi/.config/voice2json/frequent_words.txt
-home/pi/.config/voice2json/g2p.fst.gz
-home/pi/.config/voice2json/ipa_phonemes.txt
-home/pi/.config/voice2json/LICENSE
-home/pi/.config/voice2json/marytts/**
-home/pi/.config/voice2json/marytts_phonemes.txt
-home/pi/.config/voice2json/phoneme_examples.txt
-home/pi/.config/voice2json/README
-home/pi/.config/voice2json/SOURCE
-home/pi/.config/voice2json/stop_words.txt
-home/pi/.config/voice2json/test/**
+
+home/pi/.cache
+
+#It is rather unfortunate that rhasspy/profiles/en mixes up their stuff
+
+home/pi/.config/rhasspy/profiles/en/acoustic_model/**
+home/pi/.config/rhasspy/profiles/en/deepspeech/model/*/output_graph.pbmm
+home/pi/.config/rhasspy/profiles/en/tts/**
+
+home/pi/.config/rhasspy/profiles/en/base_dictionary.txt.gz
+home/pi/.config/rhasspy/profiles/en/base_language_model.txt.gz
+home/pi/.config/rhasspy/profiles/en/clean.sh  
+home/pi/.config/rhasspy/profiles/en/espeak_phonemes.txt
+home/pi/.config/rhasspy/profiles/en/frequent_words.txt
+home/pi/.config/rhasspy/profiles/en/g2p.fst.gz
+home/pi/.config/rhasspy/profiles/en/g2p.fst
+home/pi/.config/rhasspy/profiles/en/g2p.corpus
+
+home/pi/.config/rhasspy/profiles/en/ipa_phonemes.txt
+home/pi/.config/rhasspy/profiles/en/LICENSE
+home/pi/.config/rhasspy/profiles/en/supervisord.pid
+home/pi/.config/rhasspy/profiles/en/supervisord.log
+home/pi/.config/rhasspy/profiles/en/docker-compose.yaml
+
+home/pi/.config/rhasspy/profiles/en/marytts/**
+home/pi/.config/rhasspy/profiles/en/marytts_phonemes.txt
+home/pi/.config/rhasspy/profiles/en/phoneme_examples.txt
+home/pi/.config/rhasspy/profiles/en/README
+home/pi/.config/rhasspy/profiles/en/SOURCE
+home/pi/.config/rhasspy/profiles/en/stop_words.txt
+home/pi/.config/rhasspy/profiles/en/test/**
+
+
+#I don't think we usually want shell history backups
+home/pi/.local/share/xonsh
+
 
 home/pi/AgentDVR/**
 #This line lets you back up AgentDVR config

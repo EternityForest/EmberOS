@@ -11,7 +11,7 @@ apt-get -y install mednaffe  brandy bwbasic kolourpaint
 
 if [ -z "$EMBER_MICRO" ]
 then
-apt-get -y install scratch3 pychess ace-of-penguins ltris
+apt-get -y install pychess ace-of-penguins ltris
 fi
 
 #It seems to have a rather odd save location
@@ -19,3 +19,22 @@ mkdir -p /sketch/home/pi/.tuxpaint
 ! cp -ar /home/pi/.tuxpaint/. /sketch/home/pi/.tuxpaint
 ! rm -r  /home/pi/.tuxpaint
 ln -s /home/pi/persist/.tuxpaint /home/pi/.tuxpaint
+
+apt-get -y install cowsay cmatrix
+
+cd /build_cache
+
+#Too many copyright issues
+# if [ ! -d /build_cache/cowsay-files ]
+# then
+# git clone --depth 1 https://github.com/paulkaefer/cowsay-files.git
+# cd /build_cache/cowsay-files
+# else
+# cd /build_cache/cowsay-files
+# git pull --rebase
+# fi
+# rsync --no-recursive cows/   /usr/share/cowsay/cows/
+# #Flatten
+# rm /usr/share/cowsay/cows/true-color/*
+# rmdir /usr/share/cowsay/cows/true-color
+# rsync --no-recursive cows/true-color   /usr/share/cowsay/cows/

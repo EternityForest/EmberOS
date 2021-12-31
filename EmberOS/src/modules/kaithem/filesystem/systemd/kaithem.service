@@ -1,19 +1,21 @@
 [Unit]
 Description=KaithemAutomation python based automation server
-After=basic.target time-sync.target sysinit.service zigbee2mqtt.service
+After=basic.target time-sync.target sysinit.service zigbee2mqtt.service pipewire.service
 Type=simple
 
 
 [Service]
 TimeoutStartSec=0
-ExecStart=/opt/kaithem/kaithem/kaithem.py -c /sketch/kaithem/config.yaml
+ExecStart=pw-jack /sketch.opt/kaithem/kaithem/kaithem.py -c /home/pi/kaithem/config.yaml
 Restart=on-failure
 RestartSec=15
 OOMScoreAdjust=-800
 Nice=-15
 #Make it try to act like a GUI program if it can because some modules might
-#make use of that.
-Environment="DISPLAY=:0"
+#make use of that.  Note that this is a bad hack hardcoding the UID.
+#Pipewire breaks without it though.
+Environment="DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus"
+Environment="XDG_RUNTIME_DIR=/run/user/1000"
 
 #This may cause some issues but I think it's a better way to go purely because of
 #The fact that we can use PipeWire instead of managing jack, without any conflicts.
@@ -22,9 +24,11 @@ Environment="DISPLAY=:0"
 User=pi
 #Bluetooth scannning and many other things will need this
 #Setting the system time is used for integration with GPS stuff.
-AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_NET_ADMIN CAP_NET_RAW CAP_SYS_TIME
+AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_NET_ADMIN CAP_NET_RAW CAP_SYS_TIME CAP_SYS_NICE
+SecureBits=keep-caps
 
-
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target

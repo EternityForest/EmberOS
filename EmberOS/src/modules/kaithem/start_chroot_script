@@ -15,14 +15,17 @@ cd /build_cache/KaithemAutomation
 git pull --rebase
 fi
 
-git clone --depth 1 /build_cache/KaithemAutomation /opt/kaithem
+git clone --depth 1 /build_cache/KaithemAutomation /sketch/opt/kaithem
 
-cd /opt/kaithem/
+cd /sketch/opt/kaithem/
 
+#No idea why this is needed to fix things
+git rm --cached -r .
+git reset --hard
 
 git remote set-url origin https://github.com/EternityForest/KaithemAutomation.git
 
-rsync -avz /opt/kaithem/kaithem/var/  /sketch/kaithem/
+rsync -avz /sketch/opt/kaithem/kaithem/var/  /sketch/kaithem/
 
 unpack /filesystem/kaithem_sketch/ /sketch/kaithem/ root
 
@@ -32,26 +35,22 @@ unpack /filesystem/systemd/ /usr/lib/systemd/system/ root
 ! rm /sketch/kaithem/ssl/certificate.key
 ! rm /sketch/kaithem/ssl/certificate.cert
 
-chmod a+x /opt/kaithem/ /opt/kaithem/kaithem/kaithem.py
+#chmod 755 -R /opt/kaithem/
 
-#No idea why this is needed to fix things
-git rm --cached -r .
-git reset --hard
-
-git pull --rebase
 
 mkdir /home/pi/kaithem
 
 #Give www-data a "window into the root filesystem"
 cat << EOF > /sketch/config/filesystem/emberos-pi-kaithem.yaml
-/sketch/kaithem
+/sketch/kaithem:
     mode: '0750'
     user:  pi
     bindat: /home/pi/kaithem
 EOF
 
-#We want to just use Pulse
-cat << EOF > /sketch/kaithem/registry/data/jacksettings.yaml
+
+mkdir -p  /sketch/kaithem/system.mixer
+cat << EOF > /sketch/kaithem/system.mixer/jacksettings.yaml
 {jackDevice: '', jackMode: use, jackPeriodSize: 512, jackPeriods: 3, sharePulse: 'off',
   usbLatency: -1, usbPeriodSize: 512, usbPeriods: 3, usbQuality: 0, useAdditionalSoundcards: 'no'}
 EOF

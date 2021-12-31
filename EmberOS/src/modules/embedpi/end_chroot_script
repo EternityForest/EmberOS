@@ -18,3 +18,10 @@ rm -rf /home/pi/persist/**
 
 #Restore Yarn settings
 yarn config set cache-folder /usr/local/share/.cache/yarn
+
+
+
+#This was like somehow getting undone?????
+touch /etc/pipewire/media-session.d/with-jack
+cp /usr/share/doc/pipewire/examples/ld.so.conf.d/pipewire-jack-*.conf /etc/ld.so.conf.d/
+ldconfig

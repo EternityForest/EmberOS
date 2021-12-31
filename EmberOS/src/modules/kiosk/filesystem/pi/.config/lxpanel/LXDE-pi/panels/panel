@@ -99,6 +99,11 @@ Plugin {
   }
 }
 Plugin {
+  type=updater
+  Config {
+  }
+}
+Plugin {
   type=ejecter
   Config {
     AutoHide=1
@@ -133,19 +138,14 @@ Plugin {
   }
 }
 Plugin {
+  type=volumepulse
+  Config {
+  }
+}
+Plugin {
   type=space
   Config {
     Size=2
-  }
-}
-Plugin {
-  type=netstat
-  Config {
-  }
-}
-Plugin {
-  type=volumepulse
-  Config {
   }
 }
 Plugin {
@@ -163,7 +163,6 @@ Plugin {
   Config {
     Size=2
   }
-  expand=0
 }
 Plugin {
   type=ptbatt

@@ -172,6 +172,12 @@ ln -s /var/lib/dhcp /var/lib/dhcpcd5
 fi
 
 
+#This has to exist, supervisord won't make it apparently. Not a fan!
+mkdir -p /var/log/supervisor
+
+# This also has to exist or systemd login thingy pitches a fit
+mkdir -p /var/lib/systemd/linger
+
 # Make edits to fstab
 
 ##They should already have /run and /var/lock covered
@@ -186,8 +192,10 @@ fi
 
 append1 /etc/fstab "/var/log" "tmpfs /var/log tmpfs nodev,nosuid,mode=775,size=32M 0 0"
 append1 /etc/fstab "/var/tmp" "tmpfs /var/tmp tmpfs nodev,nosuid,mode=1777,size=256M 0 0"
-append1 /etc/fstab "\s/tmp"   "tmpfs /tmp    tmpfs nodev,nosuid,mode=1777,size=256M 0 0"
+append1 /etc/fstab "/tmp"   "tmpfs /tmp    tmpfs nodev,nosuid,mode=1777,size=256M 0 0"
 
+append1 /etc/fstab "/var/lib/lightdm"   "tmpfs /var/lib/lightdm   tmpfs nodev,nosuid,mode=1777,size=256M 0 0"
+append1 /etc/fstab "/var/cache/lightdm"   "tmpfs /var/cache/lightdm    tmpfs nodev,nosuid,mode=1777,size=256M 0 0"
 
 #NTP and Chrony are both valid choices. Can't really make people pick one....
 mkdir -p /var/lib/ntp
@@ -197,7 +205,7 @@ append1 /etc/fstab "/var/lib/chrony" "tmpfs /var/lib/chrony tmpfs defaults,noati
 
 #At least let's try to make this timers thing work!
 mkdir -p /var/lib/systemd/timers/
-append1 /etc/fstab "/var/lib/systemd/timers/" "tmpfs /var/lib/systemd/timers/ tmpfs defaults,noatime,nosuid,nodev,noexec,nofail,uid=_chrony,size=8M 0 0"
+append1 /etc/fstab "/var/lib/systemd" "tmpfs /var/lib/systemd/timers/ tmpfs defaults,noatime,nosuid,nodev,noexec,nofail,uid=_chrony,size=8M 0 0"
 
 
 #General purpose 32MB public unsecured free for all for easy file sharing funtimes

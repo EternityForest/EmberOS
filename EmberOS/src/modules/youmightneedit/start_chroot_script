@@ -7,15 +7,76 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmyd
 export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 
 
+#This is supposed to improve resolution of windows network services
+sudo apt-get -y install winbind
+
+cat << EOF > /etc/nsswitch.conf
+# /etc/nsswitch.conf
+#
+# Example configuration of GNU Name Service Switch functionality.
+# If you have the "glibc-doc-reference" and "info" packages installed, try:
+#  info libc "Name Service Switch" for information about this file.
+
+passwd:         files
+group:          files
+shadow:         files
+gshadow:        files
+
+hosts:          files mdns4_minimal [NOTFOUND=return] dns wins
+networks:       files
+
+protocols:      db files
+services:       db files
+ethers:         db files
+rpc:            db files
+
+netgroup:       nis
+EOF
+
 cd /build_cache
+
+if [ ! -d /build_cache/nanovna-saver ]
+then
+git clone --depth 1 https://github.com/NanoVNA-Saver/nanovna-saver /build_cache/nanovna-saver
+cd /build_cache/nanovna-saver
+else
+cd /build_cache/nanovna-saver
+git pull --rebase
+fi
+
+#Get from repos
+pip3 install --no-dependencies .
+
+
+cd /build_cache
+# tflite tensorflow
+echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+sudo apt-get update
+
+
+sudo apt-get -y install v4l-utils
+
+
+# pip3 install flask
+# pip3 install peewee_migrate
+# pip3 install pydantic
+# sudo apt-get -y install python3-tflite-runtime
+# pip3 install ws4py
+# echo "VERSION='0.9.4-hackystandalone'" > frigate/version.py
+
+# # $CONFIG_FILE = "/home/daniel/frigate/config.yml"
+# cat << EOF > /sketch/frigate/config.yml
+# mqtt:
+#     host:localhost
+# EOF
 
 
 #Mega GUI apps
 if [ -z "$EMBER_MICRO" ]
 then
-apt-get -y install ardour audacious audacious-plugins tuxguitar zeal filezilla gelemental kstars inkscape gimp  pulseview synaptic qdirstat gwenview guake skanlite 
+apt-get -y install ardour audacious audacious-plugins tuxguitar zeal filezilla gelemental kstars inkscape gimp  pulseview synaptic qdirstat gwenview guake skanlite solaar
 ! apt-get -y install fbreader
-! apt-get -y install code
 fi
 
 
@@ -54,6 +115,7 @@ sudo systemctl disable mumble-server.service
 #Coding font
 apt-get -y install -y fonts-hack
 
+apt-get -y install nodered
 
 
 #OpenCV+deps
@@ -74,7 +136,7 @@ fi
 
 
 
-apt-get -y install nmap robotfindskitten ncdu mc curl fatrace gstreamer1.0-tools pavucontrol xawtv evince stegosuite
+apt-get -y install nmap robotfindskitten ncdu mc curl fatrace gstreamer1.0-tools pavucontrol xawtv evince stegosuite unzip
 
 apt-get -y remove qpdfview
 #Sigh. Vim is huge but some people really love it...
@@ -119,6 +181,13 @@ Environment="NODE_OPTIONS=--max_old_space_size=512"
 # uncomment next line if you need to wait for time sync before starting
 #ExecStartPre=/bin/bash -c '/bin/journalctl -b -u systemd-timesyncd | /bin/grep -q "systemd-timesyncd.* Synchronized to time server"'
 
+
+#Make it try to act like a GUI program if it can because some modules might
+#make use of that.  Note that this is a bad hack hardcoding the UID.
+#Pipewire breaks without it though.
+Environment="DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus"
+Environment="XDG_RUNTIME_DIR=/run/user/1000"
+
 ExecStart=/usr/bin/env node-red-pi $NODE_OPTIONS $NODE_RED_OPTIONS
 #ExecStart=/usr/bin/env node $NODE_OPTIONS red.js $NODE_RED_OPTIONS
 # Use SIGINT to stop
@@ -145,12 +214,16 @@ yarn global add node-red-node-smooth
 yarn global add node-red-contrib-sun-position
 yarn global add node-red-contrib-tasmota
 yarn global add node-red-contrib-home-assistant-websocket
+yarn global add node-red-contrib-ble-sense
+yarn global add @abandonware/noble
+yarn global add typescript
 
 
 
+yarn global add bleno
 
 
-
+mkdir -p /home/pi/EspruinoHub
 
 if [ ! -d /build_cache/EspruinoHub ]
 then
@@ -197,7 +270,72 @@ KillSignal=SIGINT
 WantedBy=multi-user.target
 EOF
 
+
+cd /build_cache
+
+if [ ! -d /build_cache/Armoria ]
+then
+git clone --recursive --depth 1 https://github.com/Azgaar/Armoria.git
+
+else
+cd /build_cache/Armoria
+git pull --rebase
+fi
+cd /build_cache/Armoria
+yarn install
+
+cat << EOF > /etc/systemd/system/armoria.service
+[Unit]
+Description=EspruinoHub BLE -> MQTT bridge
+After=nodered.target
+Documentation=https://github.com/espruino/EspruinoHub
+
+[Service]
+ExecStart=yarn start
+WorkingDirectory=/sketch.opt/Armoria
+User=pi
+Group=daemon
+Nice=10
+SyslogIdentifier=EspruinoHub
+StandardOutput=syslog
+Restart=on-failure
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+mkdir -p /sketch.opt/armoria
+
+rsync -avz /build_cache/Armoria/ /sketch.opt/Armoria/
+
+cd /sketch.opt/Armoria/
+#No idea why this is needed to fix things
+git rm --cached -r .
+git reset --hard
+
+
 sudo apt-get install -y build-essential libudev-dev
+
+
+
+cat << EOF > /etc/systemd/system/rtl_433@.service
+[Unit]
+Description=RTL_433 service uses an SDR dongle to listen in on transmissions.
+After=nodered.target
+Documentation=https://github.com/espruino/EspruinoHub
+
+[Service]
+ExecStart=rtl_433 -f %i -F json -M utc | mosquitto_pub -t home/rtl_433 -l
+User=pi
+Nice=10
+SyslogIdentifier=RTL433
+Restart=on-failure
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target
+EOF
 
 
 ! apt-get -y install libopus0 libopus-dev
@@ -208,10 +346,7 @@ sudo apt-get install -y build-essential libudev-dev
 #Make this not fail
 ! pip3 install deepspeech-tflite
 
-# tflite tensorflow
-echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
-curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-sudo apt-get update
+
 sudo apt-get -y install python3-tflite-runtime
 
 
@@ -235,17 +370,19 @@ sudo --user=pi yarn install
 
 
 
-mkdir -p /opt/zigbee2mqtt/
-rsync -avz /build_cache/zigbee2mqtt/ /opt/zigbee2mqtt/
+mkdir -p /sketch/opt/zigbee2mqtt/
+rsync -avz /build_cache/zigbee2mqtt/ /sketch/opt/zigbee2mqtt/
 
-sudo chown -R pi:pi /opt/zigbee2mqtt
+#There is a big problem with this, it has an initial build step.
+#Which means it needs a *writable* opt.  What a horror!
+sudo chown -R pi:pi /sketch/opt/zigbee2mqtt
 
 
 mkdir -p /sketch/zigbee2mqtt
-mkdir -p /opt/zigbee2mqtt/data
+mkdir -p  /sketch/opt/zigbee2mqtt/data
 
 
-rsync -av /opt/zigbee2mqtt/data/ /sketch/zigbee2mqtt/
+rsync -av  /sketch/opt/zigbee2mqtt/data/ /sketch/zigbee2mqtt/
 
 
 
@@ -258,7 +395,7 @@ cat << EOF > /sketch/config/filesystem/emberos-zigbee2mqtt.yaml
     mode: '0700'
     user: pi
     group: pi
-    bindat: /opt/zigbee2mqtt/data
+    bindat: /sketch.opt/zigbee2mqtt/data
 EOF
 
 cat << EOF > /etc/systemd/system/zigbee2mqtt.service
@@ -267,14 +404,14 @@ Description=zigbee2mqtt
 After=network.target fs_bindings.service mosquitto.service
 
 [Service]
-ExecStart=/usr/local/bin/yarn run
-WorkingDirectory=/opt/zigbee2mqtt
+ExecStart=/usr/bin/yarn start
+WorkingDirectory=/sketch.opt/zigbee2mqtt
 StandardOutput=null
 # Or use StandardOutput=null if you don't want Zigbee2MQTT messages filling syslog, for more options see systemd.exec(5)
 StandardError=inherit
 Restart=always
 RestartSec=30
-User=pi
+#User=pi
 
 [Install]
 WantedBy=multi-user.target
@@ -476,16 +613,21 @@ device_options: {}
 external_converters: []
 
 
-#Restrict the frontend to localhost viewing only.
 frontend:
   port: 8003
-  host: 127.0.0.1
+  host: 0.0.0.0
 
 
 EOF
 
 
+cd /build_cache
 
+wget -nc https://ispyfiles.azureedge.net/downloads/Agent_ARM32_3_7_1_0.zip
+
+mkdir -p /sketch/home/pi/AgentDVR/
+cd /sketch/home/pi/AgentDVR/
+unzip /build_cache/Agent_ARM32_3_7_1_0.zip
 
 #ispy agentDVR.  The actual files are a large binary and therefore we include them in the torrentable
 #included data
@@ -505,8 +647,8 @@ After=systemd-remount-fs.service network-online.target fs_bindings.service
 # eg for Raspberry Pi:	ExecStart=/usr/share/dotnet/dotnet /home/pi/Desktop/Agent/Agent.dll
 # eg for Linux:			ExecStart=/usr/bin/dotnet /home/sean/Desktop/Agent/Agent.dll
 
-ExecStart=/usr/share/dotnet/dotnet /home/AgentDVR/Agent.dll
-
+ExecStart=/opt/dotnet/dotnet /home/pi/persist/AgentDVR/Agent.dll
+Environment="DOTNET_CLI_TELEMETRY_OPTOUT=1"
 # to query logs using journalctl, set a logical name here
 SyslogIdentifier=AgentDVR
 
@@ -541,8 +683,49 @@ echo "samba-common samba-common/do_debconf boolean true" | sudo debconf-set-sele
 #Add this if it ever gets support
 #apt-get -y install rtl8812au-dkms
 
-#Too big for github, you have to put the file there manually
-apt-get -y install /filesystem/debs/voice2json_2.0_armhf.deb
+cd /build_cache
+
+#Now we need Rhasspy
+sudo apt-get -y install libgfortran4 supervisor libopenblas-base libffi6 sox jq
+
+
+
+cat << EOF > /etc/systemd/system/rhasspy@.service
+[Unit]
+Description=Rhasspy
+After=syslog.target network.target mosquitto.service pipewire-media-session.service pipewire.service
+
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/bash -o pipefail -c '{ /usr/bin/rhasspy -p %i --local-mqtt-port 1883 --user-profiles=/home/pi/.config/rhasspy/profiles 2>&1 | cat >&2 3>&-; } 3>&1'
+
+User=pi
+Group=pi
+
+#Make it try to act like a GUI program if it can because some modules might
+#make use of that.  Note that this is a bad hack hardcoding the UID.
+#Pipewire breaks without it though.
+Environment="DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus"
+Environment="XDG_RUNTIME_DIR=/run/user/1000"
+AmbientCapabilities=CAP_SYS_NICE
+SecureBits=keep-caps
+
+
+RestartSec=1
+Restart=on-failure
+
+StandardOutput=syslog
+StandardError=syslog
+
+SyslogIdentifier=rhasspy
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+wget https://github.com/rhasspy/rhasspy/releases/latest/download/rhasspy_armhf.deb
+dpkg -i rhasspy_armhf.deb
 
 #Gonna do ThingMagic's Mercury API to enable RFID reading
 apt-get install -y unzip patch xsltproc gcc libreadline-dev python3-dev python3-setuptools
@@ -581,25 +764,11 @@ then
 apt-get -y install wireshark
 fi
 
-# Currently broken, doesn't want to build
-# #install driver for a very common cheap USB wifi chip
-# #TODO: change this if we ever upgrade to 64 bit
-# apt-get install -y raspberrypi-kernel-headers dkms
 
-# mkdir -p /var/lib/rtl8812au
-# unpack /filesystem/rtl8812au /var/lib/rtl8812au
-
-# cd /var/lib/rtl8812au
-# sed -i 's/CONFIG_PLATFORM_I386_PC = y/CONFIG_PLATFORM_I386_PC = n/g' Makefile
-# sed -i 's/CONFIG_PLATFORM_ARM_RPI = n/CONFIG_PLATFORM_ARM_RPI = y/g' Makefile
-# #You never know when power save is going to crash everything
-# sed -i 's/CONFIG_POWER_SAVING = y/CONFIG_POWER_SAVING = n/g' Makefile
+#Need for cheap USB wifis
+apt-get install -y ppp usb-modeswitch wvdial
 
 
-# make dkms_install
-
-# #Autoload so it just works
-# echo 8812au | sudo tee -a /etc/modules
 
 #UPnP rendering
 mkdir -p /opt/gmrender-resurrect
@@ -622,13 +791,7 @@ make install
 
 pip3 install hardline
 
-cat << EOF > /usr/bin/ember-launch-gmrender
-#!/bin/bash
-UPNP_UUID=\`ip link show | awk '/ether/ {print "salt:)-" $2}' | head -1 | md5sum | awk '{print $1}'\`
-gmrender -f "$(cat /etc/hostname)" -u "$UPNP_UUID"
-EOF
-chmod 755  /usr/bin/ember-launch-gmrender
-cat << EOF > /etc/systemd/system/gmrender.service
+cat << EOF > /etc/systemd/system/ember-gmrender.service
 [Unit]
 Description=Act as a UPNP media rendering server
 After=systemd-remount-fs.service network-online.target
@@ -636,12 +799,18 @@ RequiresMountsFor=/etc/ /sketch/ /home/
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/ember-launch-gmrender
+ExecStart=bash -c '/usr/bin/pw-jack gmediarender -f "$(cat /etc/hostname)" -u "$(uuidgen)" --gstout-audiopipe=jackaudiosink'
 User=pi
 WorkingDirectory=~
+AmbientCapabilities=CAP_SYS_NICE
+Environment="DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus"
+Environment="XDG_RUNTIME_DIR=/run/user/1000"
+SecureBits=keep-caps
+
 
 [Install]
 WantedBy=sysinit.target
+
 EOF
 
 
@@ -673,7 +842,7 @@ cat << EOF > /sketch/config/filesystem/emberos_hardline.yaml
     bindat: /etc/hardline/services
 EOF
 
-apt-get -y install gnuradio gnuradio-dev rtl-sdr gr-osmosdr gr-limesdr gr-dab gr-rds gr-air-modes
+apt-get -y install gnuradio gnuradio-dev rtl-sdr gr-osmosdr gr-limesdr gr-dab gr-rds gr-air-modes rtl-433
 
 
 # Printerie
@@ -714,7 +883,7 @@ unpack /filesystem/webmap /sketch/public.www/webmap
 
 
 
-cat << EOF > /etc/systemd/system/zimserver.service
+cat << EOF > /etc/systemd/system/zimserver@.service
 [Unit]
 Description=Serve wikis
 After=systemd-remount-fs.service network-online.target
@@ -736,9 +905,20 @@ EOF
 apt-get -y install mosquitto libpng16-16 chromium-browser rpi-chromium-mods batmand batctl dhtnode ntpdate
 systemctl disable dhtnode.service
 
-echo "persistence false" > /etc/mosquitto/conf.d/emberos.conf
+mkdir -p /etc/mosquitto/conf.d/
 
+cat <<EOF > /sketch/config/mosquitto.conf
+persistence false
+listener 1883
+allow_anonymous true
+
+# Disable's Nagle's algorithm on the assumption that we
+# will be doing small numbers of short packages.
+set_tcp_nodelay true
+EOF
 systemctl disable mosquitto.service
+
+ln -s /etc/sketchconfig/mosquitto.conf /etc/mosquitto/conf.d/emberos-sketch.conf
 
 # SyncThing is installed, but not set up!!!
 wget -O - https://syncthing.net/release-key.txt > /etc/apt/trusted.gpg.d/syncthing.asc
@@ -778,6 +958,7 @@ chmod 755 /usr/bin/get-youtube-dl
 
 ln -s /usr/bin.sketch/yt-dlp /usr/bin/youtube-dl
 
+ln -s /usr/bin.sketch/yt-dlp /usr/bin/yt-dlp 
 
 
 #HW drivers
@@ -849,7 +1030,7 @@ apt-get -y install python3 conky-all grsync screengrab shared-mime-info rdiff-ba
 
 apt-get -y install python3-setproctitle python3-cffi python3-dbus python3-pydbus python3-scipy python3-numpy python3-sympy python3-smbus python3-pyaudio python3-pexpect python3-pydub 
 #All the different FSes that you might want to have
-apt-get -y install btrfs-progs nilfs-tools f2fs-tools xfsprogs exfat-utils btrfsmaintenance
+apt-get -y install btrfs-progs nilfs-tools f2fs-tools xfsprogs exfat-utils btrfsmaintenance btrfs-compsize
 
 
 #These are Kivy dependancies
@@ -912,7 +1093,7 @@ pip3 install pi3d
 pip3 install npyscreen picotui asciimatics
 pip3 install esptool
 apt-get -y install libmpv-dev python3-mpv
-apt-get -y install postgresql libpq-dev postgresql-client postgresql-contrib postgresql-client-common
+#apt-get -y install postgresql libpq-dev postgresql-client postgresql-contrib postgresql-client-common
 mkdir -p /sketch/postgresql
 mkdir -p /sketch/config/postgresql
 mkdir -p /var/lib/postgresql
@@ -922,10 +1103,10 @@ mkdir -p /var/lib/postgresql
 # psql -c "GRANT ALL PRIVILEGES ON DATABASE nextcloud to www-data;"
 # systemctl stop postgresql.service
 
-systemctl disable postgresql.service
+#systemctl disable postgresql.service
 
-cp -ar /var/lib/postgresql/. /sketch/postgresql
-cp -ar /etc/postgresql/. /sketch/config/postgresql
+#cp -ar /var/lib/postgresql/. /sketch/postgresql
+#cp -ar /etc/postgresql/. /sketch/config/postgresql
 
 cat << EOF > /sketch/config/filesystem/emberos-postgres.yaml
 /sketch/postgresql:
@@ -949,23 +1130,35 @@ apt-get install libapache2-mod-php -y
 apt-get -y install python3-dev build-essential gcc g++ cmake make libtool m4 autoconf
 
 
-apt-get -y install python3 systemd cython3 build-essential mplayer python3-serial cutecom neofetch xoscope sigrok-firmware-fx2lafw 
+apt-get -y install python3 systemd cython3 build-essential python3-serial cutecom neofetch xoscope sigrok-firmware-fx2lafw 
 apt-get -y install python3-pyqt5 python3-pyqt5.qtserialport python3-pyqt5.qtsvg python3-pyqt5.qtchart python3-pyqt5.qtmultimedia
 apt-get -y install python3-pyqt5.qtsql python3-pyqt5.qtwebkit python3-pyqt5.qtopengl python3-pyqt5.qtsensors libinput-tools
-apt-get -y install python3-tz python3-dateutil lm-sensors python3-lxml python3-six python3-requests avahi-discover python3-psutil backintime-qt4
+apt-get -y install python3-tz python3-babel python3-boto3 python3-dateutil lm-sensors python3-lxml python3-six python3-requests avahi-discover python3-psutil backintime-qt4
 
 apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3-libnacl  python3-libusb1 python3-fuse python3-bluez python3-cairosvg  python3-ifaddr python3-pymodbus libbluetooth-dev libcap2-bin
 
 pip3 install beacontools[scan]
 
 #Audio handling
-apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid  jack-tools jack-stdio libgstreamer1.0-dev gstreamer1.0-libav
+apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid  jack-tools jack-stdio libgstreamer1.0-dev gstreamer1.0-libav gstreamer1.0-pipewire
 apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly zynaddsubfx vmpk autotalent x42-plugins
 
 apt-get -y install jaaa qjackctl ffmpeg
 
 
-sudo apt-get -y install build-essential autoconf automake libtool pkg-config ansible
+sudo apt-get -y install build-essential autoconf automake libtool pkg-config
+
+pip3 install ansible-core
+pip3 install paramiko
+
+
+cd /build_cache
+
+
+#This gives us Synchronize which is probably my top favorite most useful one
+wget -nc https://galaxy.ansible.com/download/ansible-posix-1.3.0.tar.gz
+ansible-galaxy collection install ansible-posix-1.3.0.tar.gz  -p collections
+
 
 #Save over 100MB by using the Sketch folder instead
 apt-get -y install fluidsynth  --no-install-recommends

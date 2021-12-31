@@ -9,7 +9,7 @@ echo "postprocessing `ls -t workspace/*.img | head -1`"
 
 ORIGINAL_LOOP=$(losetup -P -r --find --show `ls -t workspace/*.img | head -1`)
 
-dd if=/dev/zero bs=1M count=10212 >> workspace/postprocess/emberos_postprocessed.img
+dd if=/dev/zero bs=1M count=11212 >> workspace/postprocess/emberos_postprocessed.img
 
 POSTPROCESS_LOOP=`losetup -P --find --show workspace/postprocess/emberos_postprocessed.img`
 
@@ -27,7 +27,7 @@ parted --script ${POSTPROCESS_LOOP} \
     mklabel msdos \
     mkpart primary fat32 4MiB 192MiB \
     mkpart primary btrfs 192MiB 6400MiB \
-    mkpart primary btrfs 6400MiB 10200MiB \
+    mkpart primary ntfs 6400MiB 11200MiB \
     set 1 boot on
     set 2 boot on
     set 1 lba on
@@ -86,7 +86,7 @@ setfattr -h -v 0x00000800 -n system.ntfs_attrib_be workspace/postprocess_sketch/
 #Copy all files from root, compressing as we go if we were using a compression friendly FS
 rsync -az --exclude='sketch/*' --exclude='/tmp/*' --exclude='/var/tmp/*' workspace/original_root/ workspace/postprocess_root/
 
-sed -i '/23709a26-1289-4e83-bfe5-2c99d42d276e6/c\/dev/mmcblk0p1  /boot           vfat    defaults,noatime,ro          0       2' workspace/postprocess_root/etc/fstab
+sed -i '/23709a26-1289-4e83-bfe5-2c99d42d276e/c\/dev/mmcblk0p1  /boot           vfat    defaults,noatime,ro          0       2' workspace/postprocess_root/etc/fstab
 
 sed -i '/33fc23d5-a31d-45ed-8aec-e85f4fb4a436/c\/dev/mmcblk0p2  /               btrfs    defaults,noatime,ro,compress  0       1' workspace/postprocess_root/etc/fstab
 sed -i '/c8dd1d93-222c-42e5-9b03-82c24d2433fd/c\/dev/mmcblk0p3 /sketch auto defaults,noatime,nofail,fmask=027,dmask=027,umask=027 0 0' workspace/postprocess_root/etc/fstab
