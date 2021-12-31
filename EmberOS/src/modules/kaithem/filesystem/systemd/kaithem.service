@@ -27,6 +27,11 @@ User=pi
 AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_NET_ADMIN CAP_NET_RAW CAP_SYS_TIME CAP_SYS_NICE
 SecureBits=keep-caps
 
+LimitRTPRIO= 95
+LimitNICE= -20
+LimitMEMLOCK= infinity
+
+
 StandardOutput=journal
 StandardError=journal
 

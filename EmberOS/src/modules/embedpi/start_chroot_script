@@ -159,13 +159,42 @@ UUID=33fc23d5-a31d-45ed-8aec-e85f4fb4a436  /               auto    defaults,noat
 UUID=c8dd1d93-222c-42e5-9b03-82c24d2433fd /sketch auto defaults,noatime,nofail,fmask=027,dmask=027,umask=027 0 0
 EOF
 
+mkdir -p /etc/fsbindings/
 
 # Here we actually create the overlay.
 # This gives us a writable root.
+# We could do this in initramfs, but doing it this way lets us directly see
+# What is in sketch.
 cat << EOF > /etc/fsbindings/emberos-root.yaml
-/sketch:
-    bindat: /
+/sketch/usr/:
+    bindat: /usr
     type: overlay
+/sketch/var/:
+    bindat: /var
+    type: overlay
+/sketch/etc/:
+    bindat: /etc
+    type: overlay
+
+/sketch/opt/:
+    bindat: /opt
+    type: overlay
+EOF
+
+cat << EOF > /etc/fsbindings/emberos-pi-home.yaml
+/sketch/home/pi:
+    bindat: /home/pi/
+    type: overlay
+
+__tmpfsoverlay__pi-chrome:
+    mode: '700'
+    user: pi
+	size: 128M:
+    bindat: /home/pi/.config/chromium
+
+__tmpfs__:
+    bindat: /home/pi/.arduino15/logs
+    size: 24Ms
 EOF
 
 
@@ -652,57 +681,24 @@ cat << EOF /var/www/html/marblemaps/README.md
 Don't put things here, it is just used as a mountpoint.
 EOF
 
+cat << EOF /etc/fsbindings/ember-pi-map-tiles.yaml
+/sketch/home/pi/.local/share/marble/maps:
+    mode: '0755'
+    user: pi
+    bindat: /var/www/html/marblemaps
+EOF
+
 
 
 #General purpose private persistant area
 mkdir -p /sketch/home/pi
-mkdir -p /home/pi/persist
 
 
 cat << EOF > /home/pi/KIOSK_INFO_README_IMPORTANT.txt
-This is a kiosk UI! For reliability, almost everything in the home dir starts fresh when rebooting.
-
-Anything saved in this home dir, except the persist, public.files, and public.media folders,
-will disappear when the device is powered off!!
-
-For convenience, many things are just shortcuts to these directories, and many programs
-have been preconfigured to safe important data there, but you should not trust any folder you
-did not verify for yourself.
-
-Also note that public.* folders are truly public. Anyone on the local network may be able to read
+Note that public.* folders are truly public. Anyone on the local network may be able to read
 them.
 EOF
 
-mk_pi_persist_dir () {
-  mkdir -p "/sketch/home/pi/$1"
-  sudo --user pi mkdir -p "/home/pi/$1"
-
-  #Anything put here during image creation will be moved over to
-  #the sketch partition at the end, we can actually use this right away.
-  sudo --user pi mkdir -p "/home/pi/persist/$1"
-
-  #Move to sketch, delete original
-  ! cp -ar "/home/pi/$1/." "/sketch/home/pi/$1"
-  ! rm -r  "/home/pi/$1"
-  ln -s "/home/pi/persist/$1" "/home/pi/$1"
-}
-
-cat << EOF > /usr/bin/make-pi-persist-folder
-#!/bin/bash
-
-  echo "The selected folder will become a symlink to a matching folder in ~/persist.  All existing stuff will be copied."
-  mkdir -p "/sketch/home/pi/$1"
-  sudo --user pi mkdir -p "~/$1"
-
-  #Anything put here during image creation will be moved over to
-  #the sketch partition at the end, we can actually use this right away.
-  sudo --user pi mkdir -p "~/persist/$1"
-
-  #Move to sketch, delete original
-  ! cp -ar "~/$1/." "/sketch~/$1"
-  ! rm -r  "~/$1"
-  ln -s "~/persist/$1" "~/$1"
-EOF
 
 mkdir -p /home/pi/.config/environment.d/
 cat << EOF > /home/pi/.config/environment.d/99-ember.conf
@@ -720,9 +716,6 @@ cat << EOF > /etc/security/limits.conf
 @audio   -  priority   -20
 EOF
 
-chmod 755  /usr/bin/make-user-persist-folder
-
-
 mkdir -p /home/pi/.local/share
 chown pi /home/pi/.local/share
 mkdir -p /home/pi/.config
@@ -730,145 +723,13 @@ mkdir -p /home/pi/.config
 
 chown -R pi /home/pi/
 
-#Symlink some directories that are pretty obviously useful to persist
-#But only the super obviously "Manual" ones that aren't messed with by the system
-mk_pi_persist_dir  Documents
-mk_pi_persist_dir  Pictures
-mk_pi_persist_dir  Music
-mk_pi_persist_dir  Downloads
-mk_pi_persist_dir  Templates
-mk_pi_persist_dir  Videos
-mk_pi_persist_dir  Arduino
-mk_pi_persist_dir  Books
-mk_pi_persist_dir  Projects
-mk_pi_persist_dir  Maps
-mk_pi_persist_dir  Scratch Projects
-mk_pi_persist_dir  Misc
-mk_pi_persist_dir  Drawer
-mk_pi_persist_dir  Games
-mk_pi_persist_dir  Sync
-mk_pi_persist_dir  Programs
-mk_pi_persist_dir  DOSbox
-mk_pi_persist_dir .config/NanoVNASaver
-
-mkdir -p /home/pi/persist/DOSbox/c
-
-mk_pi_persist_dir  .dosbox
-mk_pi_persist_dir  .local/share/xonsh
-mk_pi_persist_dir  .config/xonsh
-
-
-mk_pi_persist_dir  "Calibre Library"
-mk_pi_persist_dir  .config/calibre
-mk_pi_persist_dir  .config/Zeal
-mk_pi_persist_dir  .ipfs
-mk_pi_persist_dir  .go-ipfs
-mk_pi_persist_dir  .local/share/jami
-mk_pi_persist_dir  .local/share/kstars
-mk_pi_persist_dir  .config/environment.d
-mk_pi_persist_dir  .config/kstarsrc
-mk_pi_persist_dir  .config/jami
-mk_pi_persist_dir  .retroshare
-mk_pi_persist_dir  .goldendict
-mk_pi_persist_dir  .stellarium
-mk_pi_persist_dir  .pychess
-
-#Reserved for future use
-mk_pi_persist_dir  .drayerdb
-
-
-
-#Used to cache information about visited peers
-mk_pi_persist_dir  .hardlinep2p
-
-#Reserve in case we ever rename harkdline
-mk_pi_persist_dir  .drayerjournal
-
-mk_pi_persist_dir .local/share/marble
-mk_pi_persist_dir .local/share/Zeal
-mk_pi_persist_dir .local/share/mime
-#mk_pi_persist_dir .local/share/systemd/timers
-
-mkdir -p /sketch/home/pi/.local/share/Zeal
-
-mk_pi_persist_dir .config/vlc
-mk_pi_persist_dir .config/deluge
-mk_pi_persist_dir .config/ardour5
-mk_pi_persist_dir .config/sigrok
-mk_pi_persist_dir .kodi
-mk_pi_persist_dir .purple
-
-#Not actually installing HA at the moment
-mk_pi_persist_dir .homeassistant
-
-
 echo "# Project Notes" > /sketch/home/pi/Documents/README.md
-#This one is annoying, it saves EVERYTHING
-#to the same session file on exit. But whatever, it's only
-#30kb, probably not a significant issue
-mk_pi_persist_dir .config/spacefm
 
-mk_pi_persist_dir .wiki_indexes
-
-#Youtube client
-mk_pi_persist_dir tartube-data
-mk_pi_persist_dir .config/rhasspy/profiles
-mk_pi_persist_dir  .fonts
-mk_pi_persist_dir  .home_template
-mk_pi_persist_dir  .mednafen
-mk_pi_persist_dir  .node-red
-mk_pi_persist_dir  .npm
-mk_pi_persist_dir  .yarn
-
-mk_pi_persist_dir  .nimble
-mk_pi_persist_dir  .viking
-mk_pi_persist_dir  .viking_maps
-mk_pi_persist_dir  .fldigi
-mk_pi_persist_dir  .flrig
-mk_pi_persist_dir  .flmsg
-mk_pi_persist_dir  .flamp
-mk_pi_persist_dir  .syncthing
-mk_pi_persist_dir  .nano
-mk_pi_persist_dir  .syncthing-gtk
-mk_pi_persist_dir  .arduino15
-mk_pi_persist_dir  .config/voice2json
-mk_pi_persist_dir  .config/backintime
-mk_pi_persist_dir  .config/filezilla
-mk_pi_persist_dir  .config/yarn
-mk_pi_persist_dir  .cache/yarn
-
-mk_pi_persist_dir  .config/autostart
-mk_pi_persist_dir  .home-template
-mk_pi_persist_dir .config/pcmanfm/LXDE-pi
-mk_pi_persist_dir .config/lxpanel
-mk_pi_persist_dir .config/lxsession
-mk_pi_persist_dir .config/lxterminal
-mk_pi_persist_dir .config/menus
-mk_pi_persist_dir .config/guake
-mk_pi_persist_dir .local/lib
-mk_pi_persist_dir .local/bin
-mk_pi_persist_dir  .vscode
-mk_pi_persist_dir  AgentDVR
-mk_pi_persist_dir  .tuxpaint
-
-mk_pi_persist_dir .local/share/desktop-directories
-mk_pi_persist_dir .local/share/applications
-
-cat << EOF > /usr/bin/save-chrome-state
-#!/bin/bash
-
-mkdir -p ~/.home-template/.config/chromium
-rsync -a ~/.config/chromium/ ~/.home-template/.config/chromium/
-EOF
-
-chmod 755 /usr/bin/save-chrome-state
 
 #Make the dir for arduino, but we're gonna specifically redirect the log dir to a volatile folder.
-mkdir -p /sketch/home/pi/.arduino15/logs
-mkdir -p /home/pi/logs/
-ln -s /home/pi/logs/arduino15.log /sketch/home/pi/.arduino15/logs/application.log
+mkdir -p /home/pi/.arduino15/logs
 
-mk_pi_persist_dir .local/share/fonts
+
 
 #Give pi a place to share public stuff, if desired.  We will handle this later with
 #a mountpoint.
@@ -894,7 +755,7 @@ ln -s /var/public.media/Videos/  "/sketch/home/pi/Videos/sketch"
 
 
 mkdir -p /sketch/opt
-mkdir -p /sketch/bin
+mkdir -p /sketch/usr/bin
 mkdir -p /sketch/usr/share/fonts
 mkdir -p /sketch/usr/share/zimwikis
 mkdir -p /sketch/usr/share/emberdoc
@@ -1029,7 +890,6 @@ genfortune | cowsay | lolcat
 echo
 EOF
 
-ln -s /home/pi/persist/.xonshrc /home/pi/.xonshrc
 
 cat << EOF > /etc/xonshrc
 \$PROMPT= "{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{curr_branch: {}}{RESET} {BOLD_BLUE}{prompt_end}{RESET}"
@@ -1038,10 +898,8 @@ EOF
 
 cat << EOF > /sketch/home/pi/.vimrc
 EOF
-ln -s /home/pi/persist/.vimrc /home/pi/.vimrc
 
 mv /home/pi/.bashrc /sketch/home/pi/.bashrc 
 
 
-ln -s /home/pi/persist/.bashrc /home/pi/.bashrc
 

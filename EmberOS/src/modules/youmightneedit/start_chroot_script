@@ -696,6 +696,9 @@ Environment="XDG_RUNTIME_DIR=/run/user/1000"
 AmbientCapabilities=CAP_SYS_NICE
 SecureBits=keep-caps
 
+LimitRTPRIO= 95
+LimitNICE= -20
+LimitMEMLOCK= infinity
 
 RestartSec=1
 Restart=on-failure

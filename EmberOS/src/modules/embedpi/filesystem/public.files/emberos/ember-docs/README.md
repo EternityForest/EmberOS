@@ -4,74 +4,66 @@
 
 dillo, claws-mail, minecraft, mathematica, sonicpi, Scratch, and several other apps have been removed. Most things have been replaced with more useful or more free equivalents.
 
-### In previous versions, no longer included
+## The Sketch Folder and the root
 
-These were removed because they were too big for their usefulness.  Ardour, postgresql
+EmberOS uses a compressed readonly BTRFS filesystem for its root, both to be able to pack a lot of data, and to protect the root, so that you have 
+a better chance of fixing things if anything goes wrong.
+
+On top of that, we have a writable EXT4 overlay partition called /sketch.  This creates a clean separation and makes it easy to tell what has been
+modified.  It also makes backups simpler.
+
+We do not actually mount the overlay over /.  We mount it's individual folders over /bin, /opt.  So /sketch always reflets the real state of the persistent overlay, and there is no crazy recursive confusion.
+
+## Ram Disk overlays
+
+On top of that, we stack on some RAM disks for frequently written foldres to protect the SD card from wear and corruptions.
+
+We do this with a bindings manager configured in /etc/fsbindings.
+
+
 
 
 ## The command shell
 We now use xonshell for the default shell. It is mostly bash compatible, but
 also supports python. To use bash by default instead, do `chsh -s /bin/bash`
 
-In addition, two BASIC interpreters are provided, brandy(BBC Basic V), which runs a graphical window, and  bwbasic, which can run in several modes.
+SSH IS ENABLED BY DEFAULT!!!
 
-## Getting online
-Look in /sketch/networks, edit the wifi file as appropriate, or just connect ethernet.
+
+## Getting online if you don't have a display for bootstrapping
+
+We use NetworkManager here. You can easily set up Wifi just by editing files on the SD card.
+
+Look in /etc/NetworkManager/networks, edit the wifi file as appropriate, or just connect ethernet.
+
+You may need to install additional drivers to see this on Windows.
 
 These are NetworkManager files, so wifi will automatically reconnect for you, and you can configure almost any kind of network you want.
 
-You can also go to the command line and use "nmtui" to connect.
+Ignore all tutorials that mention wpa-supplicant or the like. You don't need to mess with that stuff.  Use "sudo nmtui" to
+edit connections via the command line.
+
+### Bootstrapping with ethernet
+
+You could also just connect to pi to an ethernet hub and ssh into embedpi.local. Then you will be able to configure everything as normal.
 
 ## Chrome bookmarks
 
 Chromium runs entirely in a RAM based folder, bookmarks are not persistant. This is because chrome
 has a habit of heavy writes to disk, and EmberOS is designed for always-on kios style use.
 
-However you can manually call save-chrominum-state to copy this to persistant storage.
 
-You can also make ~/.config/chromium a symlink to a folder in persist, but that may wear out the SD card eventually.
+To change this, look in /etc/fsbindings/emberos-pi-home.yaml and get rid of the binding over the chromium config dir.
 
 ## Media Streaming
 
-All you need to do to enable using the Pi as a UPnP renderer is enable gmediarender in the autostart/99-defaults config file.  It will advertise itself
-with whatever hostname you have selected.
-
-## Making a backup, or quickly deploying new instances.
-
-EmberOS formerly had it's own backup system.
-
-Now everything is ansible-based, and we have a quickstart template to very easily back up and restore. 
-
-For every project, copy the src/ansible template into your project folder, and rename it whatever you want.
-
-Add your machines to the inventory.ini file under the \[emberos\] role.
-
-Run the backup playbook and it will pull a backup from each machine, in roles/emberos/HOST/sketch and roles/emberos/HOST/boot.
-
-You can have as many as you want, they stay separated by the actual hostname on the machine(Not the name given in the inventory file!).
-
-To change what is included or excluded, see /roles/emberos/ignore.txt.
-
-Use the deploy.yml to deploy everything.  
-
-
-Note: By default, the backup includes network config from the device and other private data! *It is not meant to share publically!*
-
-If you would like to share a backup as a ready-to-use appliance, you will probably need to modify the playbook to only copy whitelisted things,
-or else you will need to hand edit(Be careful!).
-
-
-I think that only using one role is appropriate here, since emberos isn't a cloud platform and you probably won't have many similar roles,
-but this is just a template to semi-standardize things, edit as needed.
-
-
-
+All you need to do to enable using the Pi as a UPnP renderer is enable gmediarender in the autostart/99-defaults config file.  It will advertise itself with whatever hostname you have selected.
 
 
 
 ## Making a server you can access from the internet
 
-EmberOS includes HardlineP2P.  Put a file named WhateverName.ini in /sketch/config/hardline.services/, with content like:
+EmberOS includes HardlineP2P.  Put a file named WhateverName.ini in /etc/hardline.services/, with content like:
 https://github.com/EternityForest/hardlinep2p
 
 ```
@@ -167,46 +159,11 @@ Dat requires some very basic command line use, but is near-ideal for publishing 
 For 2-way sync between multiple machines, like keeping a music collection on a Kodi box in sync with a PC, there is SyncThing.
 
 
-### The Home Dir and normal desktop use
-
-/home/pi is in a tmpfs, but /home/pi/persist is bound to /sketch/home/pi, and anything in there is persistant.
-
-The contents of /home/pi/persist/.home_template are copied to /home/pi after the tmpfs is mounted.
-
-By default, many common folders that seem logical to assume you want persistant storage for are symlinked to the persist folder. ALWAYS CHECK BEFORE PUTTING IMPORTANT DATA SOMEWHERE!
-
-DO NOT PUT ANYTHING YOU WANT TO KEEP IN THE ROOT OF THE HOME DIR!!!
-
-
-#### Adding a persisant directory/customizing the home dir
-```
-#Create the actual persistant directory
-mkdir persist/foo
-
-#Now create a link to it. You can't just put it in the home dir directly,
-#As that is just a tmpfs
-
-#So you add it to the .home_template, which is copied to home on boot.
-ln -s persist/foo .home_template/foo
-```
 
 #### Other user's home dirs
 
-Other users home dirs won't be set up like this unless you do it manually, EmberOS is mostly assuming  with Pi as the only non-system user.
+Other users home dirs won't be set up like /home/pi with protective ramdisks this unless you do it manually, EmberOS is mostly assuming  with Pi as the only non-system user.
 
-
-#### Managing the certificate for Kaithem
-
-Keys are generated automaticaly if the key(not the cert) is missing, and auto added to the browser trust.
-
-The root CA that actually gets trusted is at /sketch/config/emberCA.pem,
-And the key is at /sketch/config.private/emberCA.key
-
-Delete both this key, and kaithem's key at /sketch/kaithem/ssl/certificate.key and reboot.
-
-Then you will need to add the new key at /sketch/config/emberCA.pem to any browsers that need to be secure.
-
-Of course, you can also manually supply these keys.
 
 ## Alternate shells
 fish, elvish, bash, and xonsh are included.
@@ -218,16 +175,15 @@ fish, elvish, bash, and xonsh are included.
 ## Enabling services
 
 Instead of SSHing in(Which may not always be available), you can activate any systemd
-service by editing the config files(See /sketch/config/autostart/).
+service by editing the config files(See /etc/ember-autostart/).
 
 They are very simple INI files.
 
-You can't disable services enabled via systemctl this way(Under the hood, a script reads the file and starts all enabled services but does not sto anything).  The intent is to use the config files for all optional or user services.
+You can't disable services enabled via systemctl this way(Under the hood, a script reads the file and starts all enabled services but does not sto anything).
 
 ## Sharing Files
 
-Samba is enabled by default and exposes three shares. You can change any of this in
-/sketch/config/smb.conf, which is just a standard samba config file.
+Samba is enabled by default and exposes three shares.
 
 ### temp
 
@@ -238,13 +194,13 @@ for quick and dirty sharing of non-private stuff under 32MB.  It is backed by th
 
 ### media
 
-Used for media sharing, not writable from the network. Backed by /sketch/public.media(Bound to /var/public/media, which is readable by all and only writable by root).
+Used for media sharing, not writable from the network. Backed by /var/public.media(which is readable by all and only writable by root).
 
 There is a special subfolder called pi, which is bound to /home/pi/public.media, owned by pi, and readable to any.
 
 ### files
 
-Used for general sharing, not writable from the network. Backed by /sketch/public.files(Bound to /var/public/files, which is readable by all and only writable by root).
+Used for general sharing, not writable from the network. Backed by /var/public.files(which is readable by all and only writable by root).
 
 There is a special subfolder called pi, which is bound to /home/pi/public.files, owned by pi, and readable to any.
 
@@ -259,53 +215,15 @@ is configured for persistent storage.
 The wordnet dictionary, plus the GoldenDict viewer are included.
 
 
-## Securing SSH
-
-In /sketch/ssh/pi, you will find everything you might expect to see in ~/.ssh
-
-You can add authorized keys there, same as you would in .ssh on any machine!
-
-/sketch/ssh/ssh_config is equivalent to /etc/ssh_config.
-
-Use this to disable password auth:
-`PasswordAuthentication no`
-
-There is no way to change the password for pi via the sketch folder,
-however by disabling password auth, you can prevent anyone without physical access
-from getting the chance to even try the password.
-
-If you want to allow root login(May be needed for SFTP clients), use:
-`PermitRootLogin yes`
-
-And add the keys to /sketch/ssh/root/
 
 
 ## Changing the Kiosk UI
 
-Previously, EmberOS used FVWM config files.  This is no more, everything is standard PIXEL desktop, as FVWM's performance was a bit dissapointing.
-
-.config/autostart is symlinked to the persist folder.  To run things at boot, just use .desktop files in /sketch/home/pi/.config/autostart
+To run things at boot, just use .desktop files in /home/pi/.config/autostart
 
 You can just modify the defaults to do what you want.
 
-## Changing the timezone
-/sketch/timezone is a text file that should just contain an Olson timezone name like "Us/Pacific" without quotes.
 
-## Running a script without SSH
-
-At boot, we execute any executables in `/sketch/runonce/`, then delete them.
-
-## Using
-
-Change /sketch/hostname to the name you want to give it.  You can now access
-it as hostname.local
-
-If you need to "factory reset" an image, just delete and copy from rootfs /sketch to the sketch partition. 
-
-If you need to update or install new software to the system itself, just SSH in and use
-`sudo mount -o remount,rw /` to remount the root as writable, do your work, and reboot.
-
-Note that this won't affect home dirs, they have a separate tmpfs.
 
 
 ### Kaithem
@@ -313,16 +231,11 @@ Note that this won't affect home dirs, they have a separate tmpfs.
 Go to https://hostname.local:8001, and ignore the security warnings you will get(You're on a private network, right?)
 
 You can now use it as any other Kaithem instance.  Look at the example module to get started.
-Anything you create gets saved back to that /sketch partition.
-
-Note: This now runs as pi, not root.  The old /sketch/kaithem/ is still the storage dir, but it is bound to /pi/kaithem/
-to make it acessible.
+Anything you create gets saved back to /home/pi/kaithem.
 
 
 ### Firewalling
-ssh/**
-
-EmberOS uses firewalld.  
+mberOS uses firewalld.  
 
 #### The Public Zone(Dofferent than the defaults!)
 The ranges used by Yggdrasil and CJDNS are mapped to the public zone which blocks almost everything incoming, including SSH(Some other setups default to allowing SSH, we don't, because raspbian has a default password).
@@ -333,7 +246,7 @@ The ranges used by Yggdrasil and CJDNS are mapped to the public zone which block
  firewall-cmd --permanent --zone=public --add-port=80/tcp
 
 ### Offline Wiki Content
-Put any .zim files in a subfolder of /sketch/share/wikis/(One per subfolder).
+Put any .zim files in a subfolder of /usr/share/zimwikis/(One per subfolder).
 
 You can then activate wikioffline@SUBFOLDER:PORT.service to serve that wiki on all IPv4 addresses.
 
@@ -345,27 +258,15 @@ This is provided by a small wrapper around ZIMPly.
 You can also temporarily start the wiki server with `wikioffline SUBFOLDER PORT`
 
 ### Mesh Networks
-In `/sketch/config/autostart/`, enable yggdrasil.service.
-
-To configure it, see `/sketch/config.private/yggdrasil.conf`, which is mapped to the usual
-`/etc/yggdrasil.conf` file. A sane default is provided with a generated unique private key.
+Enable yggdrasil.service.
 
 You may then want to set up a NetworkManager file to use ad-hoc networking. Be sure to
 set the firewalld zone to `public`, or else  ensure that you are not running anything private(Like ssh with weak passwords!!!)
 
 
-### Configuring Audio
-
-If you need to force HDMI or Analog output, or change the ALSA volume of the onboard card,
-just edit /sketch/config/sound.ini, and change the output option to "hdmi" or "analog" as desired.
-
-We default to "auto", which is probably not what you want if using an HDMI monitor and 3.5mm speakers.
-
-This is provided by `ember-manage-audio.service`
-
 ## Serving OpenStreetMap Maps
 
-Thanks to a symlink in /sketch/www, you can get map tiles at the url /maptiles/earth/openstreetmap/{z}/{x}/{y}.png if apache is enabled.
+You can get map tiles at the url /maptiles/earth/openstreetmap/{z}/{x}/{y}.png if apache is enabled, thanks to a symlink.
 
  The maps are stored at 
 `/home/pi/.local/share/marble/maps/earth`, which is the same folder that marble. To get new maps, browse them in Marble,
@@ -375,61 +276,16 @@ EmberOS includes maps of the entire world, at a fairly low resolution.
 
 
 
-## Installing NextCloud
-
-All dependancies should already be included, as is the zipped version of nexcloud itself.
-
-You should be able to run `sh /usr/share.sketch/php_apps/install_nextcloud.sh`
-
-.htaccess is already enabled, you shouldn't need anything else.
 
 ## Serving Media
 
 One of the most common tasks for embedded devices is as a media server.
-Put whatever you want to serve in /sketch/public.media for DLNA.
-
-Put whatever you want to serve as a standard web site in /sketch/public.www to serve
-it on port 80 with apache. Whatever you put as index.http will be the start page for the fullscren kiosk!  .htaccess files are already enabled.
-
-Don't use the prefix "public." for anything you don't want to be made public, in case more
-services are added!
+Put whatever you want to serve in /var/public.media for DLNA.
 
 This is provided by `minidlna.service` and can be disabled in the sketch autostart config.
 
-## Adding programs to the sketch
+Apache is already set up and enabled out of the box.
 
-The goal here is to be mostly batteries included, with a clean separation between your actual
-application and the base image+packages, and usually you would just use "writable"
-and then apt-get as normal if you need to install something.
-
-However, /sketch/opt is bound to /sketch.opt, and /sketch/bin is bound to /usr/bin.sketch.
-
-Both mapped views are mode 755 and root-owned.
-
-Should you need something added to your path, and want to include it in the sketch, it is possible.
-
-
-## Downloading/watching videos
-
-yt-dlp is included at /sketch/bin.   You'll probably need to update it.
-
-## Media Center Use
-
-Kodi is no longer part of the current install. It can be built from source, or you can wait till it is available in the new Raspbian that EmberOS is based on.
-
-
-
-## Making it actually read only
-
-You just add ro to the fstab entry for /sketch, that's the only writable part. You won't be
-able to save without SSHing(Or using kaithem's terminal) and running `sudo mount -o remount,rw /sketch`.
-
-NTFS is a journaling filesystem, so you may or may not actually need true read only. Some stuff may break if you do this.
-
-Almost nothing ever writes to sketch randomly by itself, so it sould not cause disk wear.
 
 ## Updating Kaithem
-The whole install as found in the repo is in /opt/kaithem.  Just do a git pull --rebase right in that folder after running "sudo writable".
-
-Note that formerly we used /sketch/opt/kaithem.  We don't do this as we now want a cleaner separation between user data and applications.
-
+The whole install as found in the repo is in /opt/kaithem.  Just do a git pull --rebase right in that folder.

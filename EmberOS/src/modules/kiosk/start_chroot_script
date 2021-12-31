@@ -8,7 +8,6 @@ set -e
 source /common.sh
 
 unpack /filesystem/pi /home/pi
-ln -s /home/pi/persist/.conkyrc /home/pi/.conkyrc
 
 
 
@@ -19,7 +18,10 @@ ln -s /home/pi/persist/.conkyrc /home/pi/.conkyrc
 # sudo apt-get -y install libgles2-mesa libgles2-mesa-dev xorg-dev
 
 
-
+# Big offender for wrecking down your disk with writes
+cat << EOF > /etc/X11/Xsession
+ERRFILE=/dev/null
+EOF
 
 cat << EOF > /etc/ember-autostart/ember-kiosk.desktop
 [Desktop Entry]

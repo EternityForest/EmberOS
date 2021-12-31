@@ -40,6 +40,7 @@ sudo dpkg --configure yggdrasil
 sudo apt-get install -yf #To fix dependencies
 
 mkdir -p /boot/networks/
+cp /filesystem/networks/wifi /boot/networks/boot_dir_wifi
 
 #This will let u set up networks from /boot as well as /sketch
 cat << 'EOF' > /bin/ember-copy-boot-net.sh

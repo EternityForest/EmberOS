@@ -8,13 +8,6 @@ rm -rf /var/tmp/*
 rm -rf /var/log/*
 apt-get -y reinstall shared-mime-info
 
-#During image creation packages may have put stuff in the persist folder.
-#Move it to the real sketch persist and delete it.
-#Technically we coul;d mount the real one during setup but that is one more thing to go wrong.
-rsync -avz /home/pi/persist /sketch/home/pi
-
-rm -rf /home/pi/persist/**
-
 
 #Restore Yarn settings
 yarn config set cache-folder /usr/local/share/.cache/yarn
@@ -31,3 +24,5 @@ ldconfig
 
 # Make unwritable till the mounts get there
 chmod 555 /var/tmp
+
+chown -R pi /sketch/home/pi
