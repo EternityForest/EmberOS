@@ -1,28 +1,29 @@
 #This file lists the things you probably don't want to be backing up
 #with git or rsync
-public.media/Music/Alexander Nakarada/Adventures of Flying Jack.mp3
-public.media/Music/Alexander Nakarada/README.md
-public.media/Pictures/Wallpaper/september-in-the-forest.jpg
-public.files/emberos/**
-public.media/emberos/**
-kaithem/modules/data/Examples/**
+
+# Compiled python files no matter where they are
+**.pyc
+
+/home/pi/kaithem/modules/data/Examples/**
 
 # The old backup data dirs are named after timestamps
 # We don't want those
-kaithem/modules/1*
-kaithem/modules/2*
-kaithem/modules/3*
-kaithem/modules/4*
-kaithem/modules/5*
-kaithem/modules/6*
-kaithem/modules/7*
-kaithem/modules/8*
-kaithem/modules/9*
-kaithem/logs/**
+/home/pi/kaithem/modules/1*
+/home/pi/kaithem/modules/2*
+/home/pi/kaithem/modules/3*
+/home/pi/kaithem/modules/4*
+/home/pi/kaithem/modules/5*
+/home/pi/kaithem/modules/6*
+/home/pi/kaithem/modules/7*
+/home/pi/kaithem/modules/8*
+/home/pi/kaithem/modules/9*
+/home/pi/kaithem/logs/**
 
-#Presumable we wouldn't want the logs dir
-logs/**
+/home/pi/Downloads
 
+/var/public.files/emberos/**
+/var/public.media/emberos/**
+usr/share/zimwikis/archlinux/**
 
 #You may want to delete this and sync it if securuty isn't a real issue and you changed something.
 ssh/**
@@ -31,66 +32,50 @@ ssh/**
 home/pi/.local/share/marble/**
 home/pi/.local/share/Zeal/**
 home/pi/.kodi/addons/script.globalsearch/**
-opt/kaithem/**
-opt/rpitx/**
-opt/kouchat/**
-share/wikis/archlinux/**
-cache/**
-.emberos/cache/**
-config/ca-certificates.conf
-config/sslcerts/**
-config/timezones/**
-postgresql
-home/pi/Programs/arduino*
-home/pi/Arduino/libraries/**
-share/emberos/**
-share/ember-doc/**
-config/apache2/mods-available/**
+opt/**
+usr/share/**
+
+etc/apache2/mods-available/**
 
 # We probably don't want to be syncing every youtube vid...
 home/pi/tartube-data/**
 
 # Standard apache2 stuff. I wish there was a better way to do this.
 # But everything has to be in this file so we can rsync it.
-config/apache2/mods-enabled/access_compat.load
-config/apache2/mods-enabled/authz_core.load
-config/apache2/mods-enabled/autoindex.load
-config/apache2/mods-enabled/env.load
-config/apache2/mods-enabled/mpm_event.load
-config/apache2/mods-enabled/setenvif.conf
-config/apache2/mods-enabled/alias.conf
-config/apache2/mods-enabled/authz_host.load
-config/apache2/mods-enabled/deflate.conf
-config/apache2/mods-enabled/filter.load
-config/apache2/mods-enabled/negotiation.conf
-config/apache2/mods-enabled/setenvif.load
-config/apache2/mods-enabled/alias.load
-config/apache2/mods-enabled/authz_user.load
-config/apache2/mods-enabled/deflate.load
-config/apache2/mods-enabled/mime.conf
-config/apache2/mods-enabled/negotiation.load
-config/apache2/mods-enabled/status.conf
-config/apache2/mods-enabled/authn_core.load
-config/apache2/mods-enabled/auth_basic.load
-config/apache2/mods-enabled/dir.conf
-config/apache2/mods-enabled/mime.load
-config/apache2/mods-enabled/reqtimeout.conf
-config/apache2/mods-enabled/status.load
-config/apache2/mods-enabled/authn_file.load
-config/apache2/mods-enabled/autoindex.conf
-config/apache2/mods-enabled/dir.load
-config/apache2/mods-enabled/mpm_event.conf
-config/apache2/mods-enabled/reqtimeout.load
-
-#Exclude some of the default configs
-config/filesystem/emberos*
+etc/apache2/mods-enabled/access_compat.load
+etc/apache2/mods-enabled/authz_core.load
+etc/apache2/mods-enabled/autoindex.load
+etc/apache2/mods-enabled/env.load
+etc/apache2/mods-enabled/mpm_event.load
+etc/apache2/mods-enabled/setenvif.conf
+etc/apache2/mods-enabled/alias.conf
+etc/apache2/mods-enabled/authz_host.load
+etc/apache2/mods-enabled/deflate.conf
+etc/apache2/mods-enabled/filter.load
+etc/apache2/mods-enabled/negotiation.conf
+etc/apache2/mods-enabled/setenvif.load
+etc/apache2/mods-enabled/alias.load
+etc/apache2/mods-enabled/authz_user.load
+etc/apache2/mods-enabled/deflate.load
+etc/apache2/mods-enabled/mime.conf
+etc/apache2/mods-enabled/negotiation.load
+etc/apache2/mods-enabled/status.conf
+etc/apache2/mods-enabled/authn_core.load
+etc/apache2/mods-enabled/auth_basic.load
+etc/apache2/mods-enabled/dir.conf
+etc/apache2/mods-enabled/mime.load
+etc/apache2/mods-enabled/reqtimeout.conf
+etc/apache2/mods-enabled/status.load
+etc/apache2/mods-enabled/authn_file.load
+etc/apache2/mods-enabled/autoindex.conf
+etc/apache2/mods-enabled/dir.load
+etc/apache2/mods-enabled/mpm_event.conf
+etc/apache2/mods-enabled/reqtimeout.load
 
 #This is there so rsync doesn't try an sync it
 .git
 
-.emberos/cache
-public.www/webmap
-
+/var/cache
 
 home/pi/.cache
 
@@ -127,6 +112,7 @@ home/pi/.config/rhasspy/profiles/en/test/**
 #I don't think we usually want shell history backups
 home/pi/.local/share/xonsh
 
+home/pi/.local/share/marble/maps
 
 home/pi/AgentDVR/**
 #This line lets you back up AgentDVR config

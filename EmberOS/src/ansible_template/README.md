@@ -1,6 +1,10 @@
 ## Project Name Here
 
-This is an Ansible project folder based on the EmberOS template
+This is an Ansible project folder based on the EmberOS template.  Note: the default template will only
+back up *changed* files from the writable overlay.  With a few exceptions like /boot it will not capture any of the default EmberOS
+data.
+
+
 
 
 ## Basic Info
