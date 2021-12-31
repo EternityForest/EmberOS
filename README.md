@@ -4,17 +4,11 @@ This is a customPiOs distro for setting up a pi image suitable for consumer-grad
 
 It has a variety of preinstalled applications and can be configured almost entirely via a special windows-accessible /sketch partition.
 
-Notably, everything except /sketch boots as read-only, and there is an Apache2 server and a chromium based kiosk browser enabled by default.
+Notably, we have a compressed readonly root with a volatile overlay, and there is an Apache2 server and a chromium based kiosk browser enabled by default.  Everything is pre-setup to protect SD cards from wear and corruption without changing the user experience.
 
 This is a "batteries included" distro, meant to be usable in odd places when you might not
 even have internet access. As such, it includes a lot of stuff.   It is available in two versions, MAX and Micro.
 
-
-
-
-As a notable feature, the entire sketch partition is a Git repository, so you will
-be able to track changes to the system(A sane .gitignore is included).  There is also the included pullBack script
-to automatically take a backup from a remote system onto your Linux PC.
 
 
 As another notable feature, the root filesystem uses BTRFS(Since the July 12 build), which allows us to compress things.
@@ -25,7 +19,7 @@ the sketch partition feature makes it much easier toi fresh reinstall, and copy 
 
 *Also Important: There are no auto-updates, as they can cause stability issues, some applications may need to set that up.
 
-See [Here](EmberOS/src/modules/embedpi/filesystem/sketch/public.files/emberos/ember-doc/README.md) for info on how to do common stuff.
+See [Here](EmberOS/src/modules/embedpi/filesystem/public.files/emberos/ember-doc/README.md) for info on how to do common stuff.
 
 ## MAX and Micro
 
@@ -100,21 +94,6 @@ Also, the included SSL keys in /sketch/kaithem/ssl, and the SSH keys, are random
 
 They are just self signed keys though, you will get a warning in your browser.
 
-
-
-### Changing the passwords
-At the moment, users and passwords are stored in their normal place.  /sketch is mostly for the things one might want under version control, to deploy repeatedly, or the stuff you might
-want to chage really quickly for basic non-critical non-secure use.
-
-I might move /etc/shadow, but for now just do `writable` then change passwords in the usual way, the users aren't exactly part of the "application data" anyway.
-
-
-### /sketch
-
-To provide some semblance of security, umask is used to keep this from being accessed by anyone but root.
-It can be read and executed by root's group, but only written by root itself, aside from via BindFS.
-
-It is not encrypted though.
 
 
 ## Prebuilt image
