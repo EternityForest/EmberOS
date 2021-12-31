@@ -190,48 +190,149 @@ mkdir -p /var/lib/systemd/linger
 # and "just a few" a few others....
 
 
-append1 /etc/fstab "/var/log" "tmpfs /var/log tmpfs nodev,nosuid,mode=775,size=32M 0 0"
-append1 /etc/fstab "/var/tmp" "tmpfs /var/tmp tmpfs nodev,nosuid,mode=1777,size=256M 0 0"
-append1 /etc/fstab "/tmp"   "tmpfs /tmp    tmpfs nodev,nosuid,mode=1777,size=256M 0 0"
-
-append1 /etc/fstab "/var/lib/lightdm"   "tmpfs /var/lib/lightdm   tmpfs nodev,nosuid,mode=1777,size=256M 0 0"
-append1 /etc/fstab "/var/cache/lightdm"   "tmpfs /var/cache/lightdm    tmpfs nodev,nosuid,mode=1777,size=256M 0 0"
-
-#NTP and Chrony are both valid choices. Can't really make people pick one....
-mkdir -p /var/lib/ntp
-append1 /etc/fstab "/var/lib/ntp" "tmpfs /var/lib/ntp tmpfs defaults,noatime,nosuid,nodev,noexec,size=1M 0 0"
-mkdir -p /var/lib/chrony
-append1 /etc/fstab "/var/lib/chrony" "tmpfs /var/lib/chrony tmpfs defaults,noatime,nosuid,nodev,noexec,nofail,uid=_chrony,size=1M 0 0"
-
-#At least let's try to make this timers thing work!
-mkdir -p /var/lib/systemd/timers/
-append1 /etc/fstab "/var/lib/systemd" "tmpfs /var/lib/systemd/timers/ tmpfs defaults,noatime,nosuid,nodev,noexec,nofail,uid=_chrony,size=8M 0 0"
+# We don't want any logging happening before we are able to get this mount up.
+chmod 555 /var/log/
+mount -t tmpfs -o nonempty size=10M tmpfs /var/log/
 
 
-#General purpose 32MB public unsecured free for all for easy file sharing funtimes
-mkdir -p /public.temp
-append1 /etc/fstab "/public.temp" "tmpfs /public.temp tmpfs defaults,noatime,nosuid,nodev,noexec,nofail,mode=1777,size=32M 0 0"
+cat << EOF > /etc/fsbindings/emberos-misc-ramdisks.yaml
+
+__tmpfsoverlay__varlog:
+    bindat: /var/log/
+    mode: '755'
+    user: root
+	size: 32M
+
+__tmpfs__:
+    bindat: /var/tmp/
+    mode: '1777'
+    user: root
+	size: 256M
+
+__tmpfs__:
+    bindat: /tmp/
+    mode: '1777'
+    user: root
+	size: 256M
+
+__tmpfs__:
+    bindat: /var/lib/lightdm
+    mode: '1777'
+    user: root
+	size: 256M
+
+__tmpfs__:
+    bindat: /var/cache/lightdm
+    mode: '1777'
+    user: root
+	size: 256M
+
+__tmpfs__:
+    bindat: /var/lib/ntp
+    mode: '755'
+    user: root
+	size: 1M
+
+__tmpfs__:
+    bindat: /var/lib/chrony
+    mode: '755'
+    user: root
+	size: 1M
+
+__tmpfs__:
+    bindat: /var/lib/systemd
+    mode: '755'
+    user: root
+	size: 8M
+
+__tmpfs__:
+    bindat: /public.tmp
+    mode: '1777'
+    user: root
+	size: 32M
+
+__tmpfs__:
+    bindat: /var/lib/logrotate
+    mode: '755'
+    user: root
+	size: 32M
+
+__tmpfs__:
+    bindat: /var/lib/sudo
+    mode: '700'
+    user: root
+	size: 8MB
 
 
-#Keep logrotate. We want to clear old logs out of RAM
-append1 /etc/fstab "/var/lib/logrotate" "tmpfs /var/lib/logrotate tmpfs defaults,noatime,nosuid,nodev,noexec,size=2M 0 0"
+__tmpfs__:
+    bindat: /var/lib/pulse
+    mode: '755'
+    user: root
+	size: 8MB
 
-append1 /etc/fstab "/var/lib/sudo" "tmpfs /var/lib/sudo tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=2M 0 0"
+__tmpfs__:
+    bindat: /var/lib/dhcp
+    mode: '755'
+    user: root
+	size: 8MB
 
-mkdir -p /var/lib/pulse
-append1 /etc/fstab "/var/lib/pulse" "tmpfs /var/lib/pulse tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=2M 0 0"
+__tmpfs__:
+    bindat: /var/lib/NetworkManager
+    mode: '755'
+    user: root
+	size: 8MB
 
-mkdir -p /var/lib/dhcp
-append1 /etc/fstab "/var/lib/dhcp" "tmpfs /var/lib/dhcp tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=2M 0 0"
+_tmpfs__:
+    bindat: /var/lib/rfkill
+    mode: '755'
+    user: root
+	size: 8MB
+
+EOF
 
 
 
+# append1 /etc/fstab "/var/log" "tmpfs /var/log tmpfs nodev,nosuid,mode=775,size=32M 0 0"
+# append1 /etc/fstab "/var/tmp" "tmpfs /var/tmp tmpfs nodev,nosuid,mode=1777,size=256M 0 0"
+# append1 /etc/fstab "/tmp"   "tmpfs /tmp    tmpfs nodev,nosuid,mode=1777,size=256M 0 0"
 
-mkdir -p /var/lib/NetworkManager
-append1 /etc/fstab "/var/lib/NetworkManager" "tmpfs /var/lib/NetworkManager tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=2M 0 0"
+# append1 /etc/fstab "/var/lib/lightdm"   "tmpfs /var/lib/lightdm   tmpfs nodev,nosuid,mode=1777,size=256M 0 0"
+# append1 /etc/fstab "/var/cache/lightdm"   "tmpfs /var/cache/lightdm    tmpfs nodev,nosuid,mode=1777,size=256M 0 0"
 
-mkdir -p /var/lib/systemd/rfkill
-append1 /etc/fstab "/var/lib/systemd/rfkill" "tmpfs /var/lib/systemd/rfkill tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=2M 0 0"
+# #NTP and Chrony are both valid choices. Can't really make people pick one....
+# mkdir -p /var/lib/ntp
+# append1 /etc/fstab "/var/lib/ntp" "tmpfs /var/lib/ntp tmpfs defaults,noatime,nosuid,nodev,noexec,size=1M 0 0"
+# mkdir -p /var/lib/chrony
+# append1 /etc/fstab "/var/lib/chrony" "tmpfs /var/lib/chrony tmpfs defaults,noatime,nosuid,nodev,noexec,nofail,uid=_chrony,size=1M 0 0"
+
+# #At least let's try to make this timers thing work!
+# mkdir -p /var/lib/systemd/timers/
+# append1 /etc/fstab "/var/lib/systemd" "tmpfs /var/lib/systemd/timers/ tmpfs defaults,noatime,nosuid,nodev,noexec,nofail,uid=_chrony,size=8M 0 0"
+
+
+# #General purpose 32MB public unsecured free for all for easy file sharing funtimes
+# mkdir -p /public.temp
+# append1 /etc/fstab "/public.temp" "tmpfs /public.temp tmpfs defaults,noatime,nosuid,nodev,noexec,nofail,mode=1777,size=32M 0 0"
+
+
+# #Keep logrotate. We want to clear old logs out of RAM
+# append1 /etc/fstab "/var/lib/logrotate" "tmpfs /var/lib/logrotate tmpfs defaults,noatime,nosuid,nodev,noexec,size=2M 0 0"
+
+# append1 /etc/fstab "/var/lib/sudo" "tmpfs /var/lib/sudo tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=2M 0 0"
+
+# mkdir -p /var/lib/pulse
+# append1 /etc/fstab "/var/lib/pulse" "tmpfs /var/lib/pulse tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=2M 0 0"
+
+# mkdir -p /var/lib/dhcp
+# append1 /etc/fstab "/var/lib/dhcp" "tmpfs /var/lib/dhcp tmpfs defaults,noatime,nosuid,nodev,noexec,mode=700,size=2M 0 0"
+
+
+
+# mkdir -p /var/lib/NetworkManager
+# append1 /etc/fstab "/var/lib/NetworkManager" "tmpfs /var/lib/NetworkManager tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=2M 0 0"
+
+# mkdir -p /var/lib/systemd/rfkill
+# append1 /etc/fstab "/var/lib/systemd/rfkill" "tmpfs /var/lib/systemd/rfkill tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=2M 0 0"
 
 
 #This module doesn't do the actual making it read only part

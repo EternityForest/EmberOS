@@ -97,8 +97,6 @@ then
 apt-get -y install pidgin jami jami-daemon mumble
 fi
 
-! mv /etc/mumble-server.ini /sketch/config/mumble-server.ini
-ln -s /etc/sketchconfig/mumble-server.ini /etc/mumble-server.ini
 sudo systemctl disable mumble-server.service
 
 
@@ -144,7 +142,7 @@ apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs
 
 #Enable builtin wordnet, disable the wiktionary service by default because that uses
 #Network
-cp /filesystem/goldendict_config /sketch/home/pi/.goldendict/config
+cp /filesystem/goldendict_config /home/pi/.goldendict/config
 
 
 #Do this last, it has a manual prompt
@@ -292,7 +290,7 @@ Documentation=https://github.com/espruino/EspruinoHub
 
 [Service]
 ExecStart=yarn start
-WorkingDirectory=/sketch.opt/Armoria
+WorkingDirectory=/opt/Armoria
 User=pi
 Group=daemon
 Nice=10
@@ -305,11 +303,11 @@ KillSignal=SIGINT
 WantedBy=multi-user.target
 EOF
 
-mkdir -p /sketch.opt/armoria
+mkdir -p /opt/armoria
 
-rsync -avz /build_cache/Armoria/ /sketch.opt/Armoria/
+rsync -avz /build_cache/Armoria/ /opt/Armoria/
 
-cd /sketch.opt/Armoria/
+cd /opt/Armoria/
 #No idea why this is needed to fix things
 git rm --cached -r .
 git reset --hard
@@ -370,33 +368,20 @@ sudo --user=pi yarn install
 
 
 
-mkdir -p /sketch/opt/zigbee2mqtt/
-rsync -avz /build_cache/zigbee2mqtt/ /sketch/opt/zigbee2mqtt/
+mkdir -p /opt/zigbee2mqtt/data
+rsync -avz /build_cache/zigbee2mqtt/ /opt/zigbee2mqtt/
 
 #There is a big problem with this, it has an initial build step.
 #Which means it needs a *writable* opt.  What a horror!
-sudo chown -R pi:pi /sketch/opt/zigbee2mqtt
-
-
-mkdir -p /sketch/zigbee2mqtt
-mkdir -p  /sketch/opt/zigbee2mqtt/data
-
-
-rsync -av  /sketch/opt/zigbee2mqtt/data/ /sketch/zigbee2mqtt/
+sudo chown -R pi:pi /opt/zigbee2mqtt
 
 
 
 
 
 
-#Writable zigbee2mqtt
-cat << EOF > /sketch/config/filesystem/emberos-zigbee2mqtt.yaml
-/sketch/zigbee2mqtt:
-    mode: '0700'
-    user: pi
-    group: pi
-    bindat: /sketch.opt/zigbee2mqtt/data
-EOF
+
+
 
 cat << EOF > /etc/systemd/system/zigbee2mqtt.service
 [Unit]
@@ -405,7 +390,7 @@ After=network.target fs_bindings.service mosquitto.service
 
 [Service]
 ExecStart=/usr/bin/yarn start
-WorkingDirectory=/sketch.opt/zigbee2mqtt
+WorkingDirectory=/opt/zigbee2mqtt
 StandardOutput=null
 # Or use StandardOutput=null if you don't want Zigbee2MQTT messages filling syslog, for more options see systemd.exec(5)
 StandardError=inherit
@@ -417,7 +402,7 @@ RestartSec=30
 WantedBy=multi-user.target
 EOF
 
-cat << EOF > /sketch/zigbee2mqtt/configuration.yaml
+cat << EOF > /opt/zigbee2mqtt/data/configuration.yaml
 # Optional: Home Assistant integration (MQTT discovery) (default: false)
 homeassistant: true
 
@@ -625,8 +610,8 @@ cd /build_cache
 
 wget -nc https://ispyfiles.azureedge.net/downloads/Agent_ARM32_3_7_1_0.zip
 
-mkdir -p /sketch/home/pi/AgentDVR/
-cd /sketch/home/pi/AgentDVR/
+mkdir -p /home/pi/AgentDVR/
+cd /home/pi/AgentDVR/
 unzip /build_cache/Agent_ARM32_3_7_1_0.zip
 
 #ispy agentDVR.  The actual files are a large binary and therefore we include them in the torrentable
@@ -647,7 +632,7 @@ After=systemd-remount-fs.service network-online.target fs_bindings.service
 # eg for Raspberry Pi:	ExecStart=/usr/share/dotnet/dotnet /home/pi/Desktop/Agent/Agent.dll
 # eg for Linux:			ExecStart=/usr/bin/dotnet /home/sean/Desktop/Agent/Agent.dll
 
-ExecStart=/opt/dotnet/dotnet /home/pi/persist/AgentDVR/Agent.dll
+ExecStart=/opt/dotnet/dotnet /home/pi/AgentDVR/Agent.dll
 Environment="DOTNET_CLI_TELEMETRY_OPTOUT=1"
 # to query logs using journalctl, set a logical name here
 SyslogIdentifier=AgentDVR
@@ -831,16 +816,8 @@ RestartSec=5s
 WantedBy=sysinit.target
 EOF
 
-mkdir -p /sketch/config/hardline.services/
 mkdir -p /etc/hardline/services/
 
-cat << EOF > /sketch/config/filesystem/emberos_hardline.yaml
-/sketch/config/hardline.services/:
-    mode: '0770'
-    user: root
-    group: root
-    bindat: /etc/hardline/services
-EOF
 
 apt-get -y install gnuradio gnuradio-dev rtl-sdr gr-osmosdr gr-limesdr gr-dab gr-rds gr-air-modes rtl-433
 
@@ -849,35 +826,16 @@ apt-get -y install gnuradio gnuradio-dev rtl-sdr gr-osmosdr gr-limesdr gr-dab gr
 apt-get -y install cups cups-ipp-utils cups-core-drivers system-config-printer
 
 
-mkdir -p /sketch/spool/cups/
-mkdir -p /sketch/config/cups/
-mkdir -p /etc/cups/
-mkdir -p /var/spool/cups/
 
-rsync -av /etc/cups/ /sketch/config/cups/
 usermod -a -G lpadmin pi
 
-cat << EOF > /sketch/config/filesystem/emberos_cups.yaml
-/sketch/config/cups/:
-    mode: '0770'
-    user: root
-    group: lpadmin
-    bindat: /etc/cups
-
-/sketch/spool/cups/:
-    mode: '0700'
-    user: root
-    bindat: /var/spool/cups/
-
-/sketch/ssh/root: /root/.ssh/
-EOF
 
 apt-get -y install smbclient samba samba-common-bin cifs-utils minidlna
 
 unpack /filesystem/bin /usr/bin/ root
 chmod 755 /usr/bin/wikioffline
-mkdir -p /sketch/public.www/webmap
-unpack /filesystem/webmap /sketch/public.www/webmap
+mkdir -p /var/www/html/webmap
+unpack /filesystem/webmap /var/www/html/webmap
 
 
 
@@ -907,7 +865,7 @@ systemctl disable dhtnode.service
 
 mkdir -p /etc/mosquitto/conf.d/
 
-cat <<EOF > /sketch/config/mosquitto.conf
+cat <<EOF > /etc/mosquitto.conf
 persistence false
 listener 1883
 allow_anonymous true
@@ -918,7 +876,6 @@ set_tcp_nodelay true
 EOF
 systemctl disable mosquitto.service
 
-ln -s /etc/sketchconfig/mosquitto.conf /etc/mosquitto/conf.d/emberos-sketch.conf
 
 # SyncThing is installed, but not set up!!!
 wget -O - https://syncthing.net/release-key.txt > /etc/apt/trusted.gpg.d/syncthing.asc
@@ -941,24 +898,8 @@ then
 sudo apt-get -y install syncthing-gtk retroshare 
 fi
 
-mkdir -p /sketch/home/pi/.syncthing
-mkdir -p /sketch/home/pi/.syncthing-gtk
 
-#We don't know if the sycthing dir will exist as soon as it's installe
-! cp -ar /home/pi/.config/syncthing/. /sketch/home/pi/.syncthing
-! cp -ar /home/pi/.config/syncthing-gtk/. /sketch/home/pi/.syncthing-gtk
 
-cat << EOF > /usr/bin/get-youtube-dl
-#!/bin/bash
-cd /sketch/bin/yt-dlp
-./yt-dlp -U
-EOF
-
-chmod 755 /usr/bin/get-youtube-dl
-
-ln -s /usr/bin.sketch/yt-dlp /usr/bin/youtube-dl
-
-ln -s /usr/bin.sketch/yt-dlp /usr/bin/yt-dlp 
 
 
 #HW drivers
@@ -1094,9 +1035,6 @@ pip3 install npyscreen picotui asciimatics
 pip3 install esptool
 apt-get -y install libmpv-dev python3-mpv
 #apt-get -y install postgresql libpq-dev postgresql-client postgresql-contrib postgresql-client-common
-mkdir -p /sketch/postgresql
-mkdir -p /sketch/config/postgresql
-mkdir -p /var/lib/postgresql
 # systemctl start postgresql.service
 # psql -c "CREATE USER www-data;"
 # psql -c "CREATE DATABASE nextcloud;"
@@ -1105,20 +1043,7 @@ mkdir -p /var/lib/postgresql
 
 #systemctl disable postgresql.service
 
-#cp -ar /var/lib/postgresql/. /sketch/postgresql
-#cp -ar /etc/postgresql/. /sketch/config/postgresql
 
-cat << EOF > /sketch/config/filesystem/emberos-postgres.yaml
-/sketch/postgresql:
-    mode: '0750'
-    user:  postgres
-    bindat: /var/lib/postgresql
-
-/sketch/config:
-    bindfiles:
-        /sketch/config/postgresql: /etc/postgresql
-
-EOF
 
 
 apt-get install -y php-{bcmath,bz2,intl,gd,mbstring,pgsql,zip,xml,gd,sqlite3,json}

@@ -7,7 +7,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 
 import os, sys,subprocess,threading,time
-wikisdir = '/usr/share.sketch/wikis/'
+wikisdir = '/usr/share/zimwikis/'
 indexdir = '~/.wiki_indexes'
 
 x = None

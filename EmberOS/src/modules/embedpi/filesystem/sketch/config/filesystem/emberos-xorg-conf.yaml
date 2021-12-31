@@ -1,4 +1,0 @@
-/sketch/config/xorg.conf.d:
-    bindat: /usr/share/X11/xorg.conf.d
-    mode: '755'
-    user: root

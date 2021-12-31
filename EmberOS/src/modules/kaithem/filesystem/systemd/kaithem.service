@@ -6,7 +6,7 @@ Type=simple
 
 [Service]
 TimeoutStartSec=0
-ExecStart=pw-jack /sketch.opt/kaithem/kaithem/kaithem.py -c /home/pi/kaithem/config.yaml
+ExecStart=pw-jack /opt/kaithem/kaithem/kaithem.py -c /home/pi/kaithem/config.yaml
 Restart=on-failure
 RestartSec=15
 OOMScoreAdjust=-800

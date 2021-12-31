@@ -14,12 +14,6 @@ then
 apt-get -y install pychess ace-of-penguins ltris
 fi
 
-#It seems to have a rather odd save location
-mkdir -p /sketch/home/pi/.tuxpaint
-! cp -ar /home/pi/.tuxpaint/. /sketch/home/pi/.tuxpaint
-! rm -r  /home/pi/.tuxpaint
-ln -s /home/pi/persist/.tuxpaint /home/pi/.tuxpaint
-
 apt-get -y install cowsay cmatrix
 
 cd /build_cache

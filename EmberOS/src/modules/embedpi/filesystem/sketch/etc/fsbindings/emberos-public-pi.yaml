@@ -1,9 +1,9 @@
-/sketch/public.files/pi:
+/var/public.files/pi:
     mode: '0755'
     user: pi
     bindat:  /home/pi/public.files
 
-/sketch/public.media/pi:
+/var/public.media/pi:
     mode: '0755'
     user: pi
     bindat: /home/pi/public.media

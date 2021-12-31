@@ -80,58 +80,18 @@ unpack /filesystem/networkmanager /etc/NetworkManager root
 unpack /filesystem/systemd /etc/systemd/system root
 unpack /filesystem/bin /usr/bin root
 
-chmod 744 /usr/bin/emberos_netcfg.sh
-chmod 755 /usr/bin/nss-systemcerts-import
+
 
 mkdir -p /etc/pki/nssdb
 
-systemctl enable emberos_netcfg.service
 
 
-#Copy to sketch folder
-mkdir -p /sketch/config/sslcerts
-mkdir -p /sketch/config/sslcerts.local
-mkdir -p /usr/local/share/ca-certificates
-
-cp  -La /usr/share/ca-certificates/. /sketch/config/sslcerts
-cp  -La /usr/local/share/ca-certificates /sketch/config/sslcerts.local
-
-cp  /etc/ca-certificates.conf /sketch/config/ca-certificates.conf
 
 
-mkdir -p  /sketch/config/firewalld/
 
-mkdir -p /sketch/.emberos/cache/etc.ssl
-touch /sketch/.emberos/cache/ssl_tar_md5
+
 
 mkdir -p /var/lib/blueman
-#Bind to /etc
-cat << EOF > /sketch/config/filesystem/emberos-netcfg.yaml
-/sketch/config/:
-   bindfiles:
-    sslcerts: /usr/share/ca-certificates/
-    sslcerts.local: /usr/local/share/ca-certificates/
-    ca-certificates.conf: /etc/ca-certificates.conf
-
-/sketch/config/firewalld/: /etc/firewalld/
-
-__tmpfsoverlay__SSLCERTS:
-  bindat: /etc/ssl/
-  mode: '0755'
-  user: root
-
-__tmpfsoverlay__BLUEMAN:
-  bindat: /var/lib/blueman
-  mode: '0755'
-  user: root
-EOF
-
-
-cat << EOF > /sketch/config/filesystem/emberos-yggdrasil.yaml
-/sketch/config.private:
-   bindfiles:
-    yggdrasil.conf: /etc/yggdrasil.conf
-EOF
 
 
 
@@ -161,20 +121,6 @@ cat << EOF > /etc/firewalld/zones/public.xml
 EOF
 
 
-#NTP is just about the only thing that's safe to allow publically in general.
-#Even then, it's bad if you have some kind of remote admin enabled.
-#firewall-cmd --zone=public --add-port=123/udp --permanent
-cp -ar /etc/firewalld/. /sketch/config/firewalld
-
-###### Make NetworkManager sketchified
-
-cat << EOF > /sketch/config/filesystem/emberos_networks.yaml
-/sketch/networks/:
-    mode: '0600'
-    user: root
-    bindat: /etc/NetworkManager/system-connections
-EOF
-
 
 # Try to fix the kinds of bugs that are fixable by an Avahi restart
 # https://bugs.launchpad.net/ubuntu/+source/avahi/+bug/624043
@@ -194,7 +140,7 @@ unpack /filesystem/avahi /etc/avahi/ root
 ! systemctl disable dhcpcd.service
 ! systemctl disable dhcpcd5.service
 
-mkdir -p /sketch/networks
-unpack /filesystem/networks /sketch/networks root
+mkdir -p /etc/NetworkManager/networks
+unpack /filesystem/networks /sketch/etc/NetworkManager/system-connections/ root
 
 

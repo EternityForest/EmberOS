@@ -55,6 +55,8 @@ if mount | grep "/var/log type tmpfs"; then
     fi
 fi
 
+
+mkdir -p /var/lib/systemd/linger
 ###--------------------------------Samba shimming-----------------------------
 mkdir -p /tmp/samba
 mkdir -p /tmp/cache

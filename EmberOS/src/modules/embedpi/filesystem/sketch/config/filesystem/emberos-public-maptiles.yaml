@@ -1,4 +1,0 @@
-/sketch/home/pi/.local/share/marble/maps:
-    bindat: /var/www/html/marblemaps
-    mode: '755'
-    user: pi

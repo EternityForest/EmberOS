@@ -7,7 +7,7 @@ set -e
 
 source /common.sh
 
-unpack /filesystem/pi /sketch/home/pi
+unpack /filesystem/pi /home/pi
 ln -s /home/pi/persist/.conkyrc /home/pi/.conkyrc
 
 
@@ -21,7 +21,7 @@ ln -s /home/pi/persist/.conkyrc /home/pi/.conkyrc
 
 
 
-cat << EOF > /sketch/home/pi/.config/autostart/ember-kiosk.desktop
+cat << EOF > /etc/ember-autostart/ember-kiosk.desktop
 [Desktop Entry]
 Name=EmberDefaultKiosk
 Type=Application

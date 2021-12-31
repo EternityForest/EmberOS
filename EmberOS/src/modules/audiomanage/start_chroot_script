@@ -10,7 +10,7 @@ export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 source /common.sh
 #mkdir -p /etc/pulse
 #cp /filesystem/defaults.pa /etc/pulse/default.pa
-cat << 'EOF' > /sketch/config/sound.ini
+cat << 'EOF' > /etc/ember-sound.ini
 #This file allows you to automatically set the volume of all soundcards.
 #Set to -1 to disable this behavior.
 
@@ -25,7 +25,7 @@ cat << 'EOF' > /usr/bin/ember-manage-audio.py
 import subprocess,configparser
 import traceback
 config = configparser.ConfigParser()
-config.read('/sketch/config/sound.ini')
+config.read('/etc/ember-sound.ini')
 
 vol = config['SetVolume']['volume']
 

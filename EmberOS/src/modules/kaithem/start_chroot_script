@@ -5,7 +5,6 @@ set -e
 
 source /common.sh
 
-mkdir -p /sketch/kaithem/
 
 if [ ! -d /build_cache/KaithemAutomation ]
 then
@@ -15,9 +14,10 @@ cd /build_cache/KaithemAutomation
 git pull --rebase
 fi
 
-git clone --depth 1 /build_cache/KaithemAutomation /sketch/opt/kaithem
+git clone --depth 1 /build_cache/KaithemAutomation /opt/kaithem
 
-cd /sketch/opt/kaithem/
+cd /opt/kaithem/
+mkdir /home/pi/kaithem
 
 #No idea why this is needed to fix things
 git rm --cached -r .
@@ -25,32 +25,23 @@ git reset --hard
 
 git remote set-url origin https://github.com/EternityForest/KaithemAutomation.git
 
-rsync -avz /sketch/opt/kaithem/kaithem/var/  /sketch/kaithem/
+rsync -avz /opt/kaithem/kaithem/var/  /sketch/home/pi/kaithem/
 
-unpack /filesystem/kaithem_sketch/ /sketch/kaithem/ root
+unpack /filesystem/kaithem_sketch/ /sketch/home/pi/kaithem/ pi
 
-unpack /filesystem/systemd/ /usr/lib/systemd/system/ root
+unpack /filesystem/systemd/ /usr/lib/systemd/system/ pi
 
 #Remove dummy keys so the user can add them if missing
-! rm /sketch/kaithem/ssl/certificate.key
-! rm /sketch/kaithem/ssl/certificate.cert
+! rm  /sketch/home/pi/kaithem/ssl/certificate.key
+! rm  /sketch/home/pi/kaithem/certificate.cert
 
 #chmod 755 -R /opt/kaithem/
 
 
-mkdir /home/pi/kaithem
-
-#Give www-data a "window into the root filesystem"
-cat << EOF > /sketch/config/filesystem/emberos-pi-kaithem.yaml
-/sketch/kaithem:
-    mode: '0750'
-    user:  pi
-    bindat: /home/pi/kaithem
-EOF
 
 
-mkdir -p  /sketch/kaithem/system.mixer
-cat << EOF > /sketch/kaithem/system.mixer/jacksettings.yaml
+mkdir -p    /sketch/home/pi/kaithem/system.mixer
+cat << EOF >   /sketch/home/pi/kaithem/system.mixer/jacksettings.yaml
 {jackDevice: '', jackMode: use, jackPeriodSize: 512, jackPeriods: 3, sharePulse: 'off',
   usbLatency: -1, usbPeriodSize: 512, usbPeriods: 3, usbQuality: 0, useAdditionalSoundcards: 'no'}
 EOF
