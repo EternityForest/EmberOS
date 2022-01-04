@@ -2,35 +2,60 @@
 
 This is a customPiOs distro for setting up a pi image suitable for consumer-grade embedded use, based on heaviliy modified Raspi OS.
 
-It has a variety of preinstalled applications and can be configured almost entirely via a special windows-accessible /sketch partition.
-
-Notably, we have a compressed readonly root with a volatile overlay, and there is an Apache2 server and a chromium based kiosk browser enabled by default.  Everything is pre-setup to protect SD cards from wear and corruption without changing the user experience.
-
 This is a "batteries included" distro, meant to be usable in odd places when you might not
 even have internet access. As such, it includes a lot of stuff.   It is available in two versions, MAX and Micro.
 
+As another notable feature, the root filesystem uses BTRFS(Since the July 12 build), which allows us to compress things.  The root is read-only, but there is a third writable EXT4 partition called /sketch.
 
-
-As another notable feature, the root filesystem uses BTRFS(Since the July 12 build), which allows us to compress things.
-
-
-It is not really recommended that you use tools like dist-upgrade to move between releases.  Although it is based on standard Raspi OS,
-the sketch partition feature makes it much easier toi fresh reinstall, and copy over all sketch partition contents,
+Overlay filesystems create the illusion that the whole thing is writable, so almost everything should look to a user just like vanilla raspbian.
 
 *Also Important: There are no auto-updates, as they can cause stability issues, some applications may need to set that up.
 
 See [Here](EmberOS/src/modules/embedpi/filesystem/public.files/emberos/ember-doc/README.md) for info on how to do common stuff.
 
-## MAX and Micro
 
-Micro will do 99% of what MAX will, but fits on an 8GB card, whereas MAX requires a 16GB card. The difference is that
-Micro does not include many of the larger GUI apps, nor does it include all the thousands of sound effects, music files, and other content in MAX.
+## Ultra Quickstart without a display.
 
-It still includes basically all headless functionality in MAX.
+Flash the image.  You can now boot and use it like any other pi image, just a bit more hardened against SD wear and without
+any persistent state for the Chromium browser.
 
-If this will be a desktop-like machine, cyberdeck, etc, you probably want the full version.
+Set your computer up to be able to browse EXT4 partitions(On Linux this Just Works).  On Windows you
+probably need extra software for this, or WSL2.  I don't know about Mac.
 
-Otherwise, you may want Micro, for faster flashing, and to fit on cheaper SD cards.
+Look in the sketch partition. A few files are already present for maximally easy editing.  Fill in your wifi
+credentials in /etc/NetworkManager/system-connections if desired.
+
+Set your new hostname in /etc/hostname/ and /etc/hosts/. Default is embedpi.   You 
+
+
+
+Enable or disable any services you want in /etc/ember-autostart.  Note these are just systemd services, you could also
+start them by command line, but this lets you do it purely with a text editor.
+
+If you want to make a simple digital signage display, just put your stuff in /var/www/html/ starting at index.html and leave everything else alone, the default boot mode is to launch to a fullscreen chrome.
+
+
+## Security Warning
+
+In the unlikely event that the EXT4 partition becomes somehow corrupted or the bindings fail, the system will likely still be able to boot, but will do so as if it were an unmodified factory image. This is intentional as recoverability is prioritized.
+
+In this state, the password wil be the default and the hostname will be embedpi.local.
+
+For this reason, do not open the SSH port to the wider world, or put any critical systems on a public-acessible network. If you would like to do so, use a VPN, or change the default ports so that the port in this fallback mode is different from the one you exposed.
+
+You can also copy changes back to the real root, by plugging the card into a host machine.  If you have many devices to deploy,
+you probably want to create your own custom image with your own factory defaults.
+
+It should be emphasized that this kind of corruption is exacty what EmberOS is intended to prevent and will probably not happen
+for a home user, unless your application has heavy SD Card writes.
+
+
+## Home Assistant Warning
+
+There are rumors that HA can be very hard on cards.  EmberOS will likely not be able to protect from this at all.
+
+
+
 
 ## Debian 11 update, Kaithem does not run as root(2021Oct27 and up)
 
@@ -68,9 +93,28 @@ You can still run it as root, but it will cause problems since the pi user owns 
 * Mesh Networking node
 
 
-#### Semi read only
- Read only root filesystem, and mostly read only /home/pi, with carefully controlled symlinks to persistent folders to make apps work as they should, while keeping everything
- else read only, or purely volatile, so things like chromium's absurd disk writes can't cause trouble.
+
+#### Factory Reset
+
+Because the root is read only, you can just wipe the /sketch partition, and you are good to go, back to a fresh start.
+You will still need to recreate the empty /usr, /var, /etc, /opt, and /srv folders in /sketch.
+
+As an easier way, just copy the contents of /boot/sketch.factory/
+
+
+#### Storage Space
+You deleting preinstalled things will not free up space, it will only put "whiteout" markers in the upper filesystem, actually using more space.  To actually gain space you would have to mount the card on a computer and remove stuff
+from the underlying BTRFS partion, then expand /sketch to actually make use of it.
+
+This has the notable disadvantage that when you update something, it will take up space as it cannot just remove the factory version.  This is less of an issue in the age of 16GB cards.
+
+Due to the rather large base filesystem,  the sketch partition is pretty small, you will have to enlarge it yourself.
+
+####  Other notes
+It's important to note that nothing a device itself does modifies the base image, only the writable default.  By mounting on a host computer you could rsync them and delete the upper dir stuff to make your changes the new "factory defaults".
+
+You can back up /sketch and be sure that you got all changes, with no factory stuff, but this method might not back up deletions to factory stuff, as those aren't real deletions.
+
 
 
 
@@ -84,8 +128,7 @@ THE DEFAULT PASSWORD IS USED FOR KAITHEM, which runs as root. The standard pi:ra
 Do *not* open a port to let people on the internet access this, 
 without a firewall/nat/etc unless you change this, or disable password auth(Probably the better option)
 
-There is also an unsecured Mosquitto MQTT server. Nothing is currently using it, but if you
-do, be sure nobody can access those ports. 
+There is also an unsecured Mosquitto MQTT server if you enable it.
 
 
 Think of it like the common WiFi printers and file servers that allow anyone on the network to print.
@@ -129,37 +172,6 @@ be ready to flash!
 sudo ./build_dist micro_variant
 Use the micro variant postprocess script.
 
-
-
-### The Bindings Manager
-
-More documentation to come, but basically, everything is managed via
-a "bind engine" that takes config files and uses them to set up bindings
-between /sketch and other places.
-
-BindFS allows permission-transformed views, which is how other users can write to selected dirs in /sketch, which is normally owned by root with mode 700.
-
-The binding manager runs once at boot.
-
-This is what config files look like:
-
-```yaml
-cat << EOF > /sketch/config/filesystem/some_directory.yaml
-/sketch/foo:
-    #Mode must be quoted
-    mode: '0755'
-    #/var/lib/someApplication and all files under
-    #it appear to be owned by root
-    user: root
-    #Binds /sketch/home/foo to /var/lib/someApplication
-    bindat: /var/lib/someApplication
-    pre_cmd: echo beforemainbindmount
-    post_cmd: echo aftermainbindmount
-    #This binds /var/lib/someApplication/foo to /etc/foo
-    bindfiles:
-        foo: /etc/foo
-```
-This is managed by `fs_bindings.service`
 
 ### Apps
 [See Here](docs/IncludedApps.md)

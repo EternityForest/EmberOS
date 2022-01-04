@@ -7,7 +7,7 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmyd
 export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 
 #Games
-apt-get -y install mednaffe  brandy bwbasic kolourpaint
+apt-get -y install mednaffe  brandy bwbasic pinta
 
 if [ -z "$EMBER_MICRO" ]
 then
@@ -18,17 +18,3 @@ apt-get -y install cowsay cmatrix
 
 cd /build_cache
 
-#Too many copyright issues
-# if [ ! -d /build_cache/cowsay-files ]
-# then
-# git clone --depth 1 https://github.com/paulkaefer/cowsay-files.git
-# cd /build_cache/cowsay-files
-# else
-# cd /build_cache/cowsay-files
-# git pull --rebase
-# fi
-# rsync --no-recursive cows/   /usr/share/cowsay/cows/
-# #Flatten
-# rm /usr/share/cowsay/cows/true-color/*
-# rmdir /usr/share/cowsay/cows/true-color
-# rsync --no-recursive cows/true-color   /usr/share/cowsay/cows/

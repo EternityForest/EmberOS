@@ -141,7 +141,7 @@ unpack /filesystem/avahi /etc/avahi/ root
 ! systemctl disable dhcpcd.service
 ! systemctl disable dhcpcd5.service
 
-mkdir -p /etc/NetworkManager/networks
+mkdir -p /sketch/etc/NetworkManager/system-connections
 unpack /filesystem/networks /sketch/etc/NetworkManager/system-connections/ root
 
-
+chmod -R 700 /sketch/etc/NetworkManager/system-connections

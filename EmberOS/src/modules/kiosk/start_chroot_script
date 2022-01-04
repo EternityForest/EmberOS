@@ -23,6 +23,8 @@ cat << EOF > /etc/X11/Xsession
 ERRFILE=/dev/null
 EOF
 
+mkdir -p /sketch/home/pi/.config/autostart/
+
 cat << EOF > /sketch/home/pi/.config/autostart/ember-kiosk.desktop
 [Desktop Entry]
 Name=EmberDefaultKiosk

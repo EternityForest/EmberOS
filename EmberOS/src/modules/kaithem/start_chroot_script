@@ -37,7 +37,9 @@ unpack /filesystem/systemd/ /usr/lib/systemd/system/ pi
 
 #chmod 755 -R /opt/kaithem/
 
-
+cd /opt/kaithem/
+git rm --cached -r .
+git reset --hard
 
 
 mkdir -p    /sketch/home/pi/kaithem/system.mixer

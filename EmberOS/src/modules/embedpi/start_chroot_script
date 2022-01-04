@@ -151,15 +151,28 @@ rm /etc/xdg/lxsession/LXDE-pi/sshpwd.sh
 # Our read only one is going to just be something like BTRFS.  We really need that compression, but we do not want
 # the horrid write amplification nor the unavailability of windows support.
 
+
+mkdir -p /base_root
+
 # Our upper one can be EXT4.
 cat << EOF > /etc/fstab
 proc            /proc           proc    defaults          0       0
 UUID=23709a26-1289-4e83-bfe5-2c99d42d276e  /boot           vfat    defaults,noatime,ro          0       2
 UUID=33fc23d5-a31d-45ed-8aec-e85f4fb4a436  /               auto    defaults,noatime,ro,compress  0       1
+UUID=33fc23d5-a31d-45ed-8aec-e85f4fb4a436  /base_root               auto    defaults,noatime,ro,compress  0       1
 UUID=c8dd1d93-222c-42e5-9b03-82c24d2433fd /sketch auto defaults,noatime,nofail,fmask=027,dmask=027,umask=027 0 0
+tmpfs /media tmpfs  defaults,noatime,nosuid,nodev,noexec,mode=0755,size=1M 0 0
+tmpfs /mnt tmpfs  defaults,noatime,nosuid,nodev,noexec,mode=0755,size=1M 0 0
 EOF
 
 mkdir -p /etc/fsbindings/
+
+mkdir -p /sketch/srv
+mkdir -p /sketch/opt
+mkdir -p /sketch/usr/bin
+mkdir -p /sketch/etc
+mkdir -p /sketch/home
+
 
 # Here we actually create the overlay.
 # This gives us a writable root.
@@ -178,6 +191,10 @@ cat << EOF > /etc/fsbindings/emberos-root.yaml
 
 /sketch/opt/:
     bindat: /opt
+    type: overlay
+
+/sketch/srv/:
+    bindat: /srv
     type: overlay
 EOF
 
@@ -375,7 +392,7 @@ mkdir -p /public.temp
 cat << EOF > /var/www/html/index.html
 
 <h1 id="welcome-to-emberos">Welcome to EmberOS</h1>
-<p>This is the kiosk start page. It is served from /sketch/kiosk_startpage.html.</p>
+<p>This is the kiosk start page.</p>
 <p>You can of course exit back to the shell with Alt+F4.</p>
 
 <h3>Links to content on this server:</h3>
@@ -592,9 +609,6 @@ chmod 744 /etc/systemd/system/fs_bindings.service
 chmod 744 /usr/bin/fs_bindings.py
 systemctl enable /etc/systemd/system/fs_bindings.service
 
-chmod 744 /etc/systemd/system/runprovisioning.service
-chmod 744 /usr/bin/runprovisioning.py
-systemctl enable /etc/systemd/system/runprovisioning.service
 
 chmod 744 /etc/systemd/system/serviceconfig.service
 chmod 744 /usr/bin/serviceconfig.py
@@ -635,7 +649,7 @@ EOF
 # ln -s /sketch/cache/systemd.timers /var/lib/systemd/timers
 
 
-cat << EOF > /sketch/config/filesystem/readme.md
+cat << EOF > /etc/fsbindings/readme.md
 
 The bind manager tool takes config files like
 
@@ -676,17 +690,7 @@ mkdir -p /home/pi/public.media
 
 # We are going to share our cached marble maps tiles with the world
 # Bit of a privacy issue as it reveals where you have been looking
-mkdir -p /var/www/html/marblemaps
-cat << EOF /var/www/html/marblemaps/README.md
-Don't put things here, it is just used as a mountpoint.
-EOF
-
-cat << EOF /etc/fsbindings/ember-pi-map-tiles.yaml
-/sketch/home/pi/.local/share/marble/maps:
-    mode: '0755'
-    user: pi
-    bindat: /var/www/html/marblemaps
-EOF
+ln -s /home/pi/.local/share/marble/maps /var/www/html/marblemaps
 
 
 
@@ -722,8 +726,8 @@ mkdir -p /home/pi/.config
 
 
 chown -R pi /home/pi/
-
-echo "# Project Notes" > /sketch/home/pi/Documents/README.md
+mkdir -p /home/pi/Documents/
+echo "# Project Notes" > /home/pi/Documents/README.md
 
 
 #Make the dir for arduino, but we're gonna specifically redirect the log dir to a volatile folder.
@@ -745,20 +749,21 @@ mkdir -p /var/public.media/Videos
 mkdir -p /var/public.media/
 mkdir -p /var/public.files/
 
+mkdir -p /home/pi/Music/
+mkdir -p /home/pi/Pictures/
+mkdir -p /home/pi/Videos/
+
 #Make the example files more discoverable
-ln -s /var/public.media/Music/  "/sketch/home/pi/Music/sketch"
-ln -s /var/public.media/Pictures/  "/sketch/home/pi/Pictures/sketch"
-ln -s /var/public.media/Videos/  "/sketch/home/pi/Videos/sketch"
+ln -s /var/public.media/Music/  "/home/pi/Music/sketch.public"
+ln -s /var/public.media/Pictures/  "/home/pi/Pictures/sketch.public"
+ln -s /var/public.media/Videos/  "/home/pi/Videos/sketch.public"
 
 
 
 
 
-mkdir -p /sketch/opt
-mkdir -p /sketch/usr/bin
-mkdir -p /sketch/usr/share/fonts
-mkdir -p /sketch/usr/share/zimwikis
-mkdir -p /sketch/usr/share/emberdoc
+
+
 
 mkdir -p /usr/share.sketch
 
@@ -805,44 +810,22 @@ echo "$EMBEDPI_VAR"
 unpack /filesystem/root /
 
 
-
 #These depend on the fact that remounting seems to leave things
 #In their place in the layering of mounts
 cat << EOF > /usr/bin/writable
 #!/bin/bash
-mount -o remount,rw /dev/mmcblk0p2  /
-mount -o remount,rw /dev/mmcblk0p1 /boot
-mount -o remount,rw /dev/mmcblk0p3 /sketch
+mount -o remount,rw,noatime /dev/mmcblk0p1 /boot
+mount -o remount,rw,noatime /dev/mmcblk0p3 /sketch
+mount -o remount,rw,noatime /dev/mmcblk0p2 /base_root
 EOF
 
 cat << EOF > /usr/bin/readonly
 #!/bin/bash
-mount -o remount,ro /dev/mmcblk0p2 /
 mount -o remount,ro /dev/mmcblk0p1 /boot
 EOF
 
 chmod 755 /usr/bin/writable
 chmod 755 /usr/bin/readonly
-
-
-#Hackishly patch this to call readonly first
-
-cat << EOF > /lib/systemd/system/regenerate_ssh_host_keys.service
-[Unit]
-Description=Regenerate SSH host keys
-Before=ssh.service
-ConditionFileIsExecutable=/usr/bin/ssh-keygen
-
-[Service]
-Type=oneshot
-ExecStartPre=-/bin/dd if=/dev/hwrng of=/dev/urandom count=1 bs=4096
-ExecStartPre=-/bin/sh -c "/bin/rm -f -v /etc/ssh/ssh_host_*_key*"
-ExecStart=/bin/bash -c ' /usr/bin/ssh-keygen -A -v >> /var/log/regenerate_ssh_host_keys.log 2>&1'
-ExecStartPost=/bin/bash -c 'for i in /etc/ssh/ssh_host_*_key*; do actualsize=$(wc -c <"$i") ;if [ $actualsize -eq 0 ]; then echo size is 0 bytes ; exit 1 ; fi ; done ; /usr/bin/writable; /bin/systemctl disable regenerate_ssh_host_keys ; /usr/bin/readonly'
-
-[Install]
-WantedBy=multi-user.target
-EOF
 
 
 
@@ -857,9 +840,6 @@ mkdir -p /etc/apache2/sites-available/
 cp /filesystem/apache-0-defaults /etc/apache2/sites-available/000-default.conf
 
 
-mkdir -p /sketch/etc/apache2
-cp -ar /etc/apache2/. /sketch/etc/apache2
-rm  /etc/apache2/*
 
 ######################################################
 
@@ -877,10 +857,10 @@ cat << EOF > /etc/shells
 EOF
 
 
-sudo apt-get -y install lolcat figlet
+sudo apt-get -y install lolcat figlet cowsay
 
 
-cat << EOF > /sketch/home/pi/.xonshrc
+cat << EOF > /home/pi/.xonshrc
 \$PROMPT= "{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{curr_branch: {}}{RESET} {BOLD_BLUE}{prompt_end}{RESET}"
 echo "This is Xonsh! An enhanced shell! It is mostly compatible with bash. If something doesn't work like you  expect, you may need to switch to actual bash."
 echo
@@ -896,10 +876,9 @@ cat << EOF > /etc/xonshrc
 EOF
 
 
-cat << EOF > /sketch/home/pi/.vimrc
+cat << EOF > /home/pi/.vimrc
 EOF
 
-mv /home/pi/.bashrc /sketch/home/pi/.bashrc 
 
 
 

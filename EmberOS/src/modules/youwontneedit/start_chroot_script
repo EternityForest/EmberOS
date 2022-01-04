@@ -3,11 +3,11 @@
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmydata
 export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 
+! apt purge -y valgrind
 
 ! apt purge -y wolfram-engine wolframscript thonny
 ! apt purge -y sonic-pi-samples
-
-#Everyhting aside from scratch3 official can go
+! apt purge -y libreoffice-base libreoffice-math
 ! apt purge -y nuscratch
 ! apt purge -y scratch2
 ! apt purge -y scratch3
@@ -15,6 +15,10 @@ export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 ! apt purge -y minecraft-pi
 ! apt purge -y python-minecraftpi
 ! apt purge -y realvnc-vnc-server
+! apt purge -y gpicview
+! apt purge -y oracle-java8-jdk
+! apt purge -y oracle-java7-jdk
+! apt purge -y tcsh
 
 ! apt purge -y ^dillo$  ^idle3$  ^smartsim$ ^sonic-pi$  ^epiphany-browser$  ^python-minecraftpi$ ^bluej$ 
 ! apt purge -y ^greenfoot$  ^greenfoot-unbundled$  ^claws-mail$ ^claws-mail-i18n$
@@ -22,6 +26,7 @@ export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 ! rm -r /opt/Wolfram
 ! rm -r /usr/share/code-the-classics
 ! rm -r /home/pi/MagPi/*.pdf
+! rm -r /home/pi/Bookshelf/Beginners*.pdf
 
 apt autoremove -y --purge
 

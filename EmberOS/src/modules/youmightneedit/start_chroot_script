@@ -75,13 +75,12 @@ sudo apt-get -y install v4l-utils
 #Mega GUI apps
 if [ -z "$EMBER_MICRO" ]
 then
-apt-get -y install ardour audacious audacious-plugins tuxguitar zeal filezilla gelemental kstars inkscape gimp  pulseview synaptic qdirstat gwenview guake skanlite solaar
+apt-get -y install audacious audacious-plugins tuxguitar zeal inkscape filezilla gimp pulseview qdirstat gwenview skanlite solaar
 ! apt-get -y install fbreader
 fi
 
 
-#Yeah, dolphin really is there. It's that much better than anything else.
-apt-get -y install deluge audacity vlc dolphin
+apt-get -y install deluge audacity vlc
 
 
 #See above where we build from source because the dang thing won't let us do it the normal way yet.
@@ -137,11 +136,11 @@ fi
 apt-get -y install nmap robotfindskitten ncdu mc curl fatrace gstreamer1.0-tools pavucontrol xawtv evince stegosuite unzip
 
 apt-get -y remove qpdfview
-#Sigh. Vim is huge but some people really love it...
-apt-get -y install vim zile xcas units git wget htop lsof fzf chafa nast git-lfs git-repair xloadimage iotop zenity rename sshpass
+apt-get -y install vim-tiny xcas units git wget htop lsof fzf chafa nast git-lfs git-repair xloadimage iotop zenity rename sshpass
 
 #Enable builtin wordnet, disable the wiktionary service by default because that uses
 #Network
+mkdir -p /home/pi/.goldendict
 cp /filesystem/goldendict_config /home/pi/.goldendict/config
 
 
@@ -614,8 +613,6 @@ mkdir -p /home/pi/AgentDVR/
 cd /home/pi/AgentDVR/
 unzip /build_cache/Agent_ARM32_3_7_1_0.zip
 
-#ispy agentDVR.  The actual files are a large binary and therefore we include them in the torrentable
-#included data
 apt-get install -y libtbb-dev libc6-dev gss-ntlmssp libatlas-base-dev
 
 cat << EOF > /etc/systemd/system/AgentDVR.service
@@ -749,7 +746,7 @@ echo "wireshark-common wireshark-common/install-setuid boolean false" | sudo deb
 
 if [ -z "$EMBER_MICRO" ]
 then
-apt-get -y install wireshark
+apt-get -y install wireshark termshark
 fi
 
 
@@ -936,12 +933,6 @@ apt-get -y install fldigi flrig flmsg flamp chirp librtlsdr0
 
 if [ -z "$EMBER_MICRO" ]
 then
-#Pure data, because it seems to still be the best in it's class and there's really no equivalent
-apt-get -y install puredata puredata-extra
-fi
-
-if [ -z "$EMBER_MICRO" ]
-then
 apt-get install -y wxhexeditor d-feet
 fi
 
@@ -955,14 +946,9 @@ apt-get -y install mpv libgdk-pixbuf2.0-bin gpsd gpsd-clients dosbox sshpass lir
 
 systemctl disable lircd.service
 
-systemctl disable gpsd.service
+systemctl disable gpsd.service 
 
-# Installs the Micro editor
-# Do this early, it can't be cached like apt
-cd /usr/bin/
-curl https://getmic.ro | bash
-
-#Ghostwriter is used for markdown help text
+#retext is used for markdown help text
 apt-get -y install x11-apps xterm retext
 #Try to fix missing icons
 sudo ln -s /usr/lib/*/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders /usr/local/bin/gdk-pixbuf-query-loaders
@@ -970,7 +956,7 @@ gdk-pixbuf-query-loaders > /usr/lib/arm-linux-gnueabihf/gdk-pixbuf-2.0/2.10.0/lo
 
 update-icon-caches /usr/share/icons/*
 
-apt-get -y install python3 conky-all grsync screengrab shared-mime-info rdiff-backup 
+apt-get -y install python3 grsync screengrab shared-mime-info rdiff-backup 
 
 apt-get -y install python3-setproctitle python3-cffi python3-dbus python3-pydbus python3-scipy python3-numpy python3-sympy python3-smbus python3-pyaudio python3-pexpect python3-pydub 
 #All the different FSes that you might want to have
@@ -988,13 +974,6 @@ apt-get -y install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-d
 
 
 pip3 install kivy
-
-#This language is included because of it's excellent dynamic imports in python
-#Elixir is included because it seems to be the one most practical functional type things
-#Gforth is small and popular(For some reason)
-#Lua is even smaller and more popular
-apt-get -y install nim elixir gforth lua5.3
-
 
 #Python Bluez API
 pip3 install tcpbridge
@@ -1054,6 +1033,8 @@ apt-get install libapache2-mod-php -y
 
 #Needed for .htaccess
 ! a2enmod rewrite
+! a2enmod php7.4
+
 #All the compilerie you might want
 apt-get -y install python3-dev build-essential gcc g++ cmake make libtool m4 autoconf
 
@@ -1068,7 +1049,7 @@ apt-get -y install python3-netifaces python3-jack-client python3-gst-1.0 python3
 pip3 install beacontools[scan]
 
 #Audio handling
-apt-get -y install jackd2 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid  jack-tools jack-stdio libgstreamer1.0-dev gstreamer1.0-libav gstreamer1.0-pipewire
+apt-get -y install gstreamer1.0-plugins-good gstreamer1.0-plugins-bad a2jmidid  jack-tools jack-stdio libgstreamer1.0-dev gstreamer1.0-libav gstreamer1.0-pipewire
 apt-get -y install swh-plugins tap-plugins caps  gstreamer1.0-plugins-ugly zynaddsubfx vmpk autotalent x42-plugins
 
 apt-get -y install jaaa qjackctl ffmpeg

@@ -8,6 +8,7 @@ rm -rf /var/tmp/*
 rm -rf /var/log/*
 apt-get -y reinstall shared-mime-info
 
+! rm -rf /home/pi/.cache/yarn
 
 #Restore Yarn settings
 yarn config set cache-folder /usr/local/share/.cache/yarn
@@ -26,3 +27,22 @@ ldconfig
 chmod 555 /var/tmp
 
 chown -R pi /sketch/home/pi
+
+mkdir -p /sketch/etc/NetworkManager/system-connections
+rsync -avz /etc/NetworkManager/system-connections/ /sketch/etc/NetworkManager/system-connections/
+
+cp /etc/hostname /sketch/etc/hostname
+cp /etc/hosts /sketch/etc/hosts
+
+
+
+mkdir -p /sketch/home/pi/kaithem
+mkdir -p /sketch/etc/ember-autostart
+mkdir -p /sketch/var/www/html
+
+rsync -avz /etc/ember-autostart/ /sketch/etc/ember-autostart/
+
+mkdir /boot/sketch.factory
+
+# Template just to record what was initially in sketch for easy factory resetting.
+rsync -avz /sketch/ /boot/sketch.factory/
