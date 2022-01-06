@@ -49,9 +49,3 @@ allow
 
 local stratum 14 orphan
 EOF
-
-
-
-
-chmod 744 /etc/systemd/system/manage_timezones.service
-systemctl enable /etc/systemd/system/manage_timezones.service

@@ -192,7 +192,8 @@ mkdir -p /var/lib/systemd/linger
 
 # We don't want any logging happening before we are able to get this mount up.
 chmod 555 /var/log/
-mount -t tmpfs -o nonempty size=10M tmpfs /var/log/
+# Rest of the compile still needs access to logging
+mount -t tmpfs size=32M tmpfs /var/log/
 
 
 cat << EOF > /etc/fsbindings/emberos-misc-ramdisks.yaml

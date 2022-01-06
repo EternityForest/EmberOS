@@ -160,7 +160,7 @@ proc            /proc           proc    defaults          0       0
 UUID=23709a26-1289-4e83-bfe5-2c99d42d276e  /boot           vfat    defaults,noatime,ro          0       2
 UUID=33fc23d5-a31d-45ed-8aec-e85f4fb4a436  /               auto    defaults,noatime,ro,compress  0       1
 UUID=33fc23d5-a31d-45ed-8aec-e85f4fb4a436  /base_root               auto    defaults,noatime,ro,compress  0       1
-UUID=c8dd1d93-222c-42e5-9b03-82c24d2433fd /sketch auto defaults,noatime,nofail,fmask=027,dmask=027,umask=027 0 0
+UUID=c8dd1d93-222c-42e5-9b03-82c24d2433fd /sketch auto defaults,noatime,nofail 0 0
 tmpfs /media tmpfs  defaults,noatime,nosuid,nodev,noexec,mode=0755,size=1M 0 0
 tmpfs /mnt tmpfs  defaults,noatime,nosuid,nodev,noexec,mode=0755,size=1M 0 0
 EOF
@@ -173,30 +173,6 @@ mkdir -p /sketch/usr/bin
 mkdir -p /sketch/etc
 mkdir -p /sketch/home
 
-
-# Here we actually create the overlay.
-# This gives us a writable root.
-# We could do this in initramfs, but doing it this way lets us directly see
-# What is in sketch.
-cat << EOF > /etc/fsbindings/emberos-root.yaml
-/sketch/usr/:
-    bindat: /usr
-    type: overlay
-/sketch/var/:
-    bindat: /var
-    type: overlay
-/sketch/etc/:
-    bindat: /etc
-    type: overlay
-
-/sketch/opt/:
-    bindat: /opt
-    type: overlay
-
-/sketch/srv/:
-    bindat: /srv
-    type: overlay
-EOF
 
 cat << EOF > /etc/fsbindings/emberos-pi-home.yaml
 /sketch/home/pi:
@@ -221,6 +197,8 @@ xor
 zlib_deflate
 raid6_pq
 f2fs
+overlay
+ext4
 EOF
 mkdir -p /usr/src/initramfs/
 
@@ -241,6 +219,29 @@ echo "EmberOS Initramfs running!"
 
 # Mount the root filesystem. NOTE!!!
 mount -t ext4,btrfs,f2fs -o ro /dev/mmcblk0p2 /mnt/root || rescue_shell
+
+# Mount the Sketch Partition
+mount -t ext4,btrfs,f2fs -o rw,noatime /dev/mmcblk0p3 /mnt/root/sketch || rescue_shell
+
+# Make the individial mounts.  Note that we do not overlay the whole root.  That woold do some recursion loop business that would be confusing, and we need to always be able to see what's in /sketch
+# We have tmpfses but those come later, after this.
+
+mkdir -p /mnt/root/sketch/etc/.overlay_work
+mount -t overlay overlay -o lowerdir=/mnt/root/etc,upperdir=/mnt/root/sketch/etc/,workdir=/mnt/root/sketch/etc/.overlay_work /mnt/root/sketch/etc/ || rescue_shell
+
+mkdir -p /mnt/root/sketch/var/.overlay_work
+mount -t overlay overlay -o lowerdir=/mnt/root/var,upperdir=/mnt/root/sketch/var/,workdir=/mnt/root/sketch/var/.overlay_work /mnt/root/sketch/var/ || rescue_shell
+
+
+mkdir -p /mnt/root/sketch/usr/.overlay_work
+mount -t overlay overlay -o lowerdir=/mnt/root/usr,upperdir=/mnt/root/sketch/usr/,workdir=/mnt/root/sketch/usr/.overlay_work /mnt/root/sketch/usr/ || rescue_shell
+
+mkdir -p /mnt/root/sketch/opt/.overlay_work
+mount -t overlay overlay -o lowerdir=/mnt/root/opt,upperdir=/mnt/root/sketch/opt/,workdir=/mnt/root/sketch/opt/.overlay_work /mnt/root/sketch/opt/ || rescue_shell
+
+mkdir -p /mnt/root/sketch/srv/.overlay_work
+mount -t overlay overlay -o lowerdir=/mnt/root/srv,upperdir=/mnt/root/sketch/srv/,workdir=/mnt/root/sketch/srv/.overlay_work /mnt/root/sketch/srv/ || rescue_shell
+
 
 # Clean up.
 umount /proc
@@ -845,7 +846,7 @@ cp /filesystem/apache-0-defaults /etc/apache2/sites-available/000-default.conf
 
 
 #Switch to xonsh
-apt-get -y install -y elvish fish xonsh xonsh-doc python3-pygments python3-ptk cowsay
+apt-get -y install -y elvish fish xonsh python3-pygments python3-ptk cowsay neofetch
 cat << EOF > /etc/shells
 # /etc/shells: valid login shells
 /bin/sh
@@ -859,26 +860,77 @@ EOF
 
 sudo apt-get -y install lolcat figlet cowsay
 
+cat << EOF > /home/pi/.nanorc
+set linenumbers
+set mouse
+set tabsize 4
+set smarthome
+set smooth
+set autoindent
+EOF
+
+cat << EOF > /home/pi/.vimrc
+" Modified From: https://github.com/AGnias47/UtilityScripts/blob/master/bash/vimrc
+
+if &compatible
+	set nocompatible
+endif
+
+" Turn on filetype detection
+:filetype on
+
+" Turn on syntax highlighting if more than 1 color is available
+if &t_Co > 1
+    syntax enable
+endif
+
+" Turn on auto-indentation for C-syntax languages
+:au FileType c,cpp,java set cindent
+
+" Show matching brackets
+set showmatch
+
+" Makes backspace behave as expected
+set backspace=2
+
+"Set the tab key to 4 spaces
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set expandtab
+set smarttab
+
+" Turn on visual wrapping
+set wrap
+
+"Wrap at 120 characters
+set textwidth=120
+
+" Turn on highlighting for searching
+set hlsearch
+
+" Show cursor line and column position
+set ruler
+set number
+:set laststatus=2
+:set mouse=a
+set showmode
+EOF
+
 
 cat << EOF > /home/pi/.xonshrc
 \$PROMPT= "{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{curr_branch: {}}{RESET} {BOLD_BLUE}{prompt_end}{RESET}"
-echo "This is Xonsh! An enhanced shell! It is mostly compatible with bash. If something doesn't work like you  expect, you may need to switch to actual bash."
-echo
-hostname | figlet -k -f banner | lolcat
-# genfortune | cowsay -f $(ls /usr/share/cowsay/cows/ | shuf -n1| cut -f 1 -d . | tr -d '\n') | lolcat
+neofetch | lolcat
 genfortune | cowsay | lolcat
 echo
 EOF
+
+mkdir -p /home/pi/.config/neofetch/ 
+cp /filesystem/neofetch.conf /home/pi/.config/neofetch/config.conf
 
 
 cat << EOF > /etc/xonshrc
 \$PROMPT= "{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{curr_branch: {}}{RESET} {BOLD_BLUE}{prompt_end}{RESET}"
 EOF
-
-
-cat << EOF > /home/pi/.vimrc
-EOF
-
-
 
 

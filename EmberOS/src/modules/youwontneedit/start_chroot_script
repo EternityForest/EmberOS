@@ -19,6 +19,12 @@ export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 ! apt purge -y oracle-java8-jdk
 ! apt purge -y oracle-java7-jdk
 ! apt purge -y tcsh
+! apt purge -y nodejs-doc
+
+# Old versions
+! apt purge -y gcc-7
+! apt purge -y gcc-8
+! apt purge -y gcc-9
 
 ! apt purge -y ^dillo$  ^idle3$  ^smartsim$ ^sonic-pi$  ^epiphany-browser$  ^python-minecraftpi$ ^bluej$ 
 ! apt purge -y ^greenfoot$  ^greenfoot-unbundled$  ^claws-mail$ ^claws-mail-i18n$
