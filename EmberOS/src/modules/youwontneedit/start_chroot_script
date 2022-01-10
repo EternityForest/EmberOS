@@ -7,7 +7,9 @@ export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 
 ! apt purge -y wolfram-engine wolframscript thonny
 ! apt purge -y sonic-pi-samples
-! apt purge -y libreoffice-base libreoffice-math
+! apt purge -y libreoffice-base libreoffice-math 
+! apt purge -y libreoffice-help-common libreoffice-help-en-us
+apt-get -y install libreoffice-draw libreoffice-writer libreoffice-calc
 ! apt purge -y nuscratch
 ! apt purge -y scratch2
 ! apt purge -y scratch3

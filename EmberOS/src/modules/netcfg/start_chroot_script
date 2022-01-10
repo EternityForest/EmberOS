@@ -99,9 +99,6 @@ mkdir -p /var/lib/blueman
 ####################### Setup the firewall ##################################
 unpack /filesystem/firewalld /etc/firewalld/ root
 
-
-mkdir -p  /sketch/config/firewalld/
-
 systemctl enable firewalld.service
 
 

@@ -18,7 +18,7 @@ apt-get -y install libavdevice-dev libavfilter-dev libopus-dev libvpx-dev pkg-co
 pip3 install peerjs
 
 #This seems to be fairly low resource usage and thus safe to include
-echo "media_dir=/var/public.media/" >> /etc/minidlna.conf
+echo "media_dir=/usr/share/public.media/" >> /etc/minidlna.conf
 
 
 
@@ -269,7 +269,7 @@ cat << EOF > /etc/samba/smb.conf
 [files]
         # This share allows anonymous (guest) access
         # without authentication!
-        path = /var/public.files
+        path = /usr/share/public.files
         read only = yes
         guest ok = yes
         guest account = www-data
@@ -277,7 +277,7 @@ cat << EOF > /etc/samba/smb.conf
 [media]
         # This share allows anonymous (guest) access
         # without authentication!
-        path = /var/public.media
+        path = /usr/share/public.media
         read only = yes
         guest ok = yes
         guest account = www-data
@@ -315,21 +315,6 @@ append1() {
 		echo $3 | sudo tee -a $1
 	fi
 }
-
-
-
-#Make the appropriate tmpfses
-mkdir -p /var/cache/minidlna
-append1 /etc/fstab "/var/cache/minidlna" "tmpfs /var/cache/minidlna tmpfs defaults,noatime,nosuid,nodev,noexec,mode=775,uid=minidlna,size=64M 0 0"
-
-mkdir -p /var/lib/minidlna
-append1 /etc/fstab "/var/lib/minidlna" "tmpfs /var/lib/minidlna tmpfs defaults,noatime,nosuid,nodev,noexec,mode=775,uid=minidlna,size=64M 0 0"
-
-mkdir -p /var/cache/samba
-append1 /etc/fstab "/var/cache/samba" "tmpfs /var/cache/samba tmpfs defaults,noatime,nosuid,nodev,noexec,mode=775,size=128M 0 0"
-
-mkdir -p /var/spool/samba
-append1 /etc/fstab "/var/spool/samba" "tmpfs /var/spool/samba tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=128M 0 0"
 
 
 

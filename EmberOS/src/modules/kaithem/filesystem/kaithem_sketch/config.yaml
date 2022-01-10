@@ -2,7 +2,7 @@ site-data-dir: /home/pi/kaithem
 ssl-dir: /home/pi/kaithem/ssl
 save-before-shutdown: yes
 run-as-user: root
-autosave-state: 6 hours
+autosave-state: 2 hours
 worker-threads: 16
 http-thread-pool: 4
 https-thread-pool: 16
@@ -14,5 +14,5 @@ http-port : 8002
 
 audio-paths:
     - /usr/share/tuxpaint/sounds
-    - /var/public.media/
+    - /usr/share/public.media/
     - __default__

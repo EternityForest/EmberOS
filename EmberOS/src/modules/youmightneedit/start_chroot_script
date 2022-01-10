@@ -7,6 +7,13 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmyd
 export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 
 
+# Do these up front,  they will ask for manual intervention.
+# Use plugdev, yes to ax25 to non superusers.
+if [ -z "$EMBER_MICRO" ]
+then
+apt-get -y install solaar xastir
+fi
+
 #This is supposed to improve resolution of windows network services
 sudo apt-get -y install winbind
 
@@ -57,6 +64,7 @@ sudo apt-get update
 
 sudo apt-get -y install v4l-utils
 
+python3 -m pip install -U yt-dlp
 
 # pip3 install flask
 # pip3 install peewee_migrate
@@ -1006,6 +1014,7 @@ pip3 install pyusb
 
 sudo apt-get -y install python3-rtmidi python3-smbus python3-msgpack python3-paho-mqtt python3-gevent python3-falcon python3-mako python3-typeguard python3-paramiko libglib2.0-dev
 
+pip3 install py_cui
 pip3 install zimply
 pip3 install pycryptodome
 pip3 install pynacl
@@ -1041,7 +1050,7 @@ apt-get -y install python3-dev build-essential gcc cmake make libtool m4 autocon
 
 apt-get -y install python3 systemd cython3 build-essential python3-serial cutecom xoscope sigrok sigrok-firmware-fx2lafw 
 apt-get -y install python3-pyqt5 python3-pyqt5.qtsvg python3-pyqt5.qtchart libinput-tools
-apt-get -y install python3-tz python3-babel python3-boto3 python3-dateutil lm-sensors python3-lxml python3-six python3-requests avahi-discover python3-psutil backintime-qt4
+apt-get -y install python3-tz python3-babel python3-boto3 python3-dateutil lm-sensors python3-lxml python3-six python3-requests avahi-discover python3-psutil backintime-qt4 python3-toml
 
 
 #Removed: python3-pyqt5.qtwebkit python3-pyqt5.qtmultimedia python3-pyqt5.qtopengl python3-pyqt5.qtsql python3-pyqt5.qtserialport python3-pyqt5.qtsensors
@@ -1087,7 +1096,7 @@ apt-get -y install qsynth  --no-install-recommends
 
 mkdir -p /usr/share/soundfonts/
 #Use the soundfont that will be in the sketch folder
-ln -s /var/public.files/emberos/SoundFonts/MuseScore_General.sf3 /usr/share/soundfonts/default.sf3
+ln -s /usr/share/public.files/emberos/SoundFonts/MuseScore_General.sf3 /usr/share/soundfonts/default.sf3
 
 systemctl disable bluealsa
 

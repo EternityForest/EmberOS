@@ -2,7 +2,7 @@
 Comment=
 Terminal=false
 Name=Included Media(Music, SFX)
-Exec=pcmanfm /var/public.media/emberos
+Exec=pcmanfm /usr/share/public.media/emberos
 Type=Application
 Icon=gnome-panel-launcher
 Categories=Utility;Education;Audio

@@ -7,14 +7,12 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmyd
 export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 
 #Games
-apt-get -y install mednaffe  brandy bwbasic pinta
+apt-get -y install mednaffe  brandy bwbasic kolourpaint sl cmatrix
 
 if [ -z "$EMBER_MICRO" ]
 then
 apt-get -y install pychess ace-of-penguins ltris
 fi
-
-apt-get -y install cowsay cmatrix
 
 cd /build_cache
 

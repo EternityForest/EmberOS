@@ -53,9 +53,17 @@ apt-get install xserver-xorg-video-dummy
 #Eliminate the apt-daily updates that can't work anyway on read only roots,
 #And were the suspected cause of periodic crashes in real deployments
 sudo systemctl mask apt-daily-upgrade
-sudo systemctl mask apt-daily
+sudo systemctl mask apt-daily.service
+sudo systemctl mask apt-daily.timer
+
+systemctl mask systemd-update-utmp.service
+systemctl mask systemd-random-seed.service
+systemctl disable systemd-update-utmp.service
+systemctl disable systemd-random-seed.service
 sudo systemctl disable apt-daily-upgrade.timer
 sudo systemctl disable apt-daily.timer
+sudo systemctl disable apt-daily.service
+
 systemctl disable resize2fs_once.service 
 
 
@@ -104,15 +112,17 @@ apt-get -y install libc6 libgcc1 libgssapi-krb5-2 libicu67 libssl1.1 libstdc++6 
 
 
 #Enable initramfs which also gives the rescue shell, but mainly we need it to allow BTRFS
-sudo apt-get -y install initramfs-tools btrfs-progs f2fs-tools elinks
+sudo apt-get -y install initramfs-tools btrfs-progs btrfsmaintenance f2fs-tools elinks busybox
 
 
-#We switched to this to hopefully get rid of bad behavior when making lower layers writable for updates.
 apt-get -y install fuse-overlayfs
 
 #Get new kernel(Actually not full upgrade will handle it)
 #sudo apt-get -y install raspberrypi-bootloader rpi-eeprom
 
+
+unpack /filesystem/systemd /etc/systemd/system root
+unpack /filesystem/bin /usr/bin root 
 
 
 
@@ -154,13 +164,12 @@ rm /etc/xdg/lxsession/LXDE-pi/sshpwd.sh
 
 mkdir -p /base_root
 
-# Our upper one can be EXT4.
+# Our upper one can be EXT4.  Note that we use noauto because we do the actual work in the initramfs
 cat << EOF > /etc/fstab
 proc            /proc           proc    defaults          0       0
 UUID=23709a26-1289-4e83-bfe5-2c99d42d276e  /boot           vfat    defaults,noatime,ro          0       2
-UUID=33fc23d5-a31d-45ed-8aec-e85f4fb4a436  /               auto    defaults,noatime,ro,compress  0       1
-UUID=33fc23d5-a31d-45ed-8aec-e85f4fb4a436  /base_root               auto    defaults,noatime,ro,compress  0       1
-UUID=c8dd1d93-222c-42e5-9b03-82c24d2433fd /sketch auto defaults,noatime,nofail 0 0
+UUID=33fc23d5-a31d-45ed-8aec-e85f4fb4a436 / btrfs defaults,ro,noatime,nofail 0 0
+UUID=c8dd1d93-222c-42e5-9b03-82c24d2433fd /sketch ext4 defaults,rw,noatime,noauto 0 1
 tmpfs /media tmpfs  defaults,noatime,nosuid,nodev,noexec,mode=0755,size=1M 0 0
 tmpfs /mnt tmpfs  defaults,noatime,nosuid,nodev,noexec,mode=0755,size=1M 0 0
 EOF
@@ -174,6 +183,7 @@ mkdir -p /sketch/etc
 mkdir -p /sketch/home
 
 
+
 cat << EOF > /etc/fsbindings/emberos-pi-home.yaml
 /sketch/home/pi:
     bindat: /home/pi/
@@ -182,7 +192,7 @@ cat << EOF > /etc/fsbindings/emberos-pi-home.yaml
 __tmpfsoverlay__pi-chrome:
     mode: '700'
     user: pi
-	size: 128M:
+    size: 128M:
     bindat: /home/pi/.config/chromium
 
 __tmpfs__:
@@ -202,13 +212,28 @@ ext4
 EOF
 mkdir -p /usr/src/initramfs/
 
-cat << EOF >  /usr/src/initramfs/init
-#!/bin/busybox sh
+cat << EOF >  /etc/initramfs-tools/scripts/init-bottom/do_overlay.sh
+#!/bin/sh
 
 rescue_shell() {
     echo "Something went wrong. Dropping to a shell."
     exec sh
 }
+
+PREREQ=""
+prereqs()
+{
+   echo "$PREREQ"
+}
+
+case $1 in
+prereqs)
+   prereqs
+   exit 0
+   ;;
+esac
+
+. /scripts/functions
 
 # Mount the /proc and /sys filesystems.
 mount -t proc none /proc
@@ -217,40 +242,75 @@ mount -t sysfs none /sys
 # Do your stuff here.
 echo "EmberOS Initramfs running!"
 
-# Mount the root filesystem. NOTE!!!
-mount -t ext4,btrfs,f2fs -o ro /dev/mmcblk0p2 /mnt/root || rescue_shell
+fsck -p UUID=33fc23d5-a31d-45ed-8aec-e85f4fb4a436
 
-# Mount the Sketch Partition
-mount -t ext4,btrfs,f2fs -o rw,noatime /dev/mmcblk0p3 /mnt/root/sketch || rescue_shell
+# Ember Raw Mode prevents the upper overlay.
+# We run directly on the writable root lower dir.
 
-# Make the individial mounts.  Note that we do not overlay the whole root.  That woold do some recursion loop business that would be confusing, and we need to always be able to see what's in /sketch
-# We have tmpfses but those come later, after this.
+# This is used for customizing an image.
+if [ -f ${rootmnt}/ember-raw-mode ]; then
+    mount -o remount,rw ${rootmnt} || rescue_shell
 
-mkdir -p /mnt/root/sketch/etc/.overlay_work
-mount -t overlay overlay -o lowerdir=/mnt/root/etc,upperdir=/mnt/root/sketch/etc/,workdir=/mnt/root/sketch/etc/.overlay_work /mnt/root/sketch/etc/ || rescue_shell
+else
+    # Mount the Sketch Partition. Should we fail to do this, we go to recovery mode.
+    if mount -t ext4,btrfs,f2fs -o rw,noatime UUID=33fc23d5-a31d-45ed-8aec-e85f4fb4a436 ${rootmnt}/sketch ; then
 
-mkdir -p /mnt/root/sketch/var/.overlay_work
-mount -t overlay overlay -o lowerdir=/mnt/root/var,upperdir=/mnt/root/sketch/var/,workdir=/mnt/root/sketch/var/.overlay_work /mnt/root/sketch/var/ || rescue_shell
+        # Make the individial mounts.  Note that we do not overlay the whole root.  That woold do some recursion loop business that would be confusing, and we need to always be able to see what's in /sketch
+        # We have tmpfses but those come later, after this.
 
-
-mkdir -p /mnt/root/sketch/usr/.overlay_work
-mount -t overlay overlay -o lowerdir=/mnt/root/usr,upperdir=/mnt/root/sketch/usr/,workdir=/mnt/root/sketch/usr/.overlay_work /mnt/root/sketch/usr/ || rescue_shell
-
-mkdir -p /mnt/root/sketch/opt/.overlay_work
-mount -t overlay overlay -o lowerdir=/mnt/root/opt,upperdir=/mnt/root/sketch/opt/,workdir=/mnt/root/sketch/opt/.overlay_work /mnt/root/sketch/opt/ || rescue_shell
-
-mkdir -p /mnt/root/sketch/srv/.overlay_work
-mount -t overlay overlay -o lowerdir=/mnt/root/srv,upperdir=/mnt/root/sketch/srv/,workdir=/mnt/root/sketch/srv/.overlay_work /mnt/root/sketch/srv/ || rescue_shell
+        mkdir -p ${rootmnt}/sketch/etc/
+        mkdir -p ${rootmnt}/sketch/srv/
+        mkdir -p ${rootmnt}/sketch/opt/
+        mkdir -p ${rootmnt}/sketch/home/
+        mkdir -p ${rootmnt}/sketch/usr/
+        mkdir -p ${rootmnt}/sketch/var/
 
 
-# Clean up.
-umount /proc
-umount /sys
+        mkdir -p ${rootmnt}/sketch/.overlay_work/etc
+        mkdir -p ${rootmnt}/sketch/.overlay_work/srv
+        mkdir -p ${rootmnt}/sketch/.overlay_work/usr
+        mkdir -p ${rootmnt}/sketch/.overlay_work/opt
+        mkdir -p ${rootmnt}/sketch/.overlay_work/home
+        mkdir -p ${rootmnt}/sketch/.overlay_work/var
 
-# Boot the real thing.
-exec switch_root /mnt/root /sbin/init || rescue_shell
+        mount -t overlay overlay -o lowerdir=${rootmnt}/etc,upperdir=${rootmnt}/sketch/etc/,workdir=${rootmnt}/sketch/.overlay_work/etc ${rootmnt}/etc/ || rescue_shell
+        mount -t overlay overlay -o lowerdir=${rootmnt}/var,upperdir=${rootmnt}/sketch/var/,workdir=${rootmnt}/sketch/.overlay_work/var ${rootmnt}/var/ || rescue_shell
+        mount -t overlay overlay -o lowerdir=${rootmnt}/usr,upperdir=${rootmnt}/sketch/usr/,workdir=${rootmnt}/sketch/.overlay_work/usr ${rootmnt}/usr/ || rescue_shell
+        mount -t overlay overlay -o lowerdir=${rootmnt}/opt,upperdir=${rootmnt}/sketch/opt/,workdir=${rootmnt}/sketch/.overlay_work/opt ${rootmnt}/opt/ || rescue_shell
+        mount -t overlay overlay -o lowerdir=${rootmnt}/srv,upperdir=${rootmnt}/sketch/srv/,workdir=${rootmnt}/sketch/.overlay_work/srv ${rootmnt}/srv/ || rescue_shell
+        mount -t overlay overlay -o lowerdir=${rootmnt}/home,upperdir=${rootmnt}/sketch/home/,workdir=${rootmnt}/sketch/.overlay_work/home ${rootmnt}/home/ || rescue_shell
+    else
+        echo "You have encountered a bad problem and will probably not go to space today"
+    fi
+
+fi
 EOF
 
+
+# This is from chesty's overlayroot
+# It runs when the initramfs is being built
+#It's job is just to give us the functions we need.
+cat << EOF > /etc/initramfs-tools/hooks/hooks-ember-overlay
+#!/bin/sh
+
+. /usr/share/initramfs-tools/scripts/functions
+. /usr/share/initramfs-tools/hook-functions
+
+
+copy_exec /sbin/blkid
+copy_exec /sbin/mke2fs
+copy_exec /sbin/fsck
+copy_exec /sbin/fsck.f2fs
+copy_exec /sbin/fsck.ext2
+copy_exec /sbin/fsck.ext3
+copy_exec /sbin/fsck.ext4
+copy_exec /bin/fsck.btrfs
+copy_exec /sbin/logsave
+EOF
+
+chmod +x /etc/initramfs-tools/hooks/hooks-ember-overlay
+
+chmod +x /etc/initramfs-tools/scripts/init-bottom/do_overlay.sh
 
 cat << EOF >  /etc/kernel/postinst.d/rpi-initramfs-tools
 #!/bin/bash -e
@@ -284,6 +344,7 @@ if [ -n "$DEB_MAINT_PARAMS" ]; then
 fi
 
 
+mount -o remount,rw /boot
 
 if [ -d "/lib/modules/$1" ]; then
     mkinitramfs -o "/boot/initramfs-emberos.gz" -k $1
@@ -305,19 +366,13 @@ mkinitramfs -o /boot/initramfs-emberos-v7.gz -k ${KERNELNUM}-v7+
 mkinitramfs -o /boot/initramfs-emberos-v7l.gz -k ${KERNELNUM}-v7l+
 
 
-cp /boot/config.txt /tmp/bc
-
-echo "initramfs initramfs-emberos.gz" > /boot/config.txt
-cat /tmp/bc >> /boot/config.txt
-
-
 
 
 
 mkdir -p /sketch
 
 unpack /filesystem/sketch /sketch
-unpack /filesystem/public.files /var/public.files
+unpack /filesystem/public.files /usr/share/public.files
 
 
 apt-get -y install ntfs-3g git
@@ -397,8 +452,8 @@ cat << EOF > /var/www/html/index.html
 <p>You can of course exit back to the shell with Alt+F4.</p>
 
 <h3>Links to content on this server:</h3>
-<a href="/public_files">Public shared files(Including clipart, sfx,books,etc at /var/public.files)</a><br>
-<a href="/public_media">Public shared media(/var/public.media)</a><br>
+<a href="/public_files">Public shared files(Including clipart, sfx,books,etc at /usr/share/public.files)</a><br>
+<a href="/public_media">Public shared media(/usr/share/public.media)</a><br>
 <a href="/public_files/emberos/webapps/falstad-simulator-offline-html5/src/circuitjs.html">HTML5 Circuit Simulator</a><br>
 <a href="/public_files/emberos/webapps/htck-Bayeux/index.html">Historic tale construction kit</a><br>
 <a href="/public_files/emberos/webapps/miniPaint-master/index.html">Image Editor(In browser)</a><br>
@@ -603,8 +658,7 @@ systemctl enable /etc/systemd/system/manage_sketch_folder.service
 
 
 
-unpack /filesystem/systemd /etc/systemd/system root
-unpack /filesystem/bin /usr/bin root 
+
 
 chmod 744 /etc/systemd/system/fs_bindings.service
 chmod 744 /usr/bin/fs_bindings.py
@@ -738,26 +792,26 @@ mkdir -p /home/pi/.arduino15/logs
 
 #Give pi a place to share public stuff, if desired.  We will handle this later with
 #a mountpoint.
-mkdir -p /var/public.files/pi
-mkdir -p /var/public.media/pi
+mkdir -p /usr/share/public.files/pi
+mkdir -p /usr/share/public.media/pi
 
 
-mkdir -p /var/public.media/Pictures
-mkdir -p /var/public.media/Music
-mkdir -p /var/public.media/Videos
+mkdir -p /usr/share/public.media/Pictures
+mkdir -p /usr/share/public.media/Music
+mkdir -p /usr/share/public.media/Videos
 
 #The mountpoint
-mkdir -p /var/public.media/
-mkdir -p /var/public.files/
+mkdir -p /usr/share/public.media/
+mkdir -p /usr/share/public.files/
 
 mkdir -p /home/pi/Music/
 mkdir -p /home/pi/Pictures/
 mkdir -p /home/pi/Videos/
 
 #Make the example files more discoverable
-ln -s /var/public.media/Music/  "/home/pi/Music/sketch.public"
-ln -s /var/public.media/Pictures/  "/home/pi/Pictures/sketch.public"
-ln -s /var/public.media/Videos/  "/home/pi/Videos/sketch.public"
+ln -s /usr/share/public.media/Music/  "/home/pi/Music/sketch.public"
+ln -s /usr/share/public.media/Pictures/  "/home/pi/Pictures/sketch.public"
+ln -s /usr/share/public.media/Videos/  "/home/pi/Videos/sketch.public"
 
 
 
@@ -801,7 +855,7 @@ unpack /filesystem/home/pi /home/pi pi
 unpack /filesystem/home/root /root root
 unpack /filesystem/boot /boot root
 unpack /filesystem/bin /usr/bin root
-unpack /filesystem/public.files /var/public.files root
+unpack /filesystem/public.files /usr/share/public.files root
 unpack /filesystem/boot /boot root
 
 echo "This is an example module, install and set up what you need here!"
@@ -858,7 +912,7 @@ cat << EOF > /etc/shells
 EOF
 
 
-sudo apt-get -y install lolcat figlet cowsay
+sudo apt-get -y install lolcat cowsay
 
 cat << EOF > /home/pi/.nanorc
 set linenumbers
@@ -873,7 +927,7 @@ cat << EOF > /home/pi/.vimrc
 " Modified From: https://github.com/AGnias47/UtilityScripts/blob/master/bash/vimrc
 
 if &compatible
-	set nocompatible
+    set nocompatible
 endif
 
 " Turn on filetype detection
@@ -929,8 +983,254 @@ mkdir -p /home/pi/.config/neofetch/
 cp /filesystem/neofetch.conf /home/pi/.config/neofetch/config.conf
 
 
-cat << EOF > /etc/xonshrc
-\$PROMPT= "{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{curr_branch: {}}{RESET} {BOLD_BLUE}{prompt_end}{RESET}"
+
+#--------------------------------------------Make random numbers stay random
+if [ ! -h /var/lib/systemd/random-seed ] ; then
+#This one is actually kind of important for security, so we have a special service just for faking it.
+rm -f /var/lib/systemd/random-seed
+ln -s /run/random-seed /var/lib/systemd/random-seed
+fi
+
+#This is a pregenerated block of randomness used to enhance the security of the randomness we generate at boot.
+#This is really not needed, we generate enough at boot, but since we don't save any randomness at shutdown anymore,
+#we might as well.
+
+#Note that it is useless here because it is a fixed known thing, this was originally a script run directly on the pi.
+touch /etc/unique-random-supplement
+chmod 700  /etc/unique-random-supplement
+echo "Generating random numbers, this might be a while."
+
+#Use hwrng if possible. If that exists, generate 128 bytes just because we can
+if [ -e /dev/hwrng ] ; then
+dd bs=1 count=256 if=/dev/hwrng  of=/etc/unique-random-supplement >/dev/null
+else
+dd bs=1 count=32 if=/dev/random  of=/etc/unique-random-supplement >/dev/null
+fi
+echo "Generated random numbers"
+
+
+
+
+
+####---------------------------Install boot script. This is our new entropy source-------------------
+
+chmod 744 /usr/bin/embedtools_service.sh
+chmod 744 /etc/systemd/system/embedtools.service
+
+systemctl enable embedtools.service
+
+
+
+###-----------------------------------------No systemd profiling storage stuff-----------------------
+#Disable systemd services. We can keep the random seed one because we get there first and shim it.
+! systemctl disable systemd-readahead-collect.service
+! systemctl disable systemd-readahead-replay.service
+
+# Given a filename, a regex pattern to match and a string:
+# If found, no change, else append space + string to last line --
+# this is used for the single-line /boot/cmdline.txt file.
+append2() {
+    if grep $2 $1 >/dev/null; then
+        echo
+    else
+        # Not found; insert in file before EOF
+        sed -i "s/\'/ $3/g" $1
+    fi
+}
+
+# Add fastboot, noswap and/or ro to end of /boot/cmdline.txt
+append2 /boot/cmdline.txt fastboot fastboot
+append2 /boot/cmdline.txt noswap noswap
+
+append2 /boot/cmdline.txt ro^o^t ro
+
+
+# Move /var/spool to /tmp
+rm -rf /var/spool
+ln -s /tmp /var/spool
+
+# Move /var/lib/lightdm and /var/cache/lightdm to /tmp
+rm -rf /var/lib/lightdm
+rm -rf /var/cache/lightdm
+ln -s /tmp /var/lib/lightdm
+ln -s /tmp /var/cache/lightdm
+
+# Given a filename, a regex pattern to match and a replacement string:
+# If found, perform replacement, else append file w/replacement on new line.
+replaceAppend() {
+    if grep $2 $1 >/dev/null; then
+        # Pattern found; replace in file
+        sed -i "s/$2/$3/g" $1 >/dev/null
+    else
+        # Not found; append on new line (silently)
+        echo $3 | sudo tee -a $1 >/dev/null
+    fi
+}
+replace() {
+    if grep $2 $1 >/dev/null; then
+        # Pattern found; replace in file
+        sed -i "s/$2/$3/g" $1 >/dev/null
+    fi
+}
+
+replaceAppend /etc/ssh/sshd_config "^.*UsePrivilegeSeparation.*$" "UsePrivilegeSeparation no"
+# bbro method (not working in Jessie?):
+#rmdir /var/run/sshd
+#ln -s /tmp /var/run/sshd
+
+# Change spool permissions in var.conf (rondie/Margaret fix)
+replace /usr/lib/tmpfiles.d/var.conf "spool\s*0755" "spool 1777"
+
+# Obsolete: Move dhcpd.resolv.conf to tmpfs. Why would you not use resolvconf?
+
+#Set up symlinks in case we have dhcpcd5
+if [ ! -h /var/lib/dhcpcd5 ] ; then
+mkdir -p /var/lib/dchp
+ln -s /var/lib/dhcp /var/lib/dhcpcd5
+fi
+
+
+#This has to exist, supervisord won't make it apparently. Not a fan!
+mkdir -p /var/log/supervisor
+
+# This also has to exist or systemd login thingy pitches a fit
+mkdir -p /var/lib/systemd/linger
+
+# Make edits to fstab
+
+##They should already have /run and /var/lock covered
+
+# make / ro
+# tmpfs /var/log tmpfs nodev,nosuid 0 0
+# tmpfs /var/tmp tmpfs nodev,nosuid 0 0
+# tmpfs /tmp     tmpfs nodev,nosuid 0 0
+
+# and "just a few" a few others....
+
+
+# We don't want any logging happening before we are able to get this mount up.
+chmod 555 /var/log/
+# Rest of the compile still needs access to logging
+mount -t tmpfs -o size=32M tmpfs /var/log/
+
+
+apt-get remove -y --force-yes --purge triggerhappy dphys-swapfile fake-hwclock
+
+cat << EOF > /etc/fsbindings/emberos-misc-ramdisks.yaml
+
+__tmpfsoverlay__varcacheminidlna:
+    bindat: /var/cache/minidlna
+    mode: '755'
+    user: minidlna
+    size: 128M
+
+__tmpfsoverlay__varlibminidlna:
+    bindat: /var/lib/minidlna
+    mode: '755'
+    user: minidlna
+    size: 128M
+
+__tmpfsoverlay__varcachesamba:
+    bindat: /var/cache/samba
+    mode: '755'
+    user: root
+    size: 128M
+
+__tmpfsoverlay__varspoolsamba:
+    bindat: /var/spool/samba
+    mode: '1777'
+    user: root
+    size: 128M
+
+__tmpfsoverlay__varlog:
+    bindat: /var/log/
+    mode: '755'
+    user: root
+    size: 32M
+
+__tmpfs__:
+    bindat: /var/tmp/
+    mode: '1777'
+    user: root
+    size: 256M
+
+__tmpfs__:
+    bindat: /tmp/
+    mode: '1777'
+    user: root
+    size: 256M
+
+__tmpfs__:
+    bindat: /var/lib/lightdm
+    mode: '1777'
+    user: root
+    size: 256M
+
+__tmpfs__:
+    bindat: /var/cache/lightdm
+    mode: '1777'
+    user: root
+    size: 256M
+
+__tmpfs__:
+    bindat: /var/lib/ntp
+    mode: '755'
+    user: root
+    size: 1M
+
+__tmpfs__:
+    bindat: /var/lib/chrony
+    mode: '755'
+    user: root
+    size: 1M
+
+__tmpfs__:
+    bindat: /var/lib/systemd
+    mode: '755'
+    user: root
+    size: 8M
+
+__tmpfs__:
+    bindat: /public.tmp
+    mode: '1777'
+    user: root
+    size: 32M
+
+__tmpfs__:
+    bindat: /var/lib/logrotate
+    mode: '755'
+    user: root
+    size: 32M
+
+__tmpfs__:
+    bindat: /var/lib/sudo
+    mode: '700'
+    user: root
+    size: 8MB
+
+
+__tmpfs__:
+    bindat: /var/lib/pulse
+    mode: '755'
+    user: root
+    size: 8MB
+
+__tmpfs__:
+    bindat: /var/lib/dhcp
+    mode: '755'
+    user: root
+    size: 8MB
+
+__tmpfs__:
+    bindat: /var/lib/NetworkManager
+    mode: '755'
+    user: root
+    size: 8MB
+
+_tmpfs__:
+    bindat: /var/lib/rfkill
+    mode: '755'
+    user: root
+    size: 8MB
+
 EOF
-
-

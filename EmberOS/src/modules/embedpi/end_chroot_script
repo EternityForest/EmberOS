@@ -23,10 +23,7 @@ ldconfig
 ! rm /etc/machine-id
 
 
-# Make unwritable till the mounts get there
-chmod 555 /var/tmp
 
-chown -R pi /sketch/home/pi
 
 mkdir -p /sketch/etc/NetworkManager/system-connections
 rsync -avz /etc/NetworkManager/system-connections/ /sketch/etc/NetworkManager/system-connections/
@@ -46,3 +43,15 @@ mkdir /boot/sketch.factory
 
 # Template just to record what was initially in sketch for easy factory resetting.
 rsync -avz /sketch/ /boot/sketch.factory/
+
+# This is supposed to be unique
+! rm /etc/machine-id
+
+
+# Make unwritable till the mounts get there
+chmod 555 /var/tmp
+chmod 555 /tmp
+chown -R pi /sketch/home/pi
+
+chown -R pi /home/pi
+chown root /sketch
