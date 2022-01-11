@@ -80,6 +80,9 @@ sed -i '/23709a26-1289-4e83-bfe5-2c99d42d276e/c\/dev/mmcblk0p1  /boot           
 # sed -i '/c8dd1d93-222c-42e5-9b03-82c24d2433fd/c\/dev/mmcblk0p3 /sketch auto defaults,noatime,nofail,fmask=027,dmask=027,umask=027 0 1' workspace/postprocess_root/etc/fstab
 
 
+
+mkdir -p workspace/postprocess_sketch/default
+
 #Copy the sketch stuff from the master image
 rsync -az workspace/original_root/sketch/ workspace/postprocess_sketch/
 
@@ -90,7 +93,6 @@ chown root workspace/postprocess_root/sketch
 
 
 #Now transfer the actual files over, into the dirs marked for compression
-rsync -az --ignore-existing sketch_included_data/sketch/ workspace/postprocess_sketch/
 rsync -az --ignore-existing sketch_included_data/root/ workspace/postprocess_root/
 
 #No, I do not have the slightest idea why all attempts to fix this in the actual build fail.

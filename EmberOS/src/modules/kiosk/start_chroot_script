@@ -23,9 +23,9 @@ cat << EOF > /etc/X11/Xsession
 ERRFILE=/dev/null
 EOF
 
-mkdir -p /sketch/home/pi/.config/autostart/
+mkdir -p /sketch/profiles/default/home/pi/.config/autostart/
 
-cat << EOF > /sketch/home/pi/.config/autostart/ember-kiosk.desktop
+cat << EOF > /sketch/profiles/default/home/pi/.config/autostart/ember-kiosk.desktop
 [Desktop Entry]
 Name=EmberDefaultKiosk
 Type=Application
@@ -34,7 +34,7 @@ Terminal=false
 EOF
 
 
-cat << EOF > /sketch/home/pi/.config/autostart/unclutter.desktop
+cat << EOF > /sketch/profiles/default/home/pi/.config/autostart/unclutter.desktop
 [Desktop Entry]
 Name=Unclutter
 Type=Application

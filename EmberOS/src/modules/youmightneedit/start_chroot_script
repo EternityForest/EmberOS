@@ -1014,7 +1014,6 @@ pip3 install pyusb
 
 sudo apt-get -y install python3-rtmidi python3-smbus python3-msgpack python3-paho-mqtt python3-gevent python3-falcon python3-mako python3-typeguard python3-paramiko libglib2.0-dev
 
-pip3 install py_cui
 pip3 install zimply
 pip3 install pycryptodome
 pip3 install pynacl
