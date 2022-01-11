@@ -755,9 +755,8 @@ unpack /filesystem/root /
 #In their place in the layering of mounts
 cat << EOF > /usr/bin/writable
 #!/bin/bash
-mount -o remount,rw,noatime /dev/mmcblk0p1 /boot
-mount -o remount,rw,noatime /dev/mmcblk0p3 /sketch
-mount -o remount,rw,noatime /dev/mmcblk0p2 /base_root
+mount -o remount,rw,noatime /boot
+mount -o remount,rw,noatime /sketch
 EOF
 
 cat << EOF > /usr/bin/readonly
