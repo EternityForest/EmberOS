@@ -148,29 +148,28 @@ See the torrent files folder!
 
 ## Building(Need linux)
 
-Clone this repo with all submodules
+Clone this repo with all submodules.   Install eatmydata and duperemove.
 
 Put a fresh zipped raspbian full image in the src/images dir
 
 Run sudo eatmydata ./build_dist in the src dir. This may take over an hour, and 
-you need internet access the whole time.  Eatmydata isn't necessary but speeds everything up a lot.
+you need internet access the whole time, but almost all large downloads are cached between builds.
 
-You will need to put the proper deb package at filesystem/debs/voice2json_2.0_armhf.deb in the youmightneedit module.
-Get it here: http://voice2json.org/install.html
+You will be asked two questions.  One is should non-superusers have access to AX25 ham radio interfaces, and another
+is whether to use plugdev for solaar.  Answer yes to both
 
+ Eatmydata isn't necessary but speeds everything up a lot.
 
 Unpack latest Included Data torrent's sketch folder over to src/sketch_included_data/sketch.
 
-Now run the postprocess script inside src.
+Now run the postprocess_dist.sh script inside src.
 
 You will find the postprocessed file in the workspace. You will then need to rename it to whatever you want, and you should
 be ready to flash!
 
+This image will be around 12GB.  To make a smaller one(It is exactly the same, just without the resource pack),
+use the postprocess_dist_mini.sh instead. The resulting image will be 7.2GB.
 
-## Building the Micro Edition
-
-sudo ./build_dist micro_variant
-Use the micro variant postprocess script.
 
 
 ### Apps

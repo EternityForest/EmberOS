@@ -238,7 +238,7 @@ chown root /etc/initramfs-tools/hooks/hooks-ember-overlay
 
 chmod +x /etc/initramfs-tools/scripts/init-bottom/do_overlay.sh
 
-cp filesystem/initramfs_build_hook.sh  /etc/kernel/postinst.d/rpi-initramfs-tools
+cp /filesystem/initramfs_build_hook.sh  /etc/kernel/postinst.d/rpi-initramfs-tools
 
 chown root /etc/kernel/postinst.d/rpi-initramfs-tools
 

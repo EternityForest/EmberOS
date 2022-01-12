@@ -25,15 +25,15 @@ git reset --hard
 
 git remote set-url origin https://github.com/EternityForest/KaithemAutomation.git
 
-rsync -avz /opt/kaithem/kaithem/var/  /sketch/home/pi/kaithem/
+rsync -avz /opt/kaithem/kaithem/var/  /home/pi/kaithem/
 
-unpack /filesystem/kaithem_sketch/ /sketch/home/pi/kaithem/ pi
+unpack /filesystem/kaithem_sketch/ /home/pi/kaithem/ pi
 
 unpack /filesystem/systemd/ /usr/lib/systemd/system/ pi
 
 #Remove dummy keys so the user can add them if missing
-! rm  /sketch/home/pi/kaithem/ssl/certificate.key
-! rm  /sketch/home/pi/kaithem/certificate.cert
+! rm  /home/pi/kaithem/ssl/certificate.key
+! rm  /home/pi/kaithem/certificate.cert
 
 #chmod 755 -R /opt/kaithem/
 
@@ -42,8 +42,8 @@ git rm --cached -r .
 git reset --hard
 
 
-mkdir -p    /sketch/home/pi/kaithem/system.mixer
-cat << EOF >   /sketch/home/pi/kaithem/system.mixer/jacksettings.yaml
+mkdir -p    /home/pi/kaithem/system.mixer
+cat << EOF >   /home/pi/kaithem/system.mixer/jacksettings.yaml
 {jackDevice: '', jackMode: use, jackPeriodSize: 512, jackPeriods: 3, sharePulse: 'off',
   usbLatency: -1, usbPeriodSize: 512, usbPeriods: 3, usbQuality: 0, useAdditionalSoundcards: 'no'}
 EOF

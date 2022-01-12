@@ -1,11 +1,10 @@
-
 set -e
 set -x
 
 mkdir -p workspace/postprocess
 ! rm workspace/postprocess/emberos_postprocessed.img
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmydata
-export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmydata
+LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 echo "postprocessing `ls -t workspace/*.img | head -1`"
 
 ORIGINAL_LOOP=$(losetup -P -r --find --show `ls -t workspace/*.img | head -1`)
@@ -72,7 +71,7 @@ rsync -az --exclude='sketch/*' --exclude='/tmp/*' --exclude='/var/tmp/*' workspa
 
 
 # Make some space by fixing about 1GiB (Prob more like 300MB compressed) of duplicates.
-rmlint --types="duplicates" --config=sh:handler=clone workspace/original_root/ workspace/postprocess_root/
+eatmydata duperemove -rd workspace/postprocess_root/
 
 sed -i '/23709a26-1289-4e83-bfe5-2c99d42d276e/c\/dev/mmcblk0p1  /boot           vfat    defaults,noatime,ro          0       0' workspace/postprocess_root/etc/fstab
 
@@ -99,6 +98,8 @@ rsync -az --ignore-existing sketch_included_data/root/ workspace/postprocess_roo
 rsync -az --ignore-existing sketch_included_data/mime/ workspace/postprocess_root/usr/share/mime/
 chmod -R 755 workspace/postprocess_root/usr/share/mime/
 
+# Another dedupe pass because we can.
+eatmydata duperemove -rd workspace/postprocess_root/
 
 cd workspace/postprocess_sketch/
 

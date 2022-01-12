@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+renice -n 18 $$
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export DIST_PATH=${DIR}
