@@ -25,24 +25,19 @@ ldconfig
 
 
 
-mkdir -p /sketch/etc/NetworkManager/system-connections
-rsync -avz /etc/NetworkManager/system-connections/ /sketch/etc/NetworkManager/system-connections/
+mkdir -p /sketch/profiles/default/etc/NetworkManager/system-connections
+rsync -avz /etc/NetworkManager/system-connections/ /sketch/profiles/default/etc/NetworkManager/system-connections/
 
-cp /etc/hostname /sketch/etc/hostname
-cp /etc/hosts /sketch/etc/hosts
+cp /etc/hostname /sketch/profiles/default/etc/hostname
+cp /etc/hosts /sketch/profiles/default/etc/hosts
 
 
 
-mkdir -p /sketch/home/pi/kaithem
-mkdir -p /sketch/etc/ember-autostart
-mkdir -p /sketch/var/www/html
+mkdir -p /sketch/profiles/default/home/pi/kaithem
+mkdir -p /sketch/profiles/default/etc/ember-autostart
+mkdir -p /sketch/profiles/default/var/www/html
 
-rsync -avz /etc/ember-autostart/ /sketch/etc/ember-autostart/
-
-mkdir /boot/sketch.factory
-
-# Template just to record what was initially in sketch for easy factory resetting.
-rsync -avz /sketch/ /boot/sketch.factory/
+rsync -avz /etc/ember-autostart/ /sketch/profiles/default/etc/ember-autostart/
 
 # This is supposed to be unique
 ! rm /etc/machine-id
@@ -51,7 +46,7 @@ rsync -avz /sketch/ /boot/sketch.factory/
 # Make unwritable till the mounts get there
 chmod 555 /var/tmp
 chmod 555 /tmp
-chown -R pi /sketch/home/pi
+chown -R pi /sketch/profiles/default/home/pi
 
 chown -R pi /home/pi
 chown root /sketch

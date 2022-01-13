@@ -7,4 +7,4 @@ export DIST_PATH=${DIR}
 export CUSTOM_PI_OS_PATH=${DIR}/../CustomPiOS/src
 export PATH=$PATH:$CUSTOM_PI_OS_PATH
 
-${CUSTOM_PI_OS_PATH}/build_custom_os $@
+eatmydata tmux -c ${CUSTOM_PI_OS_PATH}/build_custom_os $@

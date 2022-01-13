@@ -40,7 +40,7 @@ if [ -f ${rootmnt}/ember-raw-mode ]; then
 
 else
     # Mount the Sketch Partition. Should we fail to do this, we go to recovery mode.
-    if mount -t ext4,btrfs,f2fs -o ro,noatime UUID=33fc23d5-a31d-45ed-8aec-e85f4fb4a436 ${rootmnt}/sketch ; then
+    if mount -t ext4,btrfs,f2fs -o ro,noatime UUID=c8dd1d93-222c-42e5-9b03-82c24d2433fd ${rootmnt}/sketch ; then
 
 
         # We have a file to trigger menu loading, otherwise we use the load profile file
@@ -54,7 +54,7 @@ else
         if [ "$SELECTEDPROFILE" = "__raw_base_image__" ]; then
           mount -o remount,rw ${rootmnt} || rescue_shell
         else
-            
+            SELECTEDPROFILE = ${rootmnt}/sketch/profiles/$SELECTEDPROFILE
             # We have a special flag that makes a profile 100% volatile
             if [ -f ${SELECTEDPROFILE}/volatile-overlay ]; then
                 echo "Volatile profile"

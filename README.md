@@ -152,13 +152,13 @@ Clone this repo with all submodules.   Install eatmydata and duperemove.
 
 Put a fresh zipped raspbian full image in the src/images dir
 
-Run sudo eatmydata ./build_dist in the src dir. This may take over an hour, and 
+Run sudo eatmydata tmux -c ./build_dist in the src dir. This may take over an hour, and 
 you need internet access the whole time, but almost all large downloads are cached between builds.
 
 You will be asked two questions.  One is should non-superusers have access to AX25 ham radio interfaces, and another
 is whether to use plugdev for solaar.  Answer yes to both
 
- Eatmydata isn't necessary but speeds everything up a lot.
+Eatmydata isn't necessary but speeds everything up a lot.  The tmux attempts protects your disk from 60GB of wear should the terminal log the output in a very inefficient way as some do.
 
 Unpack latest Included Data torrent's sketch folder over to src/sketch_included_data/sketch.
 

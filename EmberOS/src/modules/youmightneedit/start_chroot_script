@@ -83,7 +83,7 @@ python3 -m pip install -U yt-dlp
 #Mega GUI apps
 if [ -z "$EMBER_MICRO" ]
 then
-apt-get -y install audacious audacious-plugins tuxguitar zeal inkscape filezilla gimp pulseview qdirstat gwenview skanlite solaar
+apt-get -y install audacious audacious-plugins tuxguitar zeal inkscape filezilla gimp pulseview qdirstat gthumb skanlite solaar
 ! apt-get -y install fbreader
 fi
 

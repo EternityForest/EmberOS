@@ -71,7 +71,7 @@ rsync -az --exclude='sketch/*' --exclude='/tmp/*' --exclude='/var/tmp/*' workspa
 
 
 # Make some space by fixing about 1GiB (Prob more like 300MB compressed) of duplicates.
-eatmydata duperemove -rd workspace/postprocess_root/
+eatmydata tmux -c "duperemove -rd workspace/postprocess_root/"
 
 sed -i '/23709a26-1289-4e83-bfe5-2c99d42d276e/c\/dev/mmcblk0p1  /boot           vfat    defaults,noatime,ro          0       0' workspace/postprocess_root/etc/fstab
 
@@ -99,7 +99,7 @@ rsync -az --ignore-existing sketch_included_data/mime/ workspace/postprocess_roo
 chmod -R 755 workspace/postprocess_root/usr/share/mime/
 
 # Another dedupe pass because we can.
-eatmydata duperemove -rd workspace/postprocess_root/
+eatmydata tmux -c "duperemove -rd workspace/postprocess_root/"
 
 cd workspace/postprocess_sketch/
 
