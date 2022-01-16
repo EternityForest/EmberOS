@@ -24,10 +24,16 @@ esac
 mount -t proc none /proc
 mount -t sysfs none /sys
 
+if [ -f ${rootmnt}/ember-initramfs-debug ]; then
+    rescue_shell
+else
+
+
 # Do your stuff here.
 echo "EmberOS Initramfs running!"
 
-fsck -p UUID=33fc23d5-a31d-45ed-8aec-e85f4fb4a436
+#Fsck the EXT4 sketch partition
+fsck -p UUID=c8dd1d93-222c-42e5-9b03-82c24d2433fd
 
 # Ember Raw Mode prevents the upper overlay.
 # We run directly on the writable root lower dir.
@@ -101,7 +107,7 @@ else
                 mkdir -p /overlay/upper
                 mkdir -p /overlay/work
                 mkdir -p /overlay/lower
-                mount -t overlay overlay -olowerdir=/overlay/lower,upperdir=/overlay/upper,workdir=/overlay/work ${rootmnt}
+                mount -t overlay overlay -o lowerdir=/overlay/lower,upperdir=/overlay/upper,workdir=/overlay/work ${rootmnt}
             fi
 
             # Another special flag lets us define profile-specific initramfs loading.

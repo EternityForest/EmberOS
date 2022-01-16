@@ -862,6 +862,23 @@ cat << EOF > /home/pi/.xonshrc
 neofetch | lolcat
 genfortune | cowsay | lolcat
 echo
+
+import os
+import math
+import time
+import base64
+
+@events.on_postcommand
+def display_command_status(cmd, rtn, out, ts):
+    duration = ts[1] - ts[0]
+    $RIGHT_PROMPT = ("✅" if rtn==0 else "❌")+' '+str(round(duration,3))+"s"
+
+$RIGHT_PROMPT = "🌱"        
+
+@events.on_post_prompt
+def display_post_prompt():
+    $RIGHT_PROMPT = "🌱"
+
 EOF
 
 mkdir -p /home/pi/.config/neofetch/ 
