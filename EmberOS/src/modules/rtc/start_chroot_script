@@ -11,10 +11,12 @@ unpack /filesystem/systemd /etc/systemd/system/ root
 unpack /filesystem/bin /bin/ root
 
 
-chmod 744 /lib/udev/hwclock-set
-chmod 744 /bin/rtcsync.sh
-chmod 744 /etc/systemd/system/rtcsync.timer
-chmod 744 /etc/systemd/system/rtcsync.service
+chmod 755 /lib/udev/hwclock-set
 
-systemctl enable rtcsync.timer
-systemctl enable rtcsync.service
+# This is not needed, chrony does that for us
+# chmod 755 /bin/rtcsync.sh
+# chmod 744 /etc/systemd/system/rtcsync.timer
+# chmod 744 /etc/systemd/system/rtcsync.service
+
+# systemctl enable rtcsync.timer
+# systemctl enable rtcsync.service

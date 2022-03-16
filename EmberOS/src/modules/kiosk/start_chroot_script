@@ -18,10 +18,40 @@ unpack /filesystem/pi /home/pi
 # sudo apt-get -y install libgles2-mesa libgles2-mesa-dev xorg-dev
 
 
-# Big offender for wrecking down your disk with writes
-cat << EOF > /etc/X11/Xsession
-ERRFILE=/dev/null
+sudo apt-get -y install meson
+
+if [ ! -f /build_cache/suru-icon-theme ]; then
+   cd /build_cache
+   git clone --depth 1 https://github.com/snwh/suru-icon-theme.git
+fi
+
+cd /build_cache/suru-icon-theme
+
+# build
+meson "build" --prefix=/usr
+# install
+sudo ninja -C "build" install
+
+cp /build_cache/suru-icon-theme/COPYING /usr/share/icons/Suru
+cp /build_cache/suru-icon-theme/README.md /usr/share/icons/Suru
+
+
+
+# Xsession errors is a big offender for wrecking down your disk with writes
+sed -i s/'ERRFILE=\$HOME\/\.xsession\-errors'/'ERRFILE\=\/var\/log\/\$USER\-xsession\-errors'/g /etc/X11/Xsession
+
+cat << EOF > /etc/logrotate.d/xsession
+/var/log/pi-xsession-errors {
+  rotate 2 
+  weekly
+  compress
+  missingok
+  notifempty
+}
 EOF
+! rm  /home/pi/.xsession-errors
+# Make it look like it's in the same place so we can get to it easily
+ln -s /var/log/pi-xsession-errors /home/pi/.xsession-errors
 
 mkdir -p /sketch/profiles/default/home/pi/.config/autostart/
 
@@ -32,6 +62,16 @@ Type=Application
 Exec=/usr/bin/chromium-browser http://localhost --window-size=1920,1080 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null --autoplay-policy=no-user-gesture-required --no-default-browser-check --disk-cache-size=96000000 --no-first-run --simulate-outdated-no-au='Tue, 31 Dec 2099 23:59:59 GMT' &
 Terminal=false
 EOF
+
+cat << EOF > /sketch/profiles/default/home/pi/.config/autostart/ember-autorestart-kiosk.desktop
+[Desktop Entry]
+Name=EmberAutoRestartKiosk
+Type=Application
+Exec=  bash -c "while :;  /usr/bin/chromium-browser http://localhost --window-size=1920,1080 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null --autoplay-policy=no-user-gesture-required --no-default-browser-check --disk-cache-size=96000000 --no-first-run --simulate-outdated-no-au='Tue, 31 Dec 2099 23:59:59 GMT'; done"
+Terminal=false
+Hidden=true
+EOF
+
 
 
 cat << EOF > /sketch/profiles/default/home/pi/.config/autostart/unclutter.desktop

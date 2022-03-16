@@ -11,36 +11,36 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmyd
 export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 
 
+
+sudo apt-get -y install tor
+systemctl disable tor.service
+
+
 #Mesh neetworking!!!
 sudo apt-get -y install dirmngr
 #gpg --fetch-keys https://neilalexander.s3.dualstack.eu-west-2.amazonaws.com/deb/key.txt
 #gpg --export 569130E8CA20FBC4CB3FDE555898470A764B32C9 | sudo apt-key add -
 sudo cp /filesystem/569130E8CA20FBC4CB3FDE555898470A764B32C9.pubkey /etc/apt/trusted.gpg.d/yggdrasil.gpg
 echo 'deb http://neilalexander.s3.dualstack.eu-west-2.amazonaws.com/deb/ debian yggdrasil' | sudo tee /etc/apt/sources.list.d/yggdrasil.list
+sudo apt update
 
-sudo apt-get -y update
-
-
+apt-get -y install yggdrasil
 
 # Don't even think about setting this up without
 # some serious firewalling(See below, but we still should probably not enable this by default for various reasons)
 ! systemctl disable yggdrasil
 
-echo "Dummy file, only used as mountpoint" > /etc/yggdrasil.conf
-chmod 700 /etc/yggdrasil.conf
+! rm /etc/yggdrasil.conf
 
-#Manually do everything to avoind the postinst script
-groupadd --system --force yggdrasil 
-#Install after the dummy file, not before
-cd /tmp
-apt-get download yggdrasil
-sudo dpkg --unpack yggdrasil*.deb
-sudo rm /var/lib/dpkg/info/yggdrasil.postinst -f
-sudo dpkg --configure yggdrasil
-sudo apt-get install -yf #To fix dependencies
 
 mkdir -p /boot/networks/
 cp /filesystem/networks/wifi /boot/networks/boot_dir_wifi
+
+
+
+
+
+
 
 #This will let u set up networks from /boot as well as /sketch
 cat << 'EOF' > /bin/ember-copy-boot-net.sh
@@ -70,8 +70,16 @@ EOF
 systemctl enable ember-copy-boot-net.service
 
 
+# This little piece of old garbage crashes everything when it sees you have switched to networkmanager and can't find it's stuff,
+# because it still runs and fills ram with log files.
+apt-get -y remove dhcpcd-gtk
 
 apt-get -y install network-manager libnss3-tools ca-certificates nftables firewalld avahi-daemon avahi-utils radvd
+
+apt-get -y install network-manager-gnome
+
+systemctl disable wpa_supplicant.service
+systemctl mask wpa_supplicant.service
 
 systemctl enable NetworkManager.service
 unpack /filesystem/networkmanager /etc/NetworkManager root
@@ -137,6 +145,11 @@ unpack /filesystem/avahi /etc/avahi/ root
 # Which one? Both? Seems to work!
 ! systemctl disable dhcpcd.service
 ! systemctl disable dhcpcd5.service
+! systemctl mask dhcpcd.service
+! systemctl mask dhcpcd5.service
+
+! sudo apt purge -y openresolv
+! sudo apt purge -y dhcpcd5
 
 mkdir -p /sketch/profiles/default/etc/NetworkManager/system-connections
 unpack /filesystem/networks /sketch/profiles/default/etc/NetworkManager/system-connections/ root

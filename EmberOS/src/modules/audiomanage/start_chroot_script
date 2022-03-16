@@ -313,3 +313,10 @@ jack.properties = {
 }
 
 EOF
+
+cat << EOF > /etc/pipewire/media-session.d/bluez-monitor.conf
+properties = {
+    bluez5.msbc-support = true
+    bluez5.sbc-xq-support = true
+}
+EOF

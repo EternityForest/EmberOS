@@ -18,7 +18,8 @@ cat << EOF > /etc/chrony/chrony.conf
 
 # Welcome to the chrony configuration file. See chrony.conf(5) for more
 # information about usuable directives.
-pool 2.debian.pool.ntp.org iburst
+pool 2.debian.pool.ntp.org iburst maxpoll 11
+
 
 # This directive specify the location of the file containing ID/key pairs for
 # NTP authentication.

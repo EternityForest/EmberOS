@@ -56,13 +56,19 @@ if mount | grep "/var/log type tmpfs"; then
 fi
 
 
-mkdir -p /var/lib/systemd/linger
 ###--------------------------------Samba shimming-----------------------------
 mkdir -p /tmp/samba
 mkdir -p /tmp/cache
 mkdir -p /tmp/cache/samba
 mkdir -p /var/log/samba
 
+
+## --------------------------- Morse shimming---------------------------------
+#This has to exist, supervisord won't make it apparently. Not a fan!
+mkdir -p /var/log/supervisor
+
+# This also has to exist or systemd login thingy pitches a fit
+mkdir -p /var/lib/systemd/linger
 ###-------------------------------Mosquitto shimming---------------------------
 mkdir -p /var/log/mosquitto
 #In case the user doesn't actually exist

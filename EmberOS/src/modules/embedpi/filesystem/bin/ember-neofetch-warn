@@ -1,0 +1,5 @@
+#!/bin/bash
+throttled="$(vcgencmd get_throttled)"
+if [[ $throttled != "throttled=0x0" ]]; then
+    echo "throttled"
+fi

@@ -1,0 +1,28 @@
+neofetch
+genfortune | cowsay | lolcat
+echo
+
+import os
+import math
+import time
+import base64
+
+aliases['ls']=['ls', '-aFh', '--color=auto']
+aliases['grep']=['grep', '--color=auto']
+aliases['cp']=['cp', '-i']
+aliases['mv']=['mv', '-i']
+aliases['rm']=['rm', '-Iv']
+aliases['mkdir']=['mkdir', '-p']
+aliases['sl']=['sl', '-e']
+
+
+@events.on_postcommand
+def display_command_status(cmd, rtn, out, ts):
+    duration = ts[1] - ts[0]
+    $RIGHT_PROMPT = ("✅" if rtn==0 else "❌")+' '+str(round(duration,3))+"s"
+
+$RIGHT_PROMPT = "🌱"        
+
+@events.on_post_prompt
+def display_post_prompt():
+    $RIGHT_PROMPT = "🌱"

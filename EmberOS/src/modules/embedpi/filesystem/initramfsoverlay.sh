@@ -1,5 +1,5 @@
 #!/bin/sh
-
+set -x
 rescue_shell() {
     echo "Something went wrong. Dropping to a shell."
     exec sh
@@ -25,8 +25,8 @@ mount -t proc none /proc
 mount -t sysfs none /sys
 
 if [ -f ${rootmnt}/ember-initramfs-debug ]; then
-    rescue_shell
-else
+    exec sh
+fi
 
 
 # Do your stuff here.
@@ -37,8 +37,6 @@ fsck -p UUID=c8dd1d93-222c-42e5-9b03-82c24d2433fd
 
 # Ember Raw Mode prevents the upper overlay.
 # We run directly on the writable root lower dir.
-
-
 
 # This is used for customizing an image.
 if [ -f ${rootmnt}/ember-raw-mode ]; then
@@ -53,14 +51,20 @@ else
         if [ -f ${rootmnt}/sketch/show-menu ]; then
             SELECTEDPROFILE=$(dialog --dselect ${rootmnt}/sketch/profiles/default 25 25  --output-fd 1)
         else
-            SELECTEDPROFILE=`cat ${rootmnt}/sketch/load-profile`
+            #Default.  We should be able to start even from a totally empty /sketch
+            if [ -f ${rootmnt}/sketch/load-profile ]; then
+                SELECTEDPROFILE=`cat ${rootmnt}/sketch/load-profile`
+            else
+                SELECTEDPROFILE="default"
+            fi
         fi
 
         # This is a special option just for dropping right into the raw base BTRFS image.
         if [ "$SELECTEDPROFILE" = "__raw_base_image__" ]; then
           mount -o remount,rw ${rootmnt} || rescue_shell
         else
-            SELECTEDPROFILE = ${rootmnt}/sketch/profiles/$SELECTEDPROFILE
+
+            SELECTEDPROFILE=${rootmnt}/sketch/profiles/$SELECTEDPROFILE
             # We have a special flag that makes a profile 100% volatile
             if [ -f ${SELECTEDPROFILE}/volatile-overlay ]; then
                 echo "Volatile profile"
@@ -69,7 +73,6 @@ else
         
             
                 mkdir -p "${SELECTEDPROFILE}"
-
 
                 # Make the individial mounts.  Note that we do not overlay the whole root.  That wold do some recursion loop business that would be confusing, and we need to always be able to see what's in /sketch
                 # We have tmpfses but those come later, after this.
@@ -92,12 +95,12 @@ else
                 mkdir -p "${SELECTEDPROFILE}/.overlay_work/var"
             fi
 
-            mount -t overlay overlay -o "lowerdir=${rootmnt}/etc,upperdir=${SELECTEDPROFILE}/etc/,workdir=${SELECTEDPROFILE}/.overlay_work/etc" ${rootmnt}/etc/ || rescue_shell
-            mount -t overlay overlay -o "lowerdir=${rootmnt}/var,upperdir=${SELECTEDPROFILE}/var/,workdir=${SELECTEDPROFILE}/.overlay_work/var" ${rootmnt}/var/ || rescue_shell
-            mount -t overlay overlay -o "lowerdir=${rootmnt}/usr,upperdir=${SELECTEDPROFILE}/usr/,workdir=${SELECTEDPROFILE}/.overlay_work/usr" ${rootmnt}/usr/ || rescue_shell
-            mount -t overlay overlay -o "lowerdir=${rootmnt}/opt,upperdir=${SELECTEDPROFILE}/opt/,workdir=${SELECTEDPROFILE}/.overlay_work/opt" ${rootmnt}/opt/ || rescue_shell
-            mount -t overlay overlay -o "lowerdir=${rootmnt}/srv,upperdir=${SELECTEDPROFILE}/srv/,workdir=${SELECTEDPROFILE}/.overlay_work/srv" ${rootmnt}/srv/ || rescue_shell
-            mount -t overlay overlay -o "lowerdir=${rootmnt}/home,upperdir=${SELECTEDPROFILE}/home/,workdir=${SELECTEDPROFILE}/.overlay_work/home" ${rootmnt}/home/ || rescue_shell
+            mount -t overlay overlay -o "noatime,lowerdir=${rootmnt}/etc,upperdir=${SELECTEDPROFILE}/etc/,workdir=${SELECTEDPROFILE}/.overlay_work/etc" ${rootmnt}/etc/ || rescue_shell
+            mount -t overlay overlay -o "noatime,lowerdir=${rootmnt}/var,upperdir=${SELECTEDPROFILE}/var/,workdir=${SELECTEDPROFILE}/.overlay_work/var" ${rootmnt}/var/ || rescue_shell
+            mount -t overlay overlay -o "noatime,lowerdir=${rootmnt}/usr,upperdir=${SELECTEDPROFILE}/usr/,workdir=${SELECTEDPROFILE}/.overlay_work/usr" ${rootmnt}/usr/ || rescue_shell
+            mount -t overlay overlay -o "noatime,lowerdir=${rootmnt}/opt,upperdir=${SELECTEDPROFILE}/opt/,workdir=${SELECTEDPROFILE}/.overlay_work/opt" ${rootmnt}/opt/ || rescue_shell
+            mount -t overlay overlay -o "noatime,lowerdir=${rootmnt}/srv,upperdir=${SELECTEDPROFILE}/srv/,workdir=${SELECTEDPROFILE}/.overlay_work/srv" ${rootmnt}/srv/ || rescue_shell
+            mount -t overlay overlay -o "noatime,lowerdir=${rootmnt}/home,upperdir=${SELECTEDPROFILE}/home/,workdir=${SELECTEDPROFILE}/.overlay_work/home" ${rootmnt}/home/ || rescue_shell
         
             
             # We have a special flag that makes a profile 100% volatile
@@ -119,5 +122,4 @@ else
     else
         echo "You have encountered a bad problem and will probably not go to space today"
     fi
-
 fi

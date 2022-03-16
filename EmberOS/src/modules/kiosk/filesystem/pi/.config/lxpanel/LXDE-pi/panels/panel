@@ -2,12 +2,12 @@
 # Use preference dialog in lxpanel to adjust config when you can.
 
 Global {
-  edge=top
+  edge=bottom
   align=left
   margin=0
   widthtype=percent
   width=100
-  height=36
+  height=32
   transparent=0
   tintcolor=#000000
   alpha=0
@@ -21,7 +21,7 @@ Global {
   usefontsize=0
   background=0
   backgroundfile=/usr/share/lxpanel/images/background.png
-  iconsize=36
+  iconsize=28
   monitor=0
   point_at_menu=0
 }
@@ -110,61 +110,6 @@ Plugin {
   }
 }
 Plugin {
-  type=space
-  Config {
-    Size=2
-  }
-}
-Plugin {
-  type=bluetooth
-  Config {
-  }
-}
-Plugin {
-  type=space
-  Config {
-    Size=2
-  }
-}
-Plugin {
-  type=dhcpcdui
-  Config {
-  }
-}
-Plugin {
-  type=space
-  Config {
-    Size=2
-  }
-}
-Plugin {
-  type=volumepulse
-  Config {
-  }
-}
-Plugin {
-  type=space
-  Config {
-    Size=2
-  }
-}
-Plugin {
-  type=dclock
-  Config {
-    ClockFmt=%R
-    TooltipFmt=%A %x
-    BoldFont=0
-    IconOnly=0
-    CenterText=1
-  }
-}
-Plugin {
-  type=space
-  Config {
-    Size=2
-  }
-}
-Plugin {
   type=ptbatt
   Config {
   }
@@ -178,5 +123,20 @@ Plugin {
 Plugin {
   type=magnifier
   Config {
+  }
+}
+Plugin {
+  type=volume
+  Config {
+  }
+}
+Plugin {
+  type=dclock
+  Config {
+    ClockFmt=%R
+    TooltipFmt=%A %x
+    BoldFont=0
+    IconOnly=0
+    CenterText=1
   }
 }

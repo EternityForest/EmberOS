@@ -14,6 +14,16 @@ source /common.sh
 install_cleanup_trap
 
 
+# This can't be used inside the chroot.
+mv /bin/udevadm /bin/udevadm-hidden
+
+cat << EOF > /bin/udevadm
+#!/bin/bash
+echo dummy
+EOF
+
+chmod 755 /bin/udevadm
+
 
 sudo apt-get -y install eatmydata
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmydata
@@ -44,7 +54,8 @@ yarn config set cache-folder /build_cache/yarncache
 
 
 # Give option to make some things work headless
-apt-get install -y xserver-xorg-video-dummy
+# xterm is just a basic terminal in case more complex ones break, and to use for auto-opening things in a lighter terminal
+apt-get install -y xserver-xorg-video-dummy xterm
 apt-get install -y dialog
 
 #Disable the feature that automatically starts the setup wizard, this would be bad for kiosk use.
@@ -66,6 +77,13 @@ sudo systemctl disable apt-daily.service
 
 systemctl disable resize2fs_once.service 
 
+# These apparrently do a lot of disk reads. That's bad to have randomly happen when disk is an SD card.
+systemctl disable man-db.service 
+systemctl disable man-db.timer
+
+
+#I find your lack of faith in systemd disturbing
+sudo apt-get -y purge rsyslog
 
 # We just have SSH on by default
 systemctl disable sshswitch.service
@@ -96,15 +114,17 @@ mount -t tmpfs -o size=10M tmpfs /proc
 
 #Ye olde dotte nette runnetyme
 
+# We no longer have the SDK or the ASP.net becayuse we are moving away from AgentDVR which was the original reason to include it.
+
 cd /build_cache
 wget -nc https://download.visualstudio.microsoft.com/download/pr/283d08e5-e71b-404d-869c-e6ad820ade07/b46930dd45fd4d898c7f904fe33e566e/dotnet-runtime-3.1.21-linux-arm.tar.gz
-wget -nc https://download.visualstudio.microsoft.com/download/pr/9092f467-8a52-482b-9295-6870e0e7fa73/a1474c461720fee5d82ba8efcd7ea3ce/aspnetcore-runtime-3.1.21-linux-arm.tar.gz
+# wget -nc https://download.visualstudio.microsoft.com/download/pr/9092f467-8a52-482b-9295-6870e0e7fa73/a1474c461720fee5d82ba8efcd7ea3ce/aspnetcore-runtime-3.1.21-linux-arm.tar.gz
 mkdir -p /opt/dotnet
 tar zxf dotnet-runtime-3.1.21-linux-arm.tar.gz -C /opt/dotnet
-tar zxf aspnetcore-runtime-3.1.21-linux-arm.tar.gz -C /opt/dotnet
+#tar zxf aspnetcore-runtime-3.1.21-linux-arm.tar.gz -C /opt/dotnet
 
-wget -nc https://download.visualstudio.microsoft.com/download/pr/e401b906-4681-437b-a1c5-21a2d7e0f83c/824371926ae334ac264b91d8234b350c/dotnet-sdk-3.1.415-linux-arm.tar.gz
-tar zxf dotnet-sdk-3.1.415-linux-arm.tar.gz -C /opt/dotnet
+# wget -nc https://download.visualstudio.microsoft.com/download/pr/e401b906-4681-437b-a1c5-21a2d7e0f83c/824371926ae334ac264b91d8234b350c/dotnet-sdk-3.1.415-linux-arm.tar.gz
+# tar zxf dotnet-sdk-3.1.415-linux-arm.tar.gz -C /opt/dotnet
 
 
 
@@ -165,6 +185,8 @@ rm /etc/xdg/lxsession/LXDE-pi/sshpwd.sh
 mkdir -p /base_root
 
 # Our upper one can be EXT4.  Note that we use noauto because we do the actual work in the initramfs
+# This is just the core system things.  We have more tmpfses in the fsbindings.  We do them there
+# because some are actually overlays
 cat << EOF > /etc/fstab
 proc            /proc           proc    defaults          0       0
 UUID=23709a26-1289-4e83-bfe5-2c99d42d276e  /boot           vfat    defaults,noatime,ro          0       2
@@ -172,6 +194,14 @@ UUID=33fc23d5-a31d-45ed-8aec-e85f4fb4a436 / btrfs defaults,ro,noatime,nofail 0 0
 UUID=c8dd1d93-222c-42e5-9b03-82c24d2433fd /sketch ext4 defaults,rw,noatime,noauto 0 1
 tmpfs /media tmpfs  defaults,noatime,nosuid,nodev,noexec,mode=0755,size=1M 0 0
 tmpfs /mnt tmpfs  defaults,noatime,nosuid,nodev,noexec,mode=0755,size=1M 0 0
+tmpfs /tmp tmpfs  defaults,noatime,nosuid,nodev,mode=1777,size=256M 0 0
+tmpfs    /var/log    tmpfs    defaults,noatime,nosuid,mode=0755,size=128M    0 0
+tmpfs    /var/lib/logrotate    tmpfs    defaults,noatime,nosuid,mode=0755,size=32m    0 0
+tmpfs    /var/lib/sudo    tmpfs    defaults,noatime,nosuid,mode=0700,size=8m    0 0
+tmpfs    /var/lib/systemd    tmpfs    defaults,noatime,nosuid,mode=0755,size=64m    0 0
+tmpfs   /var/lib/chrony    tmpfs    defaults,noatime,nosuid,mode=0755,size=8m    0 0
+tmpfs    /var/tmp    tmpfs    defaults,noatime,nosuid,mode=1777,size=128M    0 0
+tmpfs    /var/lib/NetworkManager    tmpfs    defaults,noatime,nosuid,mode=0700,size=64M    0 0
 EOF
 
 mkdir -p /sketch/profiles/default
@@ -191,14 +221,22 @@ cat << EOF > /etc/fsbindings/emberos-pi-home.yaml
 __tmpfsoverlay__pi-chrome:
     mode: '700'
     user: pi
-    size: 128M:
+    size: 128M
     bindat: /home/pi/.config/chromium
 
-__tmpfs__:
+__tmpfs__arduinologspi:
     bindat: /home/pi/.arduino15/logs
     size: 24M
 EOF
 
+
+cat << EOF > /etc/systemd/journald.conf
+[Journal]                                                                                                                                                                                                                                                                                                                       
+Storage=volatile
+Seal=no
+SystemMaxUse=24M
+RuntimeMaxUse=24M
+EOF
 
 cat << EOF > /etc/initramfs-tools/modules
 btrfs
@@ -213,6 +251,8 @@ EOF
 cp /filesystem/initramfsoverlay.sh /etc/initramfs-tools/scripts/init-bottom/do_overlay.sh
 
 mkdir -p /sketch/profiles/__raw_base_image__
+echo "This profile is not a real profile, selecting it runs directly on the raw base" > /sketch/profiles/__raw_base_image__/README.md
+
 
 echo "default" > /sketch/load-profile
 
@@ -264,21 +304,13 @@ unpack /filesystem/sketch /sketch
 unpack /filesystem/public.files /usr/share/public.files
 
 
-apt-get -y install ntfs-3g git
+apt-get -y install ntfs-3g git git-lfs
 #Very important!!! Fuse and Fuse3 have a horrible incompatibility because of -o nonempty
 apt-get -y install bindfs fuse3
 #Needed for reading config files
 apt-get -y install python3-yaml
 
 
-#Without this we have all kinds of issues doing startx
-apt-get -y install xserver-xorg-legacy
-#Allow non-console startx, needed to make kiosk browsing work
-#This has to be AFTER the xserver-xorg-legacy to work
-sed -i \
-    's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
-
-echo "needs_root_rights=yes" >> /etc/X11/Xwrapper.config
 
 #The special /sketch partition is for everything that is not part of the image. It is made after the fact.
 mkdir -p /sketch
@@ -324,7 +356,7 @@ cat << EOF > /usr/lib/systemd/system.conf.d/20-emberos-watchdog.conf
 # total system crashes
 [Manager]
 RuntimeWatchdogSec=15
-ShutdownWatchdogSec=45min
+ShutdownWatchdogSec=120
 EOF
 
 
@@ -435,11 +467,10 @@ cat << 'EOF' > /usr/bin/manage_sketch_folder.sh
 #This script generates nonexistant keys, and
 #Also moves keys into the special tmpfs just for those keys.
 
+dbus-uuidgen --ensure=/etc/machine-id
+
 #It also binds apache's www stuff
 set -e
-
-
-dbus-uuidgen --ensure=/etc/machine-id
 
 
 mkdir -p /dev/shm/roothome
@@ -469,13 +500,28 @@ if [ ! -f /etc/ssh/root/authorized_keys ]; then
     touch /etc/ssh/root/authorized_keys
 fi
 
-mount -t overlay -o lowerdir=/root,upperdir=/dev/shm/roothome,workdir=/dev/shm/roothome_work overlay /root
 
 
 
 #We want to be robust against someone deleting that file
 if [ ! -f /etc/yggdrasil.conf ]; then
 ! yggdrasil -genconf -json > /etc/yggdrasil.conf
+fi
+
+
+
+if [ ! -f /etc/ember-local-ca/emberCA.key ] ; then
+mkdir -p /etc/ember-local-ca/
+chmod 700 /etc/ember-local-ca/
+mkdir -p /etc/ember-local-ca-cert
+
+######################
+# Become a Certificate Authority
+######################
+# Generate private key
+openssl genrsa -out /etc/ember-local-ca/emberCA.key 2048
+# Generate root certificate
+openssl req -x509 -new -nodes -key /etc/ember-local-ca/emberCA.key -sha256 -days 825 -out /etc/ember-local-ca/emberCA.pem -subj "/C=US/ST=Washington/L=Seattle/O=EmberOS Autogen/OU=A Bash Script/CN=localhost"
 fi
 
 
@@ -498,18 +544,18 @@ if [ ! -f /home/pi/kaithem/ssl/certificate.key ] ; then
     openssl req -nodes -new -key localhost.key -out localhost.csr -subj "/C=US/ST=Washington/L=Seattle/O=EmberOS Autogen/OU=A Bash Script/CN=localhost"
 
     # Create a config file for the extensions
-    cat << 'EOF2' > localhost.ext
-    authorityKeyIdentifier=keyid,issuer
-    basicConstraints=CA:FALSE
-    keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
-    subjectAltName = @alt_names
-    [alt_names]
-    DNS.1 = localhost # Be sure to include the domain name here because Common Name is not so commonly honoured by itself
-    DNS.2 = *.localhost # Optionally, add additional domains (I've added a subdomain here)
-    IP.1 = 127.0.0.1 # Optionally, add an IP address (if the connection which you have planned requires it)
-    EOF2
+cat << 'EOF2' > localhost.ext
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = localhost # Be sure to include the domain name here because Common Name is not so commonly honoured by itself
+DNS.2 = *.localhost # Optionally, add additional domains (I've added a subdomain here)
+IP.1 = 127.0.0.1 # Optionally, add an IP address (if the connection which you have planned requires it)
+EOF2
     # Create the signed certificate
-    openssl x509 -req -in localhost.csr -CA /etc/ember.private/emberCA.pem -CAkey /etc/ember.private/emberCA.key -CAcreateserial \
+    openssl x509 -req -in localhost.csr -CA /etc/ember-local-ca/emberCA.pem -CAkey /etc/ember-local-ca/emberCA.key -CAcreateserial \
     -out localhost.crt -days 825 -sha256 -extfile localhost.ext
 
     mv localhost.key /home/pi/kaithem/ssl/certificate.key
@@ -519,8 +565,18 @@ if [ ! -f /home/pi/kaithem/ssl/certificate.key ] ; then
 fi
 EOF
 
-chmod 744 /usr/bin/manage_sketch_folder.sh
+chmod 755 /usr/bin/manage_sketch_folder.sh
+chmod 755 /usr/bin/ember-neofetch-warn
 
+
+cat << EOF > /home/pi/.gitconfig
+[filter "lfs"]
+        smudge = git-lfs smudge -- %f
+        process = git-lfs filter-process
+        required = true
+        clean = git-lfs clean -- %f
+
+EOF
 
 cat << EOF > /etc/systemd/system/manage_sketch_folder.service
 [Unit]
@@ -550,12 +606,12 @@ systemctl enable /etc/systemd/system/manage_sketch_folder.service
 
 
 chmod 744 /etc/systemd/system/fs_bindings.service
-chmod 744 /usr/bin/fs_bindings.py
+chmod 755 /usr/bin/fs_bindings.py
 systemctl enable /etc/systemd/system/fs_bindings.service
 
 
-chmod 744 /etc/systemd/system/serviceconfig.service
-chmod 744 /usr/bin/serviceconfig.py
+chmod 755 /etc/systemd/system/serviceconfig.service
+chmod 755 /usr/bin/serviceconfig.py
 systemctl enable /etc/systemd/system/serviceconfig.service
 
 
@@ -577,9 +633,9 @@ mkdir -p /etc/chromium/
 # for bad things, and they're on your lan.. you've already lost.  And it is fairly obviously a shady looking url.
 cat << EOF > /etc/chromium/policies/recommended/emberos-policy.json
 {
-  "AudioCaptureAllowedUrls": ["http://localhost","http://localhost:8002"],
-  "VideoCaptureAllowedUrls": ["http://localhost","http://localhost:8002"],
-  "AutoplayWhitelist":       ["http://localhost","http://localhost:8002", "http://localhost:1880", "http://*.local"],
+  "AudioCaptureAllowedUrls": ["http://localhost","http://localhost:8002","http://localhost:8001"],
+  "VideoCaptureAllowedUrls": ["http://localhost","http://localhost:8002","http://localhost:8001"],
+  "AutoplayWhitelist":       ["http://localhost","http://localhost:8002", "http://localhost:8001","http://localhost:1880", "http://*.local"],
   "OverrideSecurityRestrictionsOnInsecureOrigin": ["*.override-insecure-http.local","override-insecure-http.local"]
 
 }
@@ -799,7 +855,7 @@ EOF
 
 sudo apt-get -y install lolcat cowsay
 
-cat << EOF > /home/pi/.nanorc
+cat << EOF > /etc/nanorc
 set linenumbers
 set mouse
 set tabsize 4
@@ -857,29 +913,8 @@ set showmode
 EOF
 
 
-cat << EOF > /home/pi/.xonshrc
-\$PROMPT= "{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{curr_branch: {}}{RESET} {BOLD_BLUE}{prompt_end}{RESET}"
-neofetch | lolcat
-genfortune | cowsay | lolcat
-echo
+cat /filesystem/xonshrc > /home/pi/.xonshrc
 
-import os
-import math
-import time
-import base64
-
-@events.on_postcommand
-def display_command_status(cmd, rtn, out, ts):
-    duration = ts[1] - ts[0]
-    $RIGHT_PROMPT = ("✅" if rtn==0 else "❌")+' '+str(round(duration,3))+"s"
-
-$RIGHT_PROMPT = "🌱"        
-
-@events.on_post_prompt
-def display_post_prompt():
-    $RIGHT_PROMPT = "🌱"
-
-EOF
 
 mkdir -p /home/pi/.config/neofetch/ 
 cp /filesystem/neofetch.conf /home/pi/.config/neofetch/config.conf
@@ -888,7 +923,7 @@ cp /filesystem/neofetch.conf /home/pi/.config/neofetch/config.conf
 
 #--------------------------------------------Make random numbers stay random
 if [ ! -h /var/lib/systemd/random-seed ] ; then
-#This one is actually kind of important for security, so we have a special service just for faking it.
+#This one is actually kind of important for security, so we have a special service just for faking it using the HWRNG
 rm -f /var/lib/systemd/random-seed
 ln -s /run/random-seed /var/lib/systemd/random-seed
 fi
@@ -898,6 +933,8 @@ fi
 #we might as well.
 
 #Note that it is useless here because it is a fixed known thing, this was originally a script run directly on the pi.
+#Kept fror consistency and because it still has very minor utility in confusing attacks by people who never find out which ember image
+#you are running on.
 touch /etc/unique-random-supplement
 chmod 700  /etc/unique-random-supplement
 echo "Generating random numbers, this might be a while."
@@ -916,8 +953,10 @@ echo "Generated random numbers"
 
 ####---------------------------Install boot script. This is our new entropy source-------------------
 
-chmod 744 /usr/bin/embedtools_service.sh
+chmod 755 /usr/bin/embedtools_service.sh
+chown root /usr/bin/embedtools_service.sh
 chmod 744 /etc/systemd/system/embedtools.service
+chown root /etc/systemd/system/embedtools.service
 
 systemctl enable embedtools.service
 
@@ -947,15 +986,8 @@ append2 /boot/cmdline.txt noswap noswap
 append2 /boot/cmdline.txt ro^o^t ro
 
 
-# Move /var/spool to /tmp
-rm -rf /var/spool
-ln -s /tmp /var/spool
 
-# Move /var/lib/lightdm and /var/cache/lightdm to /tmp
-rm -rf /var/lib/lightdm
-rm -rf /var/cache/lightdm
-ln -s /tmp /var/lib/lightdm
-ln -s /tmp /var/cache/lightdm
+
 
 # Given a filename, a regex pattern to match and a replacement string:
 # If found, perform replacement, else append file w/replacement on new line.
@@ -992,11 +1024,7 @@ ln -s /var/lib/dhcp /var/lib/dhcpcd5
 fi
 
 
-#This has to exist, supervisord won't make it apparently. Not a fan!
-mkdir -p /var/log/supervisor
 
-# This also has to exist or systemd login thingy pitches a fit
-mkdir -p /var/lib/systemd/linger
 
 # Make edits to fstab
 
@@ -1019,6 +1047,26 @@ mount -t tmpfs -o size=32M tmpfs /var/log/
 apt-get remove -y --force-yes --purge triggerhappy dphys-swapfile fake-hwclock
 
 cat << EOF > /etc/fsbindings/emberos-misc-ramdisks.yaml
+
+__tmpfsoverlay__varliblightdm:
+    bindat: /var/lib/lightdm
+    mode: '1777'
+    user: lightdm
+    size: 128M
+
+__tmpfsoverlay__varcachelightdm:
+    bindat: /var/cache/lightdm
+    mode: '1777'
+    user: lightdm
+    size: 128M
+
+__tmpfsoverlay__varlibminidlna:
+    bindat: /var/lib/minidlna
+    mode: '755'
+    user: minidlna
+    size: 128M
+
+
 
 __tmpfsoverlay__varcacheminidlna:
     bindat: /var/cache/minidlna
@@ -1044,92 +1092,33 @@ __tmpfsoverlay__varspoolsamba:
     user: root
     size: 128M
 
-__tmpfsoverlay__varlog:
-    bindat: /var/log/
-    mode: '755'
-    user: root
-    size: 32M
 
-__tmpfs__:
-    bindat: /var/tmp/
-    mode: '1777'
-    user: root
-    size: 256M
-
-__tmpfs__:
-    bindat: /tmp/
-    mode: '1777'
-    user: root
-    size: 256M
-
-__tmpfs__:
-    bindat: /var/lib/lightdm
-    mode: '1777'
-    user: root
-    size: 256M
-
-__tmpfs__:
-    bindat: /var/cache/lightdm
-    mode: '1777'
-    user: root
-    size: 256M
-
-__tmpfs__:
+__tmpfs__ntp:
     bindat: /var/lib/ntp
     mode: '755'
     user: root
     size: 1M
 
-__tmpfs__:
-    bindat: /var/lib/chrony
-    mode: '755'
-    user: root
-    size: 1M
-
-__tmpfs__:
-    bindat: /var/lib/systemd
-    mode: '755'
-    user: root
-    size: 8M
-
-__tmpfs__:
+__tmpfs__publictmp:
     bindat: /public.tmp
     mode: '1777'
     user: root
     size: 32M
 
-__tmpfs__:
-    bindat: /var/lib/logrotate
-    mode: '755'
-    user: root
-    size: 32M
 
-__tmpfs__:
-    bindat: /var/lib/sudo
-    mode: '700'
-    user: root
-    size: 8MB
-
-
-__tmpfs__:
+__tmpfs__varlibpulse:
     bindat: /var/lib/pulse
     mode: '755'
     user: root
     size: 8MB
 
-__tmpfs__:
+__tmpfs__dhcp:
     bindat: /var/lib/dhcp
     mode: '755'
     user: root
     size: 8MB
 
-__tmpfs__:
-    bindat: /var/lib/NetworkManager
-    mode: '755'
-    user: root
-    size: 8MB
-
-_tmpfs__:
+_tmpfs__rfkill:
     bindat: /var/lib/rfkill
     mode: '755'
     user: root

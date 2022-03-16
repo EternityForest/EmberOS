@@ -323,7 +323,12 @@ append1() {
 #Bind to /etc
 cat << EOF > /etc/fsbindings/emberos-smbcfg.yaml
 __tmpfsoverlay__SAMBA:
-  bindat: 
+  bindat: /var/lib/samba
   user: root
-  mode: "0700"
+  mode: "0755"
+
+__tmpfsoverlay__SAMBACache:
+  bindat: /var/cache/samba
+  user: root
+  mode: "0755"
 EOF

@@ -35,7 +35,7 @@ unpack /filesystem/systemd/ /usr/lib/systemd/system/ pi
 ! rm  /home/pi/kaithem/ssl/certificate.key
 ! rm  /home/pi/kaithem/certificate.cert
 
-#chmod 755 -R /opt/kaithem/
+chmod 755 /opt/kaithem/kaithem/kaithem.py
 
 cd /opt/kaithem/
 git rm --cached -r .

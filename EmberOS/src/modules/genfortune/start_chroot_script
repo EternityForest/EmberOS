@@ -10,3 +10,7 @@ cp /filesystem/GenFortune/Fortune\ Files/*.frtn /usr/share/genfortune
 cp /filesystem/GenFortune/genfortune.py /usr/bin/genfortune
 chmod -R 755 /usr/share/genfortune
 chmod 755 /usr/bin/genfortune
+
+
+# Be semi-compatible with the original
+ln -s /usr/bin/genfortune /usr/bin/fortune

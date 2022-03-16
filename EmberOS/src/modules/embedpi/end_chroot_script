@@ -41,7 +41,7 @@ rsync -avz /etc/ember-autostart/ /sketch/profiles/default/etc/ember-autostart/
 
 # This is supposed to be unique
 ! rm /etc/machine-id
-
+touch /etc/machine-id
 
 # Make unwritable till the mounts get there
 chmod 555 /var/tmp
@@ -50,3 +50,6 @@ chown -R pi /sketch/profiles/default/home/pi
 
 chown -R pi /home/pi
 chown root /sketch
+
+# Undo what we did.
+mv /bin/udevadm-hidden /bin/udevadm
