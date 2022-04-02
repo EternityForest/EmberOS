@@ -99,7 +99,9 @@ sudo cp /usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf /e
 su -c 'XDG_RUNTIME_DIR="/run/user/$UID" DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus" systemctl --user  disable pulseaudio.socket' pi
 
 su -c 'XDG_RUNTIME_DIR="/run/user/$UID" DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus" systemctl --user  disable pulseaudio.service' pi
-su -c 'XDG_RUNTIME_DIR="/run/user/$UID" DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus" systemctl --user enable  pipewire-pulse' pi
+
+# Can't get this to work. Leave it off and things will use the ALSA virtual device it makes.
+su -c 'XDG_RUNTIME_DIR="/run/user/$UID" DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus" systemctl --user disable  pipewire-pulse' pi
 
 
 

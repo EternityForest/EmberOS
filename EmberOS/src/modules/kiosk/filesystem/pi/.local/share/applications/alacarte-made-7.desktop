@@ -1,7 +1,7 @@
 [Desktop Entry]
 Comment=May take a minute to launch
 Terminal=true
-Name=Launch KaithemAutomation Daemon as Root
+Name=Launch KaithemAutomation Daemon
 Exec=lxterminal -e sudo systemctl start kaithem
 Type=Application
 Icon=gnome-panel-launcher

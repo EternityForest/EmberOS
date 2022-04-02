@@ -6,7 +6,7 @@ RequiresMountsFor=/etc/ /sketch/
 
 [Service]
 TimeoutStartSec=0
-ExecStart=/usr/bin/serviceconfig.py
+ExecStart=/usr/bin/python3 /usr/bin/serviceconfig.py
 Type=simple
 
 [Install]

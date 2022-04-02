@@ -6,7 +6,7 @@ Type=simple
 
 [Service]
 TimeoutStartSec=0
-ExecStart=pw-jack /opt/kaithem/kaithem/kaithem.py -c /home/pi/kaithem/config.yaml
+ExecStart=/usr/bin/bash -o pipefail -c /usr/bin/ember-launch-kaithem
 Restart=on-failure
 RestartSec=15
 OOMScoreAdjust=-800
@@ -31,9 +31,6 @@ LimitRTPRIO= 95
 LimitNICE= -20
 LimitMEMLOCK= infinity
 
-
-StandardOutput=journal
-StandardError=journal
 
 [Install]
 WantedBy=multi-user.target

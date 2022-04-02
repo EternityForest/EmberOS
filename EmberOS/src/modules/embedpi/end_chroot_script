@@ -2,6 +2,8 @@
 
 usermod --shell /usr/bin/xonsh pi
 
+usermod -a -G plugdev pi
+
 
 rm -rf /tmp/*
 rm -rf /var/tmp/*

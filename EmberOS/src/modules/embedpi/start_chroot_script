@@ -36,6 +36,10 @@ sudo apt update
 
 #Cache pip3 downloading.
 mkdir -p /build_cache/pip3
+mkdir -p /build_cache/pip3/http
+mkdir -p /build_cache/pip3/wheels
+chown -R root /build_cache/pip3
+
 mkdir -p /root/.cache/pip
 mount --bind /build_cache/pip3 /root/.cache/pip
 
@@ -93,7 +97,8 @@ systemctl disable sshswitch.service
 ! sudo usermod -a -G pulse-access pi
 ! sudo usermod -a -G bluetooth pi
 ! sudo usermod -a -G audio pi
-
+! sudo usermod -a -G plugdev pi
+usermod -aG rtkit pi
 
 #Force IPv4 for apt updates until such a time as ipv6 is supported everywhere.
 echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99-force-ipv4
@@ -111,7 +116,44 @@ mkdir -p /proc
 mount -t tmpfs -o size=10M tmpfs /proc
 
 
+# Apt update just the stuff that is likely to break or be a big problem if not updated.
 
+cat << EOF >> /etc/systemd/user/ember-update.timer
+[Unit]
+Description=EmberOS minimal updater, just the stuff that will break without it
+RefuseManualStart=no # Allow manual starts
+RefuseManualStop=no # Allow manual stops 
+
+[Timer]
+#Execute job if it missed a run due to machine being off
+Persistent=true
+OnCalendar=*-*-01 02:00:00
+Unit=ember-update.service
+
+[Install]
+WantedBy=timers.target
+EOF
+
+cat << EOF >> /etc/systemd/user/ember-update.service
+[Unit]
+Description=EmberOS minimal updater, just the stuff that will break without it
+[Service] 
+
+Type=simple
+ExecStart=/bin/bash /usr/bin/ember-update.sh
+Type=oneshot
+EOF
+
+cat << EOF >> /usr/bin/ember-update.sh
+#!/bin/bash
+apt update
+apt install ca-certificates
+apt install tzdata
+EOF
+
+chmod 755 /usr/bin/ember-update.sh
+
+systemctl enable ember-update.timer
 #Ye olde dotte nette runnetyme
 
 # We no longer have the SDK or the ASP.net becayuse we are moving away from AgentDVR which was the original reason to include it.
@@ -560,6 +602,8 @@ EOF2
 
     mv localhost.key /home/pi/kaithem/ssl/certificate.key
     mv localhost.crt /home/pi/kaithem/ssl/certificate.cert
+    chmod 700 -R /home/pi/kaithem/ssl/
+    chown pi -R /home/pi/kaithem/ssl/
     cd /
     rm -rf /dev/shm/kkeytmp/
 fi
@@ -633,21 +677,11 @@ mkdir -p /etc/chromium/
 # for bad things, and they're on your lan.. you've already lost.  And it is fairly obviously a shady looking url.
 cat << EOF > /etc/chromium/policies/recommended/emberos-policy.json
 {
-  "AudioCaptureAllowedUrls": ["http://localhost","http://localhost:8002","http://localhost:8001"],
-  "VideoCaptureAllowedUrls": ["http://localhost","http://localhost:8002","http://localhost:8001"],
-  "AutoplayWhitelist":       ["http://localhost","http://localhost:8002", "http://localhost:8001","http://localhost:1880", "http://*.local"],
-  "OverrideSecurityRestrictionsOnInsecureOrigin": ["*.override-insecure-http.local","override-insecure-http.local"]
-
+  "AudioCaptureAllowedUrls": ["http://localhost","http://localhost:8002","https://localhost:8001", "http://localhost:1880"],
+  "VideoCaptureAllowedUrls": ["http://localhost","http://localhost:8002","https://localhost:8001", "http://localhost:1880"],
+  "AutoplayWhitelist":       ["http://localhost","http://localhost:8002", "https://localhost:8001","http://localhost:1880", "http://*.local"],
 }
 EOF
-
-# ! rm /var/lib/systemd/timers
-
-# mkdir -p  /sketch/cache/systemd.timers
-# mkdir -p  /var/lib/systemd/
-
-# ln -s /sketch/cache/systemd.timers /var/lib/systemd/timers
-
 
 cat << EOF > /etc/fsbindings/readme.md
 
@@ -857,7 +891,6 @@ sudo apt-get -y install lolcat cowsay
 
 cat << EOF > /etc/nanorc
 set linenumbers
-set mouse
 set tabsize 4
 set smarthome
 set smooth
@@ -934,17 +967,23 @@ fi
 
 #Note that it is useless here because it is a fixed known thing, this was originally a script run directly on the pi.
 #Kept fror consistency and because it still has very minor utility in confusing attacks by people who never find out which ember image
-#you are running on.
-touch /etc/unique-random-supplement
-chmod 700  /etc/unique-random-supplement
+#you are running on, such as some odd HW backdoor that doesn't know about this
+touch /etc/distro-random-supplement
+chmod 700  /etc/distro-random-supplement
 echo "Generating random numbers, this might be a while."
 
-#Use hwrng if possible. If that exists, generate 128 bytes just because we can
-if [ -e /dev/hwrng ] ; then
-dd bs=1 count=256 if=/dev/hwrng  of=/etc/unique-random-supplement >/dev/null
-else
-dd bs=1 count=32 if=/dev/random  of=/etc/unique-random-supplement >/dev/null
-fi
+
+dd bs=1 count=128 if=/dev/random of=/etc/distro-random-supplement >/dev/null
+
+
+# Even more paranoia, add a block of numbers that can be updated periodically by some later service or ansible job or some such.
+touch /etc/random-supplement
+chmod 700  /etc/random-supplement
+echo "Generating random numbers, this might be a while."
+
+
+dd bs=1 count=128 if=/dev/random of=/etc/random-supplement >/dev/null
+
 echo "Generated random numbers"
 
 

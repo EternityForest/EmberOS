@@ -18,9 +18,9 @@ unpack /filesystem/pi /home/pi
 # sudo apt-get -y install libgles2-mesa libgles2-mesa-dev xorg-dev
 
 
-sudo apt-get -y install meson
+sudo apt-get -y install meson ninja-build
 
-if [ ! -f /build_cache/suru-icon-theme ]; then
+if [ ! -d /build_cache/suru-icon-theme ]; then
    cd /build_cache
    git clone --depth 1 https://github.com/snwh/suru-icon-theme.git
 fi
@@ -43,7 +43,7 @@ sed -i s/'ERRFILE=\$HOME\/\.xsession\-errors'/'ERRFILE\=\/var\/log\/\$USER\-xses
 cat << EOF > /etc/logrotate.d/xsession
 /var/log/pi-xsession-errors {
   rotate 2 
-  weekly
+  daily
   compress
   missingok
   notifempty

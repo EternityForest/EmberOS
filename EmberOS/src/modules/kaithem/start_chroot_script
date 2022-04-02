@@ -23,6 +23,7 @@ mkdir /home/pi/kaithem
 git rm --cached -r .
 git reset --hard
 
+
 git remote set-url origin https://github.com/EternityForest/KaithemAutomation.git
 
 rsync -avz /opt/kaithem/kaithem/var/  /home/pi/kaithem/
@@ -31,11 +32,24 @@ unpack /filesystem/kaithem_sketch/ /home/pi/kaithem/ pi
 
 unpack /filesystem/systemd/ /usr/lib/systemd/system/ pi
 
+
+chown -R pi /home/pi/kaithem
+chmod -R 700 /home/pi/kaithem
+
 #Remove dummy keys so the user can add them if missing
 ! rm  /home/pi/kaithem/ssl/certificate.key
 ! rm  /home/pi/kaithem/certificate.cert
 
 chmod 755 /opt/kaithem/kaithem/kaithem.py
+
+cat << EOF >  /usr/bin/ember-launch-kaithem
+#!/bin/bash
+# Systemd utterly fails at launching this unless we give it it's own little script.
+# If we run it directly from the service, jsonrpc times out over and over again.
+/usr/bin/pw-jack /usr/bin/python3 /opt/kaithem/kaithem/kaithem.py -c /home/pi/kaithem/config.yaml
+EOF
+
+chmod 755 /usr/bin/ember-launch-kaithem
 
 cd /opt/kaithem/
 git rm --cached -r .

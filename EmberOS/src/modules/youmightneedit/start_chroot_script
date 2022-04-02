@@ -26,7 +26,7 @@ fi
 
 cd /build_cache
 wget -nc http://packages.linuxmint.com/pool/main/h/hypnotix/hypnotix_2.6_all.deb
-dpkg -i hypnotix_2.6_all.deb
+! dpkg -i hypnotix_2.6_all.deb
 apt --fix-broken install
 
 
@@ -193,7 +193,11 @@ sudo apt-get update
 sudo apt-get -y install libedgetpu1-std
 
 
-sudo apt-get -y install sonobus
+sudo apt-get -y install sonobus soundconverter
+
+
+
+sudo apt-get -y install cec-utils
 
 cd /build_cache
 
@@ -201,14 +205,14 @@ wget -nc https://github.com/smicallef/spiderfoot/archive/v3.5.tar.gz
 
 mkdir /opt/spiderfoot
 cp /build_cache/v3.5.tar.gz /opt/spiderfoot/v3.5.tar.gz
-cd /opp
+cd /opt/spiderfoot
 tar zxvf v3.5.tar.gz
 ln -s spiderfoot-3.5 latest
 cd spiderfoot-3.5
 pip3 install -r requirements.txt
 
 
-cat << EOF > /usr/bin/ember-run-autopsy
+cat << EOF > /usr/bin/ember-run-spiderfoot
 #!/bin/bash
 cd /opt/spiderfoot/latest
 xterm -hold -e "python3 ./sf.py -l 127.0.0.1:5001" &
@@ -223,7 +227,7 @@ cat << EOF > /usr/share/applications/spiderfoot.desktop
 [Desktop Entry]
 Comment=
 Terminal=false
-Name=Launch Autopsy
+Name=Launch Spiderfoot
 Exec=ember-run-spiderfoot
 Type=Application
 Icon=weather-storm
@@ -231,6 +235,24 @@ Categories=Development
 EOF
 
 
+
+sudo apt-get -y install python3-wxgtk4.0
+pip3 install esphomeflasher
+
+
+
+cat << EOF > /usr/share/applications/esphomeflasher.desktop
+[Desktop Entry]
+Comment=
+Terminal=false
+Name=ESPHome Flasher
+Exec=esphomeflasher
+Type=Application
+Icon=utilities-terminal	
+Categories=Development
+EOF
+
+apt-get -y install dfu-programmer
 
 sudo apt-get -y install v4l-utils
 
@@ -298,12 +320,13 @@ item_count=2
 EOF
 
 #This thing apparently accelerates CPU based deep learning on tensorflow
-apt-get -y install libxnnpack0
+# apt-get -y install libxnnpack0
 
 apt-get -y install deluge audacity vlc vlc-plugin-base vlc-plugin-access-extra vlc-plugin-jack vlc-plugin-skins2 vlc-plugin-svg
 
 # Set it up for Pipewire
-cp /filesystem/vlrc /home/pi/.config/vlc/vlcrc
+mkdir -p /home/pi/.config/vlc/
+cp /filesystem/vlcrc /home/pi/.config/vlc/vlcrc
 
 #See above where we build from source because the dang thing won't let us do it the normal way yet.
 #apt-get -y install kodi kodi-pvr-mythtv kodi-pvr-dvbviewer kodi-pvr-iptvsimple
@@ -408,6 +431,10 @@ RestartSec=20
 # Tag things in the log
 SyslogIdentifier=Node-RED
 #StandardOutput=syslog
+
+
+AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_NET_ADMIN CAP_NET_RAW CAP_SYS_TIME CAP_SYS_NICE
+SecureBits=keep-caps
 
 LimitRTPRIO= 95
 LimitNICE= -20
@@ -828,11 +855,10 @@ EOF
 
 cd /build_cache
 
-#wget -nc https://ispyfiles.azureedge.net/downloads/Agent_ARM32_3_7_1_0.zip
+
 
 mkdir -p /home/pi/AgentDVR/
 cd /home/pi/AgentDVR/
-#unzip /build_cache/Agent_ARM32_3_7_1_0.zip
 
 
 echo "To use AgentDVR, Unzip the  arm32 zip file here.  Agent.dll should be directly in this dir." > /home/pi/AgentDVR/README.md
@@ -987,18 +1013,92 @@ apt-get -y install uhubctl usbrelay
 
 apt-get -y install python3-pip libhidapi-libusb0 libxcb-xinerama0
 
+
+# Video is the closest group i can think of.  It can't just be everyone for security reasons, but it has to be an existing group so that it "just works"
 mkdir -p /etc/udev/rules.d
 cat << EOF > /etc/udev/rules.d/70-streamdeck.rules
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0060", TAG+="uaccess"
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0063", TAG+="uaccess"
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006c", TAG+="uaccess"
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006d", TAG+="uaccess"
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0080", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0060", GROUP="video", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0063", GROUP="video", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006c", GROUP="video", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006d", GROUP="video", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0080", GROUP="video", TAG+="uaccess"
 EOF
 
 # Elgato Streamdeck UI support
 pip3 install streamdeck
 pip3 install streamdeck-ui 
+
+# Elgato keylight support
+pip3 install PyElgato
+
+
+cat << "EOF" > /usr/bin/elgatotui
+#!/usr/bin/bash
+
+elgato lights
+
+echo "Press enter for menu"
+read
+
+while true
+do
+TO_RUN=$(whiptail --title "Elgato Keylight" --menu "Choose an option" 25 78 5 \
+"1" "Search for lights" \
+"2" "Turn on" \
+"3" "Turn off" \
+"4" "Brighter" \
+"5" "Dimmer" \
+"6" "Warmer" \
+"7" "Cooler" \
+"Exit" "Exit" 3>&1 1>&2 2>&3)
+
+case $TO_RUN in
+"1")
+    elgato lights --discover
+    echo ---
+    elgato lights
+    echo "Press enter to return"
+    read
+;;
+"2")
+    elgato on
+;;
+
+"3")
+  elgato off
+  ;;
+
+"4")
+  elgato brightness --dimmer
+  ;;
+
+"5")
+  elgato color --warmer
+  ;;
+
+"6")
+  elgato color --cooler
+  ;;
+
+*)
+   exit
+  ;;
+esac
+done
+EOF
+
+chmod 755 /usr/bin/elgatotui
+
+cat << EOF > /usr/share/applications/elgatotui.desktop
+[Desktop Entry]
+Name=Keylight TUI
+Icon=preferences-desktop-peripherals
+Type=Application
+Exec=xterm -t elgatotui
+Terminal=false
+Categories=Development;Settings;
+EOF
+
 
 
 
@@ -1009,7 +1109,7 @@ Icon=preferences-desktop-peripherals
 Type=Application
 Exec=streamdeck
 Terminal=false
-Categories=Network;Chat;
+Categories=Development;Settings;
 EOF
 
 
@@ -1188,7 +1288,7 @@ sudo apt-get install -y python3-pyscard
 
 
 #Batteries included, allow messing with kiosk browser media right from the device
-apt-get -y install lame gnome-disk-utility unclutter imagemagick p7zip ark testdisk
+apt-get -y install lame gnome-disk-utility gnome-firmware unclutter imagemagick p7zip ark testdisk
 
 
 #Ham radio stuff
@@ -1202,7 +1302,7 @@ apt-get install -y wxhexeditor d-feet
 fi
 
 # GUI Utils
-apt-get -y install sqlitebrowser meld git-cola convertall  nmapsi4 qtqr
+apt-get -y install sqlitebrowser meld git-cola convertall  nmapsi4 qtqr lxappearance
 
 # parcellite
 
@@ -1452,6 +1552,60 @@ sudo apt-get -y install build-essential autoconf automake libtool pkg-config
 pip3 install ansible-core
 pip3 install paramiko
 
+
+
+apt-get -y install jackd2
+
+#We Uncomment that line to allow the realtime
+cat << EOF > /etc/security/limits.d/audio.conf
+# Provided by the jackd package.
+#
+# Changes to this file will be preserved.
+#
+# If you want to enable/disable realtime permissions, run
+#
+#    dpkg-reconfigure -p high jackd2
+
+@audio   -  rtprio     95
+@audio   -  memlock    unlimited
+@audio   -  nice      -19
+EOF
+
+# The allow any is needed or else rtkit won't let PipeWire work right.
+cat << EOF > /usr/share/polkit-1/actions/org.freedesktop.RealtimeKit1.policy
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+        "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+        "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+        <vendor>Lennart Poettering</vendor>
+
+        <action id="org.freedesktop.RealtimeKit1.acquire-high-priority">
+                <description>Grant high priority scheduling to a user process</description>
+                <description xml:lang="tr">Bir sürece yüksek öncelikli çalışabilme yetkisi ver</description>
+                <message>Authentication is required to grant an application high priority scheduling</message>
+                <message xml:lang="tr">Sürecin yüksek öncelikli çalıştırılabilmesi için yetki gerekiyor</message>
+                <defaults>
+                        <allow_any>yes</allow_any>
+                        <allow_inactive>yes</allow_inactive>
+                        <allow_active>yes</allow_active>
+                </defaults>
+        </action>
+
+        <action id="org.freedesktop.RealtimeKit1.acquire-real-time">
+                <description>Grant realtime scheduling to a user process</description>
+                <description xml:lang="tr">Bir sürece gerçek zamanlı çalışabilme yetkisi ver</description>
+                <message>Authentication is required to grant an application realtime scheduling</message>
+                <message xml:lang="tr">Sürecin gerçek zamanlı çalıştırılabilmesi için yetki gerekiyor</message>
+                <defaults>
+                        <allow_any>yes</allow_any>
+                        <allow_inactive>yes</allow_inactive>
+                        <allow_active>yes</allow_active>
+                </defaults>
+        </action>
+
+</policyconfig>
+EOF
 
 cd /build_cache
 

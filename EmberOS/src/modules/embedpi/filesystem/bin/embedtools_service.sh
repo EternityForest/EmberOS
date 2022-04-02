@@ -9,11 +9,18 @@
 set -e
 set -x
 
-cat  /etc/unique-random-supplement > /dev/random > /dev/null
+cat  /etc/distro-random-supplement > /dev/random
+
+# Check for any extra fixed random seed that could be there to further confuse a HW backdoor
+if [ -f /etc/random-supplement ] ; then
+cat  /etc/distro-random-supplement > /dev/random 
+fi
+
 
 #If the on chip hwrng isn't random, this might actually help if there is a real RTC installed.
 date +%s%N > /dev/random
 
+# Use the on chip HW RNG if it is available
 if [ -e /dev/hwrng ] ; then
 dd if=/dev/hwrng of=/dev/random bs=256 count=1 > /dev/null
 else
@@ -73,5 +80,10 @@ mkdir -p /var/lib/systemd/linger
 mkdir -p /var/log/mosquitto
 #In case the user doesn't actually exist
 ! chown mosquitto /var/log/mosquitto
+
+# This is mostly only good for one or two extra bits, but it's something.
+vcgencmd measure_temp > /dev/random
+vcgencmd measure_temp > /dev/random
+
 
 echo "Complete!"

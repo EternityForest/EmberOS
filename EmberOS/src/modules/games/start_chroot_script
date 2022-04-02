@@ -11,7 +11,84 @@ apt-get -y install mednaffe  brandy bwbasic kolourpaint sl cmatrix
 
 if [ -z "$EMBER_MICRO" ]
 then
-apt-get -y install pychess ace-of-penguins ltris
+! apt-get -y install gnome-games
+! apt-get -y install abe
+! apt-get -y install crawl-tiles
+! apt-get -y install circuslinux
+! apt-get -y install xbubble
+! apt-get -y install tomatoes
+! apt-get -y install dossizola
+! apt-get -y install gnome-mastermind
+! apt-get -y install ardentryst
+! apt-get -y install open-invaders
+! apt-get -y install monsterz
+! apt-get -y ----no-install-recommends install performous
+! apt-get -y install performous-composer
+
+# We must use JACK to fully let people select audio inputs.
+cat << EOF > /home/pi/.config/performous/config.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<performous>
+  <entry name="audio/backend" type="int" value="12"/>
+  <entry name="game/theme" type="int" value="0"/>
+  <entry name="graphic/stereo3d" type="bool" value="false"/>
+  <entry name="paths/songs" type="string_list">
+    <stringvalue>DATADIR/songs/</stringvalue>
+    <stringvalue>/usr/local/share/games/ultrastar/songs/</stringvalue>
+    <stringvalue>/usr/local/share/games/fretsonfire/data/songs/</stringvalue>
+    <stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
+    <stringvalue>/usr/share/games/fretsonfire/data/songs/</stringvalue>
+    <stringvalue>~/.ultrastar/songs/</stringvalue>
+  </entry>
+  <entry name="songs/sort-order" type="int" value="1"/>
+</performous>
+EOF
+
+cat << EOF > /usr/share/applications/XBubble.desktop
+[Desktop Entry]
+Name=Bubbles
+Type=Application
+Exec=xbubble
+Terminal=false
+Categories=Game;
+EOF
+
+#! apt-get -y install geekcode
+
+
+! apt-get -y install minetest minetest-mod-moreblocks minetest-mod-moreores minetest-mod-pipeworks minetest-server  minetest-mod-ethereal minetest-mod-homedecor
+! apt-get -y install minetest-mod-unified-inventory minetest-mod-mesecons  minetest-mod-unifieddyes minetest-mod-currency minetest-mod-character-creator  minetest-mod-basic-materials
+! apt-get -y install minetest-mod-torches
+
+# ! apt-get -y install pinball
+! apt-get -y install njam
+! apt-get -y install brainparty
+! apt-get -y install qxw
+#! apt-get -y install golly
+! apt-get -y install alex4
+
+
+cd /build_cache
+
+# wget -O -nc https://github.com/TeamRizu/OutFox/releases/download/OF4.14.1/OutFox-alpha-0.4.14.1HF-RPi-Linux-arm32v7-date-20220327.tar.gz
+
+# mkdir /opt/OutFox
+# cd /opt/OutFox
+
+# tar -xvf  /build_cache/OutFox-alpha-0.4.14.1HF-RPi-Linux-arm32v7-date-20220327.tar.gz  --strip-components=1
+
+
+# cat << EOF > /usr/share/applications/OutFox.desktop
+# [Desktop Entry]
+# Type=Application
+# Name=Project OutFox Dance
+# Icon=/home/mtk/Desktop/Icons/dance_icon.png
+# Exec=/opt/OutFox/OutFox
+# Categories=Game
+
+# EOF
+
+
 fi
 
 cd /build_cache
