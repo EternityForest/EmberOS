@@ -126,6 +126,26 @@ cat << EOF > /etc/firewalld/zones/public.xml
 </zone>
 EOF
 
+cat << EOF > /etc/systemd/system/nmbd.service
+[Unit]
+Description=Samba NMB Daemon
+Documentation=man:nmbd(8) man:samba(7) man:smb.conf(5)
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=notify
+PIDFile=/run/samba/nmbd.pid
+EnvironmentFile=-/etc/default/samba
+ExecStart=/usr/sbin/nmbd --foreground --no-process-group $NMBDOPTIONS
+ExecReload=/bin/kill -HUP $MAINPID
+LimitCORE=infinity
+Restart=on-failure
+RestartSec=600s
+
+[Install]
+WantedBy=multi-user.target
+EOF
 
 
 # Try to fix the kinds of bugs that are fixable by an Avahi restart
@@ -148,10 +168,14 @@ unpack /filesystem/avahi /etc/avahi/ root
 ! systemctl mask dhcpcd.service
 ! systemctl mask dhcpcd5.service
 
+! systemctl unmask wpa_supplicant.service
+
+
 ! sudo apt purge -y openresolv
 ! sudo apt purge -y dhcpcd5
 
 mkdir -p /sketch/profiles/default/etc/NetworkManager/system-connections
 unpack /filesystem/networks /sketch/profiles/default/etc/NetworkManager/system-connections/ root
 
-chmod -R 700 /sketch/profiles/default/etc/NetworkManager/system-connections
+chmod 700 /sketch/profiles/default/etc/NetworkManager/system-connections
+chmod 600 /sketch/profiles/default/etc/NetworkManager/system-connections/*

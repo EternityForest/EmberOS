@@ -13,6 +13,7 @@ set -e
 source /common.sh
 install_cleanup_trap
 
+mkdir -p /build_cache/pip3cache
 
 # This can't be used inside the chroot.
 mv /bin/udevadm /bin/udevadm-hidden
@@ -118,7 +119,7 @@ mount -t tmpfs -o size=10M tmpfs /proc
 
 # Apt update just the stuff that is likely to break or be a big problem if not updated.
 
-cat << EOF >> /etc/systemd/user/ember-update.timer
+cat << EOF >> /etc/systemd/system/ember-update.timer
 [Unit]
 Description=EmberOS minimal updater, just the stuff that will break without it
 RefuseManualStart=no # Allow manual starts
@@ -134,7 +135,7 @@ Unit=ember-update.service
 WantedBy=timers.target
 EOF
 
-cat << EOF >> /etc/systemd/user/ember-update.service
+cat << EOF >> /etc/systemd/system/ember-update.service
 [Unit]
 Description=EmberOS minimal updater, just the stuff that will break without it
 [Service] 
@@ -443,6 +444,9 @@ cat << EOF > /var/www/html/index.html
 
 <dt>Node Red</dt>
 <dd>Ble tools on port 1880</dd>
+
+<dt>Zigbee2MQTT</dt>
+<dd>Zigbee dongle manager on port 8003</dd>
 
 </dl>
 
@@ -943,6 +947,104 @@ set number
 :set laststatus=2
 :set mouse=a
 set showmode
+EOF
+
+# Disable uBlock Origin. It crashed several times, and might not even be supported in a year.
+cat << EOF > /etc/chromium/master-preferences
+{
+	"alternate_error_pages":{
+		"enabled":false
+	},
+	"extensions":{
+		"settings":{
+			"cjpalhdlnbpafiamejdnhcphjbkeiagm":{
+				"location":1,
+				"manifest":{
+					"manifest_version":2,
+					"key":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmJNzUNVjS6Q1qe0NRqpmfX/oSJdgauSZNdfeb5RV1Hji21vX0TivpP5gq0fadwmvmVCtUpOaNUopgejiUFm/iKHPs0o3x7hyKk/eX0t2QT3OZGdXkPiYpTEC0f0p86SQaLoA2eHaOG4uCGi7sxLJmAXc6IsxGKVklh7cCoLUgWEMnj8ZNG2Y8UKG3gBdrpES5hk7QyFDMraO79NmSlWRNgoJHX6XRoY66oYThFQad8KL8q3pf3Oe8uBLKywohU0ZrDPViWHIszXoE9HEvPTFAbHZ1umINni4W/YVs+fhqHtzRJcaKJtsTaYy+cholu5mAYeTZqtHf6bcwJ8t9i2afwIDAQAB",
+					"name":"uBlock Origin",
+					"permissions":["contextMenus","privacy","storage","tabs","unlimitedStorage","webNavigation","webRequest","webRequestBlocking","<all_urls>"],
+					"update_url":"https://clients2.google.com/service/update2/crx",
+					"version":"0.0"
+				},
+				"granted_permissions":{
+					"api":["contextMenus","privacy","storage","tabs","unlimitedStorage","webNavigation","webRequest","webRequestBlocking"],
+					"explicit_host":["<all_urls>","chrome://favicon/*","http://*/*","https://*/*"],
+					"scriptable_host":["http://*/*","https://*/*"]
+				},
+				"path":"cjpalhdlnbpafiamejdnhcphjbkeiagm\\0.0",
+				"state":0
+			},
+			"aleakchihdccplidncghkekgioiakgal":{
+				"location":1,
+				"manifest":{
+					"manifest_version":2,
+                    "key":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxpuYJpBArlJinXxN4oxx4UuFNreRTNO5Cl3TNF5FtDmgNLflbtYyC2nC5eZGxpNibzauHmGTD8ekFCfNZhHFpUEIZWd9AHI7TZdhu6gPxaK1lPEMukVEewFs2ovaEkjZbe3gy3v0eUDnADUkiaex7XeAWR6mJLzmcUaPFgzFRsDkozsE9tXLNN6oEYuWHN/yRsM1RYo7PYPulutHF8POL/8vDSyWHx/W9YDTnbv+2SBJZO7Dxi1/PbutasUag+/jma0X1nGhrEufr67NMvtpjPWSISWkIwxPR8u7EVyrKTSXs6U7jCbhKedhomeu9E/xZ1Er0dGWYWnhpdo0GNvblwIDAQAB",
+					"name":"h264ify",
+					"permissions":["storage"],
+					"update_url":"https://clients2.google.com/service/update2/crx",
+					"version":"0.0"
+				},
+				"granted_permissions":{
+					"api":["storage"],
+					"manifest_permissions":[],
+					"scriptable_host":["*://*.youtube.com/*","*://*.youtube-nocookie.com/*","*://*.youtu.be/*"]
+				},
+				"path":"aleakchihdccplidncghkekgioiakgal\\0.0",
+				"state":1
+			}
+		},
+		"theme":{
+			"id":"",
+			"use_system":true
+		}
+	},
+	"browser":{
+		"custom_chrome_frame":false,
+		"default_browser_infobar_last_declined":"1"
+	},
+	"default_search_provider":{
+		"synced_guid":"9A111FB4-A8D3-4FDD-84CE-76178E50246B"
+	},
+	"default_search_provider_data":{
+		"template_url_data":{
+			"alternate_urls":[],
+			"created_by_policy":false,
+			"date_created":"13114024949603971",
+			"favicon_url":"",
+			"id":"7",
+			"image_url":"",
+			"image_url_post_params":"",
+			"input_encodings":[],
+			"instant_url":"",
+			"instant_url_post_params":"",
+			"keyword":"duckduckgo.com",
+			"last_modified":"13114024949603971",
+			"new_tab_url":"",
+			"originating_url":"",
+			"prepopulate_id":0,
+			"safe_for_autoreplace":false,
+			"search_terms_replacement_key":"",
+			"search_url_post_params":"",
+			"short_name":"DuckDuckGo",
+			"suggestions_url":"",
+			"suggestions_url_post_params":"",
+			"synced_guid":"9A111FB4-A8D3-4FDD-84CE-76178E50246B",
+			"url":"https://duckduckgo.com/?q={searchTerms}&t=raspberrypi",
+			"usage_count":0
+		}
+	},
+	"search":{
+	    "suggest_enabled":false
+	},
+	"profile":{
+	    "default_content_setting_values":{
+	        "plugins":0
+	    }
+	},
+	"first_run_tabs":["https://welcome.raspberrypi.org/raspberry-pi-os?id=UNIDENTIFIED"]
+}
+
 EOF
 
 

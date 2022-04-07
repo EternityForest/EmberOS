@@ -2,6 +2,9 @@ neofetch
 genfortune | cowsay | lolcat
 echo
 
+# Show if there are any failed services we need to be aware of
+systemctl --failed --no-legend
+
 import os
 import math
 import time

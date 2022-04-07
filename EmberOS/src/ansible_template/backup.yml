@@ -1,5 +1,5 @@
 ---
-- name: Pull backup from all servers
+- name: Pull backup from all servers.  Only backs up boot and the default profile in /sketch. 
   
   hosts: emberos
   remote_user: pi
@@ -13,7 +13,7 @@
     delegate_to: localhost
     loop:
       - boot
-      - sketch
+      - root
 
 
   - name: Pull the backup of /boot
@@ -40,10 +40,10 @@
     become: yes
 
 
-  - name: Pull the backup of /sketch
+  - name: Pull the backup of /sketch/profiles/default/
     synchronize:
-      src: /sketch/
-      dest: machines/{{ansible_hostname}}/sketch/
+      src: /sketch/profiles/default/
+      dest: machines/{{ansible_hostname}}/root/
       checksum: yes
       mode: pull
       #Things that presumably *could* be wanted

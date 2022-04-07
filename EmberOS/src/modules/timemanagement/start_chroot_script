@@ -20,6 +20,25 @@ cat << EOF > /etc/chrony/chrony.conf
 # information about usuable directives.
 pool 2.debian.pool.ntp.org iburst maxpoll 11
 
+# Try three extremely common LAN addresses for the router, it might have an NTP server built in
+# Which might be local and therefore preferable.  These addresses are safe-ish because they are almost always
+# owned by the router/ap, not some other random device that could be another EmberOS node broadcasting false time.
+
+# We also set minstratum 13 on them so it won't trust them.  Really this is kind of just a possible fallback.
+
+server 192.168.0.1 maxpoll 11 minstratum 13
+server 192.168.1.1 maxpoll 11 minstratum 13
+server 10.0.0.1 maxpoll 11 minstratum 13
+
+# Enable these if you are on the Yggrasil network and have no other time.
+# Best to avoid it by default, they are hosted by individuals(nikat and mkb2191)
+
+#server 202:a2a5:dead:ded:9a54:4ab5:6aa7:1645  maxpoll 12
+#server 223:180a:b95f:6a53:5c70:e704:e9fc:8b8f  maxpoll 12
+
+# Use this(Fill in your IP) if you have a hardware NTP server you trust
+#server 192.168.0.15 iburst maxpoll 9 trust prefer
+
 
 # This directive specify the location of the file containing ID/key pairs for
 # NTP authentication.
@@ -47,6 +66,8 @@ rtcsync
 makestep 1 3
 
 allow
+
+# Local clock has to work
 
 local stratum 14 orphan
 EOF

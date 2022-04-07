@@ -2,7 +2,7 @@
 Comment=Offline LAN-Only chat
 Terminal=false
 Name=KouChat
-Exec=/sketch.opt/kouchat/kouchat-1.3.0.jar
+Exec=/opt/kouchat/kouchat-1.3.0.jar
 Type=Application
 Icon=gnome-panel-launcher
 Categories=Network;Chat;P2P

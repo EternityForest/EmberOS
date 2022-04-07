@@ -4,25 +4,52 @@
 # Compiled python files no matter where they are
 **.pyc
 
-/home/pi/kaithem/modules/data/Examples/**
+home/pi/kaithem/modules/data/Examples/**
 
 # The old backup data dirs are named after timestamps
 # We don't want those
-/home/pi/kaithem/modules/1*
-/home/pi/kaithem/modules/2*
-/home/pi/kaithem/modules/3*
-/home/pi/kaithem/modules/4*
-/home/pi/kaithem/modules/5*
-/home/pi/kaithem/modules/6*
-/home/pi/kaithem/modules/7*
-/home/pi/kaithem/modules/8*
-/home/pi/kaithem/modules/9*
-/home/pi/kaithem/logs/**
+home/pi/kaithem/modules/1*
+home/pi/kaithem/modules/2*
+home/pi/kaithem/modules/3*
+home/pi/kaithem/modules/4*
+home/pi/kaithem/modules/5*
+home/pi/kaithem/modules/6*
+home/pi/kaithem/modules/7*
+home/pi/kaithem/modules/8*
+home/pi/kaithem/modules/9*
+home/pi/kaithem/logs/**
 
-/home/pi/Downloads
 
-/var/public.files/emberos/**
-/var/public.media/emberos/**
+
+home/pi/kaithem/users/1*
+home/pi/kaithem/users/2*
+home/pi/kaithem/users/3*
+home/pi/kaithem/users/4*
+home/pi/kaithem/users/5*
+home/pi/kaithem/users/6*
+home/pi/kaithem/users/7*
+home/pi/kaithem/users/8*
+home/pi/kaithem/users/9*
+
+home/pi/kaithem/registry/1*
+home/pi/kaithem/registry/2*
+home/pi/kaithem/registry/3*
+home/pi/kaithem/registry/4*
+home/pi/kaithem/registry/5*
+home/pi/kaithem/registry/6*
+home/pi/kaithem/registry/7*
+home/pi/kaithem/registry/8*
+home/pi/kaithem/registry/9*
+
+home/pi/Downloads
+
+usr/share/zoneinfo/**
+usr/share/ca-certificates/**
+
+var/log/**
+
+var/public.files/emberos/**
+var/public.media/emberos/**
 usr/share/zimwikis/archlinux/**
 
 #You may want to delete this and sync it if securuty isn't a real issue and you changed something.
@@ -75,7 +102,7 @@ etc/apache2/mods-enabled/reqtimeout.load
 #This is there so rsync doesn't try an sync it
 .git
 
-/var/cache
+var/cache
 
 home/pi/.cache
 
@@ -122,3 +149,6 @@ home/pi/AgentDVR/**
 # This stops backup from pulling actual video files, which you might not want.
 - home/pi/AgentDVR/Media/WebServerRoot/Media/**
 
+
+# NVR Recordings. Maybe not wanted?
+home/pi/NVR/**

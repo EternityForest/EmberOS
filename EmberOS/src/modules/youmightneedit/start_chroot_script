@@ -17,8 +17,12 @@ cd /build_cache
 
 wget -nc https://openrgb.org/releases/release_0.7/openrgb_0.7_armhf_raspbian_bullseye_6128731.deb
 sudo apt-get -y install libhidapi-hidraw0 libc6 libgcc-s1
-dpkg -i openrgb_0.7_armhf_raspbian_bullseye_6128731.deb
 
+# This has to be hidden to stop a postinst script from running which doesn't 
+# work here and isn't needed.
+mv /bin/udevadm hide
+dpkg -i openrgb_0.7_armhf_raspbian_bullseye_6128731.deb
+mv hide /bin/udevadm
 fi
 
 
@@ -27,7 +31,7 @@ fi
 cd /build_cache
 wget -nc http://packages.linuxmint.com/pool/main/h/hypnotix/hypnotix_2.6_all.deb
 ! dpkg -i hypnotix_2.6_all.deb
-apt --fix-broken install
+apt -y --fix-broken install
 
 
 
@@ -196,6 +200,28 @@ sudo apt-get -y install libedgetpu1-std
 sudo apt-get -y install sonobus soundconverter
 
 
+# Make it discoverable
+cat << EOF > /usr/share/applications/sonobus2.desktop
+[Desktop Entry]
+Name=Sonobus(JACK enabled)
+Icon=audio-card
+Type=Application
+Exec=pw-jack sonobus
+Terminal=false
+Categories=AudioVideo
+EOF
+
+
+cat << EOF > /usr/share/applications/qjackctl2.desktop
+[Desktop Entry]
+Name=Audio Patchbay
+Icon=audio-card
+Type=Application
+Exec=pw-jack qjackctl
+Terminal=false
+Categories=AudioVideo
+EOF
+
 
 sudo apt-get -y install cec-utils
 
@@ -356,8 +382,10 @@ apt-get -y install nodered
 
 sudo apt-get -y install python3-opencv libhdf5-dev libhdf5-serial-dev libatlas-base-dev
 
-apt-get -y install chkservice matchbox-keyboard
+apt-get -y install chkservice onboard kmag
 
+
+apt-get -y install gnome-screenshot
 
 #Education
 apt-get -y install goldendict goldendict-wordnet 
