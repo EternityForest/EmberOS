@@ -10,7 +10,7 @@ rename_user () {
     if [ -f /etc/sudoers.d/010_pi-nopasswd ]; then
         sed -i "s/^$FIRSTUSER /$NEWNAME /" /etc/sudoers.d/010_pi-nopasswd
     fi
-    
+
     # Added by EmberOS Project: 
     if grep -q "^autologin-user=" /etc/lightdm/lightdm.conf ; then
         sed  -i -e "s/^autologin-user=.*/autologin-user=$NEWNAME/"
@@ -20,6 +20,11 @@ rename_user () {
         sed /etc/systemd/system/getty@tty1.service.d/autologin.conf -i -e "s/$FIRSTUSER/$NEWNAME/"
     fi
 }
+
+# Added by EmberOS Project: disable the first run wizard if a user is set up.
+if [ -f /etc/xdg/autostart/piwiz.desktop ]; then
+    rm /etc/xdg/autostart/piwiz.desktop
+fi
 
 if [ $# -eq 3 ]; then
     FIRSTUSER="$1"
