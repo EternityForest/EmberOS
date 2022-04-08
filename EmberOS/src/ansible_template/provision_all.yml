@@ -1,0 +1,55 @@
+---
+- name: Push backups from all servers
+  
+  hosts: emberos
+  remote_user: pi
+
+  tasks:
+
+  - name: Set the remote system time to match local
+    command: "date -s {{ lookup('pipe','date --iso-8601=ns') }}"
+    become: yes
+
+
+  - name: Push the backup of /boot
+    synchronize:
+      dest: /boot/
+      src: machines/{{ansible_hostname}}/boot/
+      checksum: yes
+      mode: push
+
+      become: yes
+
+  - name: Push the backup of /sketch
+    synchronize:
+      dest: /sketch/
+      src: machines/{{ansible_hostname}}/boot/
+      checksum: yes
+      mode: push
+      become: yes
+  
+  - name: Push the time zones from local controller system time.
+    synchronize:
+      dest: /usr/share/zoneinfo/
+      src:  /usr/share/zoneinfo/
+      checksum: yes
+      times: yes
+      mode: push
+      become: yes
+      -rsync_opts:
+        -"--update"
+
+  - name: Generate some randomness to push to the servers. Completely unnecessary, as modern devices have perfectly good HW rngs.
+    ansible.builtin.command: dd bs=1 count=128 if=/dev/random of=machines/{{ansible_hostname}}/random_seed.bin
+    delegate_to: 127.0.0.1
+
+  - name: Push the time zones from local controller system time.
+    synchronize:
+      dest: /etc/random-supplement
+      src:  machines/{{ansible_hostname}}/random_seed.bin
+      checksum: yes
+      times: yes
+      mode: push
+      become: yes
+      -rsync_opts:
+        -"--update"

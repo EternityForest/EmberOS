@@ -1,0 +1,44 @@
+#!/bin/sh
+
+rename_user () {
+    usermod -l "$NEWNAME" "$FIRSTUSER"
+    usermod -m -d "/home/$NEWNAME" "$NEWNAME"
+    groupmod -n "$NEWNAME" "$FIRSTGROUP"
+    for file in /etc/subuid /etc/subgid; do
+        sed -i "s/^$FIRSTUSER:/$NEWNAME:/" "$file"
+    done
+    if [ -f /etc/sudoers.d/010_pi-nopasswd ]; then
+        sed -i "s/^$FIRSTUSER /$NEWNAME /" /etc/sudoers.d/010_pi-nopasswd
+    fi
+    
+    # Added by EmberOS Project: 
+    if grep -q "^autologin-user=" /etc/lightdm/lightdm.conf ; then
+        sed  -i -e "s/^autologin-user=.*/autologin-user=$NEWNAME/"
+    fi
+
+    if [ -f /etc/systemd/system/getty@tty1.service.d/autologin.conf ]; then
+        sed /etc/systemd/system/getty@tty1.service.d/autologin.conf -i -e "s/$FIRSTUSER/$NEWNAME/"
+    fi
+}
+
+if [ $# -eq 3 ]; then
+    FIRSTUSER="$1"
+    FIRSTGROUP="$1"
+    shift
+else
+    FIRSTUSER="$(getent passwd 1000 | cut -d: -f1)"
+    FIRSTGROUP="$(getent group 1000 | cut -d: -f1)"
+fi
+
+NEWNAME=$1
+NEWPASS=$2
+
+if [ "$FIRSTUSER" != "$NEWNAME" ]; then
+    rename_user
+fi
+
+if [ -n "$NEWPASS" ]; then
+    echo "$NEWNAME:$NEWPASS" | chpasswd -e
+fi
+
+/usr/bin/cancel-rename "$NEWNAME"

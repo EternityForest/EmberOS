@@ -27,8 +27,6 @@ We do this with a bindings manager configured in /etc/fsbindings.
 We now use xonshell for the default shell. It is mostly bash compatible, but
 also supports python. To use bash by default instead, do `chsh -s /bin/bash`
 
-SSH IS ENABLED BY DEFAULT!!!
-
 
 ## Getting online if you don't have a display for bootstrapping
 
@@ -46,14 +44,6 @@ edit connections via the command line.
 ### Bootstrapping with ethernet
 
 You could also just connect to pi to an ethernet hub and ssh into embedpi.local. Then you will be able to configure everything as normal.
-
-## Chrome bookmarks
-
-Chromium runs entirely in a RAM based folder, bookmarks are not persistant. This is because chrome
-has a habit of heavy writes to disk, and EmberOS is designed for always-on kios style use.
-
-
-To change this, look in /etc/fsbindings/emberos-pi-home.yaml and get rid of the binding over the chromium config dir.
 
 ## Media Streaming
 

@@ -14,45 +14,43 @@ Overlay filesystems create the illusion that the whole thing is writable, so alm
 See [Here](EmberOS/src/modules/embedpi/filesystem/public.files/emberos/ember-doc/README.md) for info on how to do common stuff.
 
 
-## Ultra Quickstart without a display.
+## Ultra Quickstart
 
-Flash the image.  You can now boot and use it like any other pi image, just a bit more hardened against SD wear and without
-any persistent state for the Chromium browser.
+Flash the image.  You can now boot and use it like any other pi image, just a bit more hardened against SD wear.
+
+You will need to make a new user following the new Pi foundation release,
+you can do this with the pi imaging utility, or interactively when you first boot.  
+
+Keep in mind some scripts out there may rely on the specific username "pi", so you might just want to keep that.
+
+I think most stuff included with emberOS should be fine, but I'm not completely sure.
+
+
+### How it works
+
+EmberOS includes code(import_wpa_conf_to_nm.service) to import WLAN settings from wpa_supplicant if present, so the
+existing Pi setup utilities should work.  We also patch the user config tools to properly modify lightdm's config, so autologin
+works correctly.
+
+### Setting stuff up by editing files
 
 Set your computer up to be able to browse EXT4 partitions(On Linux this Just Works).  On Windows you
 probably need extra software for this, or WSL2.  I don't know about Mac.
 
-Look in the sketch partition. A few files are already present for maximally easy editing.  Fill in your wifi
-credentials in /etc/NetworkManager/system-connections if desired.
+Look in the sketch partition. A few files are already present for maximally easy editing.  Fill in your wifi credentials in /etc/NetworkManager/system-connections if desired.
 
-Set your new hostname in /etc/hostname/ and /etc/hosts/. Default is embedpi.   You 
-
-
+Set your new hostname in /etc/hostname/ and /etc/hosts/. Default is embedpi. 
 
 Enable or disable any services you want in /etc/ember-autostart.  Note these are just systemd services, you could also
 start them by command line, but this lets you do it purely with a text editor.
 
-If you want to make a simple digital signage display, just put your stuff in /var/www/html/ starting at index.html and leave everything else alone, the default boot mode is to launch to a fullscreen chrome.
-
-
-## Security Warning
-
-In the unlikely event that the EXT4 partition becomes somehow corrupted or the bindings fail, the system will likely still be able to boot, but will do so as if it were an unmodified factory image. This is intentional as recoverability is prioritized.
-
-In this state, the password wil be the default and the hostname will be embedpi.local.
-
-For this reason, do not open the SSH port to the wider world, or put any critical systems on a public-acessible network. If you would like to do so, use a VPN, or change the default ports so that the port in this fallback mode is different from the one you exposed.
-
-You can also copy changes back to the real root, by plugging the card into a host machine.  If you have many devices to deploy,
-you probably want to create your own custom image with your own factory defaults.
-
-It should be emphasized that this kind of corruption is exacty what EmberOS is intended to prevent and will probably not happen
-for a home user, unless your application has heavy SD Card writes.
+If you want to make a simple digital signage display, just put your stuff in /var/www/html/ starting at index.html and leave everything else alone, the default boot mode is to launch to a fullscreen chrome, set to not have any persistent state, so it won't wear things out.
 
 
 ## Home Assistant Warning
 
-There are rumors that HA can be very hard on cards.  EmberOS will likely not be able to protect from this at all.
+There are rumors that HA can be very hard on cards.  EmberOS will likely not be able to protect from this at all,
+unless you are very careful with log settings.
 
 
 
@@ -116,22 +114,16 @@ It's important to note that nothing a device itself does modifies the base image
 You can back up /sketch and be sure that you got all changes, with no factory stuff, but this method might not back up deletions to factory stuff, as those aren't real deletions.
 
 
-
-
 ## Security
 
-This is meant for easily creating embedded systems that run on *private* networks, in physically secure places(e.g. your house, where nobody
-can tamper with the pi).
+Previously, SSL was enabled by default, and the default pi/raspberry account worked.
 
-THE DEFAULT PASSWORD IS USED FOR KAITHEM, which runs as root. The standard pi:raspberry password is used for SSH.
-
-Do *not* open a port to let people on the internet access this, 
-without a firewall/nat/etc unless you change this, or disable password auth(Probably the better option)
-
-There is also an unsecured Mosquitto MQTT server if you enable it.
+The pi foundation has changed this, and EmberOS's new goal is to mostly follow upstream. As such, you will need to create a user,
+either interactively, by connection to a display and following prompts, or using the pi imaging tool.
 
 
-Think of it like the common WiFi printers and file servers that allow anyone on the network to print.
+There is also an unsecured Mosquitto MQTT server if you enable it, unlike the usual Mosquitto defaults.  On a private network
+with non-critical info I think this is usually what you want
 
 Also, the included SSL keys in /sketch/kaithem/ssl, and the SSH keys, are randomly generated on boot if missing.
 

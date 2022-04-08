@@ -148,6 +148,26 @@ WantedBy=multi-user.target
 EOF
 
 
+
+cat << EOF > /etc/systemd/system/import_wpa_conf_to_nm.service
+[Unit]
+Description=Import any networks found in a wpa_supplicant file to NetworkManager
+Before=NetworkManager.service
+After=raspberrypi-net-mods.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /usr/bin/import_from_wpa_config.py
+
+[Install]
+WantedBy=NetworkManager.service
+EOF
+
+chmod 755 /usr/bin/import_from_wpa_config.py
+
+systemctl enable import_wpa_conf_to_nm.service
+chmod 744 /etc/systemd/system/import_wpa_conf_to_nm.service
+
 # Try to fix the kinds of bugs that are fixable by an Avahi restart
 # https://bugs.launchpad.net/ubuntu/+source/avahi/+bug/624043
 chmod 755 /usr/bin/restart_avahi.sh
@@ -172,7 +192,6 @@ unpack /filesystem/avahi /etc/avahi/ root
 
 
 ! sudo apt purge -y openresolv
-! sudo apt purge -y dhcpcd5
 
 mkdir -p /sketch/profiles/default/etc/NetworkManager/system-connections
 unpack /filesystem/networks /sketch/profiles/default/etc/NetworkManager/system-connections/ root

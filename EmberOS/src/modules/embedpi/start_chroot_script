@@ -25,6 +25,8 @@ EOF
 
 chmod 755 /bin/udevadm
 
+# Not needed, pi user already exists by default.
+# ! useradd pi -p $1$z9DUrrc.$YZXoFiHTCuckH0xLelcKz1
 
 sudo apt-get -y install eatmydata
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmydata
@@ -63,8 +65,17 @@ yarn config set cache-folder /build_cache/yarncache
 apt-get install -y xserver-xorg-video-dummy xterm
 apt-get install -y dialog
 
-#Disable the feature that automatically starts the setup wizard, this would be bad for kiosk use.
-! rm /etc/xdg/autostart/piwiz.desktop
+# Stop networkmanager start dhcpcd, fix it all after, because piwiz insists on using dhcpcd.
+cat << EOF > /etc/xdg/autostart/piwiz.desktop
+[Desktop Entry]
+Type=Application
+Name=Raspberry Pi First-Run Wizard
+Exec=sh -c 'sudo systemctl stop NetworkManager;sudo systemctl start dhcpcd;gsettings set org.gnome.mutter center-new-windows true; sudo -AE piwiz;sudo systemctl stop dhcpcd;sudo systemctl start import_wpa_conf_to_nm;sudo systemctl start NetworkManager;'
+StartupNotify=true
+EOF
+
+# Fix userconf pi to be out new lightdm-enabled version
+mv /filesystem/userconf-pi /usr/lib/userconf-pi/userconf
 
 #Eliminate the apt-daily updates that can't work anyway on read only roots,
 #And were the suspected cause of periodic crashes in real deployments
@@ -90,15 +101,16 @@ systemctl disable man-db.timer
 #I find your lack of faith in systemd disturbing
 sudo apt-get -y purge rsyslog
 
-# We just have SSH on by default
-systemctl disable sshswitch.service
-
 ! sudo usermod -a -G dialout pi
 ! sudo usermod -a -G serial pi
 ! sudo usermod -a -G pulse-access pi
 ! sudo usermod -a -G bluetooth pi
 ! sudo usermod -a -G audio pi
 ! sudo usermod -a -G plugdev pi
+! sudo usermod -a -G sudo pi
+! sudo usermod -a -G lpadmin pi
+! sudo usermod -a -G adm pi
+
 usermod -aG rtkit pi
 
 #Force IPv4 for apt updates until such a time as ipv6 is supported everywhere.
@@ -218,7 +230,7 @@ echo libcomposite >> /etc/modules
 systemctl set-default multi-user.target
 
 #No more annoying popup about ssh passwords.
-rm /etc/xdg/lxsession/LXDE-pi/sshpwd.sh
+! rm /etc/xdg/lxsession/LXDE-pi/sshpwd.sh
 
 # Here we have 2 filesystems.
 # Our read only one is going to just be something like BTRFS.  We really need that compression, but we do not want
@@ -232,7 +244,7 @@ mkdir -p /base_root
 # because some are actually overlays
 cat << EOF > /etc/fstab
 proc            /proc           proc    defaults          0       0
-UUID=23709a26-1289-4e83-bfe5-2c99d42d276e  /boot           vfat    defaults,noatime,ro          0       2
+UUID=23709a26-1289-4e83-bfe5-2c99d42d276e  /boot           vfat    defaults,noatime          0       2
 UUID=33fc23d5-a31d-45ed-8aec-e85f4fb4a436 / btrfs defaults,ro,noatime,nofail 0 0
 UUID=c8dd1d93-222c-42e5-9b03-82c24d2433fd /sketch ext4 defaults,rw,noatime,noauto 0 1
 tmpfs /media tmpfs  defaults,noatime,nosuid,nodev,noexec,mode=0755,size=1M 0 0
@@ -261,12 +273,6 @@ mkdir -p /sketch/profiles/default/home
 
 
 cat << EOF > /etc/fsbindings/emberos-pi-home.yaml
-__tmpfsoverlay__pi-chrome:
-    mode: '700'
-    user: pi
-    size: 128M
-    bindat: /home/pi/.config/chromium
-
 __tmpfs__arduinologspi:
     bindat: /home/pi/.arduino15/logs
     size: 24M
@@ -358,7 +364,7 @@ apt-get -y install python3-yaml
 #The special /sketch partition is for everything that is not part of the image. It is made after the fact.
 mkdir -p /sketch
 
-raspi-config nonint do_ssh 0
+#raspi-config nonint do_ssh 0
 raspi-config nonint do_spi 0
 raspi-config nonint do_i2c 0
 raspi-config nonint do_camera 0
@@ -845,22 +851,6 @@ echo "$EMBEDPI_VAR"
 unpack /filesystem/root /
 
 
-#These depend on the fact that remounting seems to leave things
-#In their place in the layering of mounts
-cat << EOF > /usr/bin/writable
-#!/bin/bash
-mount -o remount,rw,noatime /boot
-mount -o remount,rw,noatime /sketch
-EOF
-
-cat << EOF > /usr/bin/readonly
-#!/bin/bash
-mount -o remount,ro /dev/mmcblk0p1 /boot
-EOF
-
-chmod 755 /usr/bin/writable
-chmod 755 /usr/bin/readonly
-
 
 
 # Setup apache
@@ -1148,7 +1138,9 @@ replace() {
     fi
 }
 
-replaceAppend /etc/ssh/sshd_config "^.*UsePrivilegeSeparation.*$" "UsePrivilegeSeparation no"
+
+# This hack should be no longer needed
+# replaceAppend /etc/ssh/sshd_config "^.*UsePrivilegeSeparation.*$" "UsePrivilegeSeparation no"
 # bbro method (not working in Jessie?):
 #rmdir /var/run/sshd
 #ln -s /tmp /var/run/sshd

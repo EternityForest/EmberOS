@@ -12,7 +12,6 @@ if [ -n "$DEB_MAINT_PARAMS" ]; then
 fi
 
 
-mount -o remount,rw /boot
 
 if [ -d "/lib/modules/$1" ]; then
 
@@ -31,4 +30,3 @@ if [ -d "/lib/modules/$1" ]; then
 else
     echo "File not found. it may be a big problem?"
 fi
-mount -o remount,ro /boot

@@ -430,7 +430,7 @@ Documentation=http://nodered.org/docs/hardware/raspberrypi.html
 [Service]
 Type=simple
 # Run as normal pi user - change to the user name you wish to run Node-RED as
-User=pi
+User=1000
 Group=pi
 WorkingDirectory=/home/pi
 
@@ -449,7 +449,7 @@ Environment="NODE_OPTIONS=--max_old_space_size=512"
 Environment="DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus"
 Environment="XDG_RUNTIME_DIR=/run/user/1000"
 
-ExecStart=/usr/bin/env node-red-pi $NODE_OPTIONS $NODE_RED_OPTIONS
+ExecStart=/usr/bin/pw-jack /usr/bin/env node-red-pi $NODE_OPTIONS $NODE_RED_OPTIONS
 #ExecStart=/usr/bin/env node $NODE_OPTIONS red.js $NODE_RED_OPTIONS
 # Use SIGINT to stop
 KillSignal=SIGINT
@@ -528,7 +528,7 @@ Documentation=https://github.com/espruino/EspruinoHub
 [Service]
 ExecStart=/opt/EspruinoHub/start.sh
 WorkingDirectory=/home/pi/EspruinoHub
-User=pi
+User=1000
 Group=daemon
 Nice=10
 SyslogIdentifier=EspruinoHub
@@ -563,7 +563,7 @@ Documentation=Armoria by Azgaar
 [Service]
 ExecStart=npm run start
 WorkingDirectory=/opt/Armoria
-User=pi
+User=1000
 Group=daemon
 Nice=10
 SyslogIdentifier=Armoria
@@ -597,7 +597,7 @@ Documentation=https://github.com/espruino/EspruinoHub
 
 [Service]
 ExecStart=rtl_433 -f %i -F json -M utc | mosquitto_pub -t home/rtl_433 -l
-User=pi
+User=1000
 Nice=10
 SyslogIdentifier=RTL433
 Restart=on-failure
@@ -671,7 +671,7 @@ StandardOutput=null
 StandardError=inherit
 Restart=always
 RestartSec=30
-#User=pi
+User=1000
 
 [Install]
 WantedBy=multi-user.target
@@ -915,7 +915,7 @@ SyslogIdentifier=AgentDVR
 # If you pick a different user, make sure dotnet and all permissions are set correctly to run the app
 # To update permissions, use 'chown YOUR_USERNAME -R AGENT_LOCATION' to take ownership of the folder and files
 
-User=pi
+User=1000
 
 # ensure the service automatically restarts
 Restart=always
@@ -959,7 +959,7 @@ After=syslog.target network.target mosquitto.service pipewire-media-session.serv
 Type=simple
 ExecStart=/usr/bin/bash -o pipefail -c '{ /usr/bin/rhasspy -p %i --local-mqtt-port 1883 --user-profiles=/home/pi/.config/rhasspy/profiles 2>&1 | cat >&2 3>&-; } 3>&1'
 
-User=pi
+User=1000
 Group=pi
 
 #Make it try to act like a GUI program if it can because some modules might
@@ -1171,7 +1171,7 @@ RequiresMountsFor=/etc/ /sketch/ /home/
 [Service]
 Type=simple
 ExecStart=bash -c '/usr/bin/pw-jack gmediarender -f "$(cat /etc/hostname)" -u "$(uuidgen)" --gstout-audiopipe=jackaudiosink'
-User=pi
+User=1000
 WorkingDirectory=~
 AmbientCapabilities=CAP_SYS_NICE
 Environment="DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus"
@@ -1236,7 +1236,7 @@ RequiresMountsFor=/etc/ /sketch/ /home/
 [Service]
 Type=simple
 ExecStart=wikioffline %i
-User=pi
+User=1000
 WorkingDirectory=~
 
 

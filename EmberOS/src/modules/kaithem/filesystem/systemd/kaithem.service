@@ -20,8 +20,8 @@ Environment="XDG_RUNTIME_DIR=/run/user/1000"
 #This may cause some issues but I think it's a better way to go purely because of
 #The fact that we can use PipeWire instead of managing jack, without any conflicts.
 
-#Also, node red runs as pi, lets stay standard.
-User=pi
+#Also, node red runs as pi/user1000, lets stay standard.
+User=1000
 #Bluetooth scannning and many other things will need this
 #Setting the system time is used for integration with GPS stuff.
 AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_NET_ADMIN CAP_NET_RAW CAP_SYS_TIME CAP_SYS_NICE

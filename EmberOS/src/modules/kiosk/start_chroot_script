@@ -81,3 +81,16 @@ Type=Application
 Exec=unclutter
 Terminal=false
 EOF
+
+
+
+cat << EOF > /usr/bin/ember-kiosk-launch.sh
+#!/bin/bash
+mkdir -p /dev/shm/kiosk-temp-config
+mkdir -p /dev/shm/kiosk-temp-cache
+XDG_CONFIG_HOME=/dev/shm/kiosk-temp-config
+XDG_CACHE_HOME=/dev/shm/kiosk-temp-cache
+/usr/bin/chromium-browser $1 --window-size=1920,1080 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --autoplay-policy=no-user-gesture-required --no-default-browser-check --disk-cache-size=48000000 --no-first-run --simulate-outdated-no-au='Tue, 31 Dec 2099 23:59:59 GMT' &
+EOF
+
+chmod 755 ember-kiosk-launch.sh
