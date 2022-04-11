@@ -332,3 +332,7 @@ __tmpfsoverlay__SAMBACache:
   user: root
   mode: "0755"
 EOF
+
+
+systemctl enable nmbd
+systemctl enable smbd

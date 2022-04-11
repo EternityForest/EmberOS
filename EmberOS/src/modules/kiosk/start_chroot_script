@@ -59,7 +59,7 @@ cat << EOF > /sketch/profiles/default/home/pi/.config/autostart/ember-kiosk.desk
 [Desktop Entry]
 Name=EmberDefaultKiosk
 Type=Application
-Exec=/usr/bin/chromium-browser http://localhost --window-size=1920,1080 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null --autoplay-policy=no-user-gesture-required --no-default-browser-check --disk-cache-size=96000000 --no-first-run --simulate-outdated-no-au='Tue, 31 Dec 2099 23:59:59 GMT' &
+Exec=/usr/bin/ember-kiosk-launch.sh http://localhost &
 Terminal=false
 EOF
 
@@ -67,7 +67,7 @@ cat << EOF > /sketch/profiles/default/home/pi/.config/autostart/ember-autorestar
 [Desktop Entry]
 Name=EmberAutoRestartKiosk
 Type=Application
-Exec=  bash -c "while :;  /usr/bin/chromium-browser http://localhost --window-size=1920,1080 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null --autoplay-policy=no-user-gesture-required --no-default-browser-check --disk-cache-size=96000000 --no-first-run --simulate-outdated-no-au='Tue, 31 Dec 2099 23:59:59 GMT'; done"
+Exec=  bash -c "while :;  /usr/bin/ember-kiosk-launch.sh http://localhost; done"
 Terminal=false
 Hidden=true
 EOF
@@ -88,9 +88,9 @@ cat << EOF > /usr/bin/ember-kiosk-launch.sh
 #!/bin/bash
 mkdir -p /dev/shm/kiosk-temp-config
 mkdir -p /dev/shm/kiosk-temp-cache
-XDG_CONFIG_HOME=/dev/shm/kiosk-temp-config
-XDG_CACHE_HOME=/dev/shm/kiosk-temp-cache
-/usr/bin/chromium-browser $1 --window-size=1920,1080 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --autoplay-policy=no-user-gesture-required --no-default-browser-check --disk-cache-size=48000000 --no-first-run --simulate-outdated-no-au='Tue, 31 Dec 2099 23:59:59 GMT' &
+export XDG_CONFIG_HOME=/dev/shm/kiosk-temp-config
+export XDG_CACHE_HOME=/dev/shm/kiosk-temp-cache
+/usr/bin/chromium-browser $1 --window-size=1920,1080 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --autoplay-policy=no-user-gesture-required --no-default-browser-check --disk-cache-size=48000000 --no-first-run --simulate-outdated-no-au='Tue, 31 Dec 2099 23:59:59 GMT'
 EOF
 
-chmod 755 ember-kiosk-launch.sh
+chmod 755 /usr/bin/ember-kiosk-launch.sh

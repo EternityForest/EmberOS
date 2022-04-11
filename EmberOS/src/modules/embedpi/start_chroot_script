@@ -65,17 +65,11 @@ yarn config set cache-folder /build_cache/yarncache
 apt-get install -y xserver-xorg-video-dummy xterm
 apt-get install -y dialog
 
-# Stop networkmanager start dhcpcd, fix it all after, because piwiz insists on using dhcpcd.
-cat << EOF > /etc/xdg/autostart/piwiz.desktop
-[Desktop Entry]
-Type=Application
-Name=Raspberry Pi First-Run Wizard
-Exec=sh -c 'sudo systemctl stop NetworkManager;sudo systemctl start dhcpcd;gsettings set org.gnome.mutter center-new-windows true; sudo -AE piwiz;sudo systemctl stop dhcpcd;sudo systemctl start import_wpa_conf_to_nm;sudo systemctl start NetworkManager;'
-StartupNotify=true
-EOF
+
 
 # Fix userconf pi to be out new lightdm-enabled version
 mv /filesystem/userconf-pi /usr/lib/userconf-pi/userconf
+chmod 755 /usr/lib/userconf-pi/userconf
 
 #Eliminate the apt-daily updates that can't work anyway on read only roots,
 #And were the suspected cause of periodic crashes in real deployments
@@ -139,7 +133,7 @@ RefuseManualStop=no # Allow manual stops
 
 [Timer]
 #Execute job if it missed a run due to machine being off
-Persistent=true
+Persistent=yes
 OnCalendar=*-*-01 02:00:00
 Unit=ember-update.service
 
@@ -225,9 +219,6 @@ sed -i 's/AutoEnable=false/AutoEnable=true/g' /etc/bluetooth/main.conf
 #Enable acting as a USB composite device on pi zero
 echo libcomposite >> /etc/modules 
 
-
-
-systemctl set-default multi-user.target
 
 #No more annoying popup about ssh passwords.
 ! rm /etc/xdg/lxsession/LXDE-pi/sshpwd.sh
@@ -863,6 +854,7 @@ cp /filesystem/apache2.conf /etc/apache2/apache2.conf
 mkdir -p /etc/apache2/sites-available/
 cp /filesystem/apache-0-defaults /etc/apache2/sites-available/000-default.conf
 
+systemctl enable apache2.service
 
 
 ######################################################

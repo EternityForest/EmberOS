@@ -575,6 +575,7 @@ KillSignal=SIGINT
 WantedBy=multi-user.target
 EOF
 
+systemctl enable armoria.service
 
 rsync -avz /build_cache/Armoria/ /opt/Armoria/
 
@@ -1223,6 +1224,7 @@ chmod 755 /usr/bin/wikioffline
 mkdir -p /var/www/html/webmap
 unpack /filesystem/webmap /var/www/html/webmap
 
+systemctl enable minidlna.service
 
 
 
@@ -1244,7 +1246,7 @@ WorkingDirectory=~
 WantedBy=sysinit.target
 EOF
 
-
+systemctl enable wikioffline@archlinux:1338.service
 
 apt-get -y install mosquitto libpng16-16 chromium-browser rpi-chromium-mods batmand batctl dhtnode ntpdate
 systemctl disable dhtnode.service

@@ -54,6 +54,7 @@ chmod -R 600 /etc/NetworkManager/system-connections/*
 
 # don't know what is messing this up
 chmod 755 /usr/bin/bluetooth-autoconnect.py
+systemctl enable bluetooth-autoconnect.service
 
 chown -R pi /home/pi
 chown root /sketch
