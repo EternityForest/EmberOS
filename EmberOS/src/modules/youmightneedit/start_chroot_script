@@ -199,6 +199,8 @@ sudo apt-get -y install libedgetpu1-std
 
 sudo apt-get -y install sonobus soundconverter
 
+sudo apt-get -y install dconf-editor
+
 
 # Make it discoverable
 cat << EOF > /usr/share/applications/sonobus2.desktop
@@ -354,8 +356,6 @@ apt-get -y install deluge audacity vlc vlc-plugin-base vlc-plugin-access-extra v
 mkdir -p /home/pi/.config/vlc/
 cp /filesystem/vlcrc /home/pi/.config/vlc/vlcrc
 
-#See above where we build from source because the dang thing won't let us do it the normal way yet.
-#apt-get -y install kodi kodi-pvr-mythtv kodi-pvr-dvbviewer kodi-pvr-iptvsimple
 
 apt-get -y install chromium-browser libreoffice-draw libreoffice-writer libreoffice-calc libreoffice-impress
 
@@ -385,7 +385,7 @@ sudo apt-get -y install python3-opencv libhdf5-dev libhdf5-serial-dev libatlas-b
 apt-get -y install chkservice onboard kmag
 
 
-apt-get -y install gnome-screenshot
+apt-get -y install gnome-screenshot gnome-system-monitor gnome-logs
 
 #Education
 apt-get -y install goldendict goldendict-wordnet 
@@ -1246,7 +1246,7 @@ WorkingDirectory=~
 WantedBy=sysinit.target
 EOF
 
-systemctl enable wikioffline@archlinux:1338.service
+systemctl enable zimserver@archlinux:1338.service
 
 apt-get -y install mosquitto libpng16-16 chromium-browser rpi-chromium-mods batmand batctl dhtnode ntpdate
 systemctl disable dhtnode.service

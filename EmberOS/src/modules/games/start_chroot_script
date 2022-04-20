@@ -22,8 +22,8 @@ then
 ! apt-get -y install ardentryst
 ! apt-get -y install open-invaders
 ! apt-get -y install monsterz
-! apt-get -y --no-install-recommends install performous
-! apt-get -y install performous-composer
+# ! apt-get -y --no-install-recommends install performous
+# ! apt-get -y install performous-composer
 
 
 cat << EOF > /usr/share/applications/XBubble.desktop
@@ -38,9 +38,8 @@ EOF
 #! apt-get -y install geekcode
 
 
-! apt-get -y install minetest minetest-mod-moreblocks minetest-mod-moreores minetest-mod-pipeworks minetest-server  minetest-mod-ethereal minetest-mod-homedecor
-! apt-get -y install minetest-mod-unified-inventory minetest-mod-mesecons  minetest-mod-unifieddyes minetest-mod-currency minetest-mod-character-creator  minetest-mod-basic-materials
-! apt-get -y install minetest-mod-torches minetest-mod-throwing 
+# All these are done through the included data pack now, since we focus on MineClone2
+apt-get -y install minetest
 
 systemctl disable minetest-server
 

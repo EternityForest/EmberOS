@@ -5,7 +5,6 @@ import re
 import os
 import configparser
 import uuid
-import stat
 
 # Note: Will Not Work with PiWiz!!! They do some dhcpcd stuff.
 
@@ -28,7 +27,7 @@ country_re = 'country\s*=\s*"?(...?)"?[\s$]'
 
 
 if os.path.exists("/etc/wpa_supplicant/wpa_supplicant.conf"):
-    with os.open("/etc/wpa_supplicant/wpa_supplicant.conf") as f:
+    with open("/etc/wpa_supplicant/wpa_supplicant.conf",'r') as f:
         s=f.read()
 
 
@@ -87,7 +86,7 @@ for i in re.findall(country_re,s):
 
 
 try:
-    os.makedirs("/var/run/NetworkManager/system-connections/",mode=16877)
+    os.makedirs("/etc/NetworkManager/system-connections/",mode=16877)
 except Exception:
     pass
 
@@ -96,18 +95,18 @@ for i in re.findall(n_re,s):
     c.read_string("[d]\r\n"+i)
     c = c['d']
     if 'ssid' in c and 'psk' in c:
-        t2 = template.replace('YourWifiNameHere',c['ssid'])
+        t2 = template.replace('YourWifiNameHere',c['ssid'].replace('"','') if c['ssid'].startswith('"') else c['ssid'])
         t2 = t2.replace('YourWifiPasswordHere',c['psk'])
         u = uuid.uuid5(uuid.UUID(nsuid),c['ssid']+ "/" + c['psk'] )
-        valid_uuids[u] == True
+        valid_uuids[str(u)] = True
         t2 = t2.replace('f671d4c3-2ae0-417d-ad5a-9bc1d040b0ec', str(u))
 
-        path = "/var/run/NetworkManager/system-connections/"+"wpaconf_donotedit"+c['ssid'].replace("/",'_').replace('"','').replace(" ",'_')
+        path = "/etc/NetworkManager/system-connections/"+"wpaconf_donotedit"+c['ssid'].replace("/",'_').replace('"','').replace(" ",'_')
 
 
         if os.path.exists(path):
             with open(path) as f:
-                if f==t2.read():
+                if t2==f.read():
                     continue
 
         with open(path,'w') as f:
@@ -116,17 +115,21 @@ for i in re.findall(n_re,s):
         if not os.stat(path).st_mode == '0o100600':
             os.chmod(path, 0o100600)
 
-for i in list(os.listdir("/var/run/NetworkManager/system-connections/")):
-    d = os.path.join("/var/run/NetworkManager/system-connections/", i)
+for i in list(os.listdir("/etc/NetworkManager/system-connections/")):
+    d = os.path.join("/etc/NetworkManager/system-connections/", i)
 
-    with open(d) as f:
-        s = d.read()
+    with open(d,'r') as f:
+        s = f.read()
     
     if "b2bdb0b4-11da-40f2-b121-e50a1fe6a7d9" in s:
         # Now we know it was made be this app
 
-        for i in valid_uuids:
-            if i in s:
+        valid = 0
+        for j in valid_uuids:
+            if j in s:
                 # We found one of the UUIDs that we know comes from one of our files
-                continue
+                valid = 1
+        if not valid:
+             os.remove(d)
         
+		

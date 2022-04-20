@@ -153,10 +153,15 @@ EOF
 
 cat << EOF >> /usr/bin/ember-update.sh
 #!/bin/bash
-apt update
+yes | apt update
 apt install ca-certificates
 apt install tzdata
 EOF
+
+# Extremely big offender for filling up the RAM and making a big crash.
+# I'd like to put it in /var/log but we really shouldn't be filling that to the brim either.
+mkdir -p /home/pi/.cache/lxsession/LXDE-pi/
+ln -sf /dev/null /home/pi/.cache/lxsession/LXDE-pi/run.log
 
 chmod 755 /usr/bin/ember-update.sh
 
@@ -166,10 +171,10 @@ systemctl enable ember-update.timer
 # We no longer have the SDK or the ASP.net becayuse we are moving away from AgentDVR which was the original reason to include it.
 
 cd /build_cache
-wget -nc https://download.visualstudio.microsoft.com/download/pr/283d08e5-e71b-404d-869c-e6ad820ade07/b46930dd45fd4d898c7f904fe33e566e/dotnet-runtime-3.1.21-linux-arm.tar.gz
-# wget -nc https://download.visualstudio.microsoft.com/download/pr/9092f467-8a52-482b-9295-6870e0e7fa73/a1474c461720fee5d82ba8efcd7ea3ce/aspnetcore-runtime-3.1.21-linux-arm.tar.gz
+# wget -nc https://download.visualstudio.microsoft.com/download/pr/283d08e5-e71b-404d-869c-e6ad820ade07/b46930dd45fd4d898c7f904fe33e566e/dotnet-runtime-3.1.21-linux-arm.tar.gz
+# # wget -nc https://download.visualstudio.microsoft.com/download/pr/9092f467-8a52-482b-9295-6870e0e7fa73/a1474c461720fee5d82ba8efcd7ea3ce/aspnetcore-runtime-3.1.21-linux-arm.tar.gz
 mkdir -p /opt/dotnet
-tar zxf dotnet-runtime-3.1.21-linux-arm.tar.gz -C /opt/dotnet
+# tar zxf dotnet-runtime-3.1.21-linux-arm.tar.gz -C /opt/dotnet
 #tar zxf aspnetcore-runtime-3.1.21-linux-arm.tar.gz -C /opt/dotnet
 
 # wget -nc https://download.visualstudio.microsoft.com/download/pr/e401b906-4681-437b-a1c5-21a2d7e0f83c/824371926ae334ac264b91d8234b350c/dotnet-sdk-3.1.415-linux-arm.tar.gz
@@ -1029,6 +1034,8 @@ cat << EOF > /etc/chromium/master-preferences
 
 EOF
 
+# Have to also disable it in pi confs
+cat /filesystem/chromeprefs.json /home/pi/.config/chromium/Default/Preferences
 
 cat /filesystem/xonshrc > /home/pi/.xonshrc
 

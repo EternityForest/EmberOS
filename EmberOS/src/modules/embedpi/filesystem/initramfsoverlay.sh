@@ -85,6 +85,7 @@ else
                 mkdir -p "${SELECTEDPROFILE}/home/"
                 mkdir -p "${SELECTEDPROFILE}/usr/"
                 mkdir -p "${SELECTEDPROFILE}/var/"
+                mkdir -p "${SELECTEDPROFILE}/root/"
 
 
                 mkdir -p "${SELECTEDPROFILE}/.overlay_work/etc"
@@ -93,6 +94,8 @@ else
                 mkdir -p "${SELECTEDPROFILE}/.overlay_work/opt"
                 mkdir -p "${SELECTEDPROFILE}/.overlay_work/home"
                 mkdir -p "${SELECTEDPROFILE}/.overlay_work/var"
+                mkdir -p "${SELECTEDPROFILE}/.overlay_work/root"
+
             fi
 
             mount -t overlay overlay -o "noatime,lowerdir=${rootmnt}/etc,upperdir=${SELECTEDPROFILE}/etc/,workdir=${SELECTEDPROFILE}/.overlay_work/etc" ${rootmnt}/etc/ || rescue_shell
@@ -101,7 +104,8 @@ else
             mount -t overlay overlay -o "noatime,lowerdir=${rootmnt}/opt,upperdir=${SELECTEDPROFILE}/opt/,workdir=${SELECTEDPROFILE}/.overlay_work/opt" ${rootmnt}/opt/ || rescue_shell
             mount -t overlay overlay -o "noatime,lowerdir=${rootmnt}/srv,upperdir=${SELECTEDPROFILE}/srv/,workdir=${SELECTEDPROFILE}/.overlay_work/srv" ${rootmnt}/srv/ || rescue_shell
             mount -t overlay overlay -o "noatime,lowerdir=${rootmnt}/home,upperdir=${SELECTEDPROFILE}/home/,workdir=${SELECTEDPROFILE}/.overlay_work/home" ${rootmnt}/home/ || rescue_shell
-        
+            mount -t overlay overlay -o "noatime,lowerdir=${rootmnt}/root,upperdir=${SELECTEDPROFILE}/root/,workdir=${SELECTEDPROFILE}/.overlay_work/root" ${rootmnt}/root/ || rescue_shell
+
             
             # We have a special flag that makes a profile 100% volatile
             if [ -f ${SELECTEDPROFILE}/volatile-overlay ]; then

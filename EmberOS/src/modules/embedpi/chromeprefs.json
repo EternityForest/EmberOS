@@ -1,0 +1,1138 @@
+{
+    "account_id_migration_state": 2,
+    "account_tracker_service_last_update": "13294883915081473",
+    "alternate_error_pages": {
+        "backup": false
+    },
+    "announcement_notification_service_first_run_time": "13294883913122247",
+    "autocomplete": {
+        "retention_policy_last_version": 98
+    },
+    "autofill": {
+        "orphan_rows_removed": true,
+        "upload_encoding_seed": "F6906981C4D6E7E0B54BAEEC54ADE48E"
+    },
+    "browser": {
+        "custom_chrome_frame": false,
+        "window_placement": {
+            "bottom": 684,
+            "left": 0,
+            "maximized": false,
+            "right": 1905,
+            "top": 279,
+            "work_area_bottom": 1048,
+            "work_area_left": 0,
+            "work_area_right": 1920,
+            "work_area_top": 0
+        }
+    },
+    "countryid_at_install": 21843,
+    "data_reduction": {
+        "daily_original_length": [
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "12825"
+        ],
+        "daily_received_length": [
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "12825"
+        ],
+        "last_update_date": "13294821600000000",
+        "this_week_number": 2728,
+        "this_week_services_downstream_foreground_kb": {
+            "104798869": 0,
+            "106373593": 0,
+            "112189210": 47,
+            "117649486": 441,
+            "35565745": 2,
+            "41424546": 12,
+            "49601082": 1,
+            "54845618": 9897,
+            "80134684": 2,
+            "82509217": 0,
+            "88863520": 0
+        }
+    },
+    "default_apps_install_state": 3,
+    "default_search_provider": {
+        "synced_guid": "9A111FB4-A8D3-4FDD-84CE-76178E50246B"
+    },
+    "default_search_provider_data": {
+        "template_url_data": {
+            "alternate_urls": [],
+            "contextual_search_url": "",
+            "created_by_policy": false,
+            "created_from_play_api": false,
+            "date_created": "13114024949603971",
+            "doodle_url": "",
+            "favicon_url": "https://duckduckgo.com/favicon.ico",
+            "id": "7",
+            "image_url": "",
+            "image_url_post_params": "",
+            "input_encodings": [],
+            "is_active": 0,
+            "keyword": "duckduckgo.com",
+            "last_modified": "13114024949603971",
+            "last_visited": "13294888784316289",
+            "logo_url": "",
+            "new_tab_url": "",
+            "originating_url": "",
+            "preconnect_to_search_url": false,
+            "prepopulate_id": 0,
+            "safe_for_autoreplace": false,
+            "search_url_post_params": "",
+            "short_name": "DuckDuckGo",
+            "suggestions_url": "",
+            "suggestions_url_post_params": "",
+            "synced_guid": "9A111FB4-A8D3-4FDD-84CE-76178E50246B",
+            "url": "https://duckduckgo.com/?q={searchTerms}&t=raspberrypi",
+            "usage_count": 0
+        }
+    },
+    "domain_diversity": {
+        "last_reporting_timestamp": "13294883915170656"
+    },
+    "download": {
+        "directory_upgrade": true
+    },
+    "extensions": {
+        "alerts": {
+            "initialized": true
+        },
+        "chrome_url_overrides": {},
+        "last_chrome_version": "98.0.4758.106",
+        "settings": {
+            "ahfgeienlihckogmohjhadlkjgocpleb": {
+                "active_permissions": {
+                    "api": [
+                        "management",
+                        "system.display",
+                        "system.storage",
+                        "webstorePrivate",
+                        "system.cpu",
+                        "system.memory",
+                        "system.network"
+                    ],
+                    "manifest_permissions": []
+                },
+                "app_launcher_ordinal": "t",
+                "commands": {},
+                "content_settings": [],
+                "creation_flags": 1,
+                "events": [],
+                "from_webstore": false,
+                "incognito_content_settings": [],
+                "incognito_preferences": {},
+                "install_time": "13294883913171712",
+                "location": 5,
+                "manifest": {
+                    "app": {
+                        "launch": {
+                            "web_url": "https://chrome.google.com/webstore"
+                        },
+                        "urls": [
+                            "https://chrome.google.com/webstore"
+                        ]
+                    },
+                    "description": "Discover great apps, games, extensions and themes for Chromium.",
+                    "icons": {
+                        "128": "webstore_icon_128.png",
+                        "16": "webstore_icon_16.png"
+                    },
+                    "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCtl3tO0osjuzRsf6xtD2SKxPlTfuoy7AWoObysitBPvH5fE1NaAA1/2JkPWkVDhdLBWLaIBPYeXbzlHp3y4Vv/4XG+aN5qFE3z+1RU/NqkzVYHtIpVScf3DjTYtKVL66mzVGijSoAIwbFCC3LpGdaoe6Q1rSRDp76wR6jjFzsYwQIDAQAB",
+                    "name": "Web Store",
+                    "permissions": [
+                        "webstorePrivate",
+                        "management",
+                        "system.cpu",
+                        "system.display",
+                        "system.memory",
+                        "system.network",
+                        "system.storage"
+                    ],
+                    "version": "0.2"
+                },
+                "needs_sync": true,
+                "page_ordinal": "n",
+                "path": "/usr/lib/chromium-browser/resources/web_store",
+                "preferences": {},
+                "regular_only_preferences": {},
+                "state": 1,
+                "was_installed_by_default": false,
+                "was_installed_by_oem": false
+            },
+            "aleakchihdccplidncghkekgioiakgal": {
+                "active_bit": false,
+                "active_permissions": {
+                    "api": [
+                        "storage"
+                    ],
+                    "manifest_permissions": [],
+                    "scriptable_host": [
+                        "*://*.youtu.be/*",
+                        "*://*.youtube-nocookie.com/*",
+                        "*://*.youtube.com/*"
+                    ]
+                },
+                "allowlist": 1,
+                "commands": {},
+                "content_settings": [],
+                "creation_flags": 9,
+                "events": [],
+                "from_webstore": true,
+                "granted_permissions": {
+                    "api": [
+                        "storage"
+                    ],
+                    "manifest_permissions": [],
+                    "scriptable_host": [
+                        "*://*.youtu.be/*",
+                        "*://*.youtube-nocookie.com/*",
+                        "*://*.youtube.com/*"
+                    ]
+                },
+                "incognito_content_settings": [],
+                "incognito_preferences": {},
+                "install_time": "13294883921783223",
+                "location": 1,
+                "manifest": {
+                    "browser_action": {
+                        "default_icon": {
+                            "128": "icons/icon128.png",
+                            "16": "icons/icon16.png",
+                            "48": "icons/icon48.png"
+                        },
+                        "default_popup": "options.html",
+                        "default_title": "h264ify"
+                    },
+                    "content_scripts": [
+                        {
+                            "all_frames": true,
+                            "js": [
+                                "src/inject/inject.js",
+                                "src/inject/content_script.js"
+                            ],
+                            "matches": [
+                                "*://*.youtube.com/*",
+                                "*://*.youtube-nocookie.com/*",
+                                "*://*.youtu.be/*"
+                            ],
+                            "run_at": "document_start"
+                        }
+                    ],
+                    "current_locale": "en_US",
+                    "default_locale": "en",
+                    "description": "Makes YouTube stream H.264 videos instead of VP8/VP9 videos",
+                    "differential_fingerprint": "1.7eb40708580d9969cd534a6c570b5a3b5d96b637d978fe3e1f1fe20124b7dd42",
+                    "homepage_url": "https://github.com/erkserkserks/h264ify",
+                    "icons": {
+                        "128": "icons/icon128.png",
+                        "16": "icons/icon16.png",
+                        "48": "icons/icon48.png"
+                    },
+                    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxpuYJpBArlJinXxN4oxx4UuFNreRTNO5Cl3TNF5FtDmgNLflbtYyC2nC5eZGxpNibzauHmGTD8ekFCfNZhHFpUEIZWd9AHI7TZdhu6gPxaK1lPEMukVEewFs2ovaEkjZbe3gy3v0eUDnADUkiaex7XeAWR6mJLzmcUaPFgzFRsDkozsE9tXLNN6oEYuWHN/yRsM1RYo7PYPulutHF8POL/8vDSyWHx/W9YDTnbv+2SBJZO7Dxi1/PbutasUag+/jma0X1nGhrEufr67NMvtpjPWSISWkIwxPR8u7EVyrKTSXs6U7jCbhKedhomeu9E/xZ1Er0dGWYWnhpdo0GNvblwIDAQAB",
+                    "manifest_version": 2,
+                    "name": "h264ify",
+                    "options_ui": {
+                        "page": "options.html"
+                    },
+                    "permissions": [
+                        "storage"
+                    ],
+                    "update_url": "https://clients2.google.com/service/update2/crx",
+                    "version": "1.1.0"
+                },
+                "needs_sync": true,
+                "path": "aleakchihdccplidncghkekgioiakgal/1.1.0_0",
+                "preferences": {},
+                "regular_only_preferences": {},
+                "state": 1,
+                "was_installed_by_default": false,
+                "was_installed_by_oem": false,
+                "withholding_permissions": false
+            },
+            "cjpalhdlnbpafiamejdnhcphjbkeiagm": {
+                "active_bit": false,
+                "active_permissions": {
+                    "api": [
+                        "contextMenus",
+                        "privacy",
+                        "storage",
+                        "tabs",
+                        "unlimitedStorage",
+                        "webNavigation",
+                        "webRequest",
+                        "webRequestBlocking"
+                    ],
+                    "explicit_host": [
+                        "\u003Call_urls>",
+                        "chrome://favicon/*"
+                    ],
+                    "manifest_permissions": [],
+                    "scriptable_host": [
+                        "http://*/*",
+                        "https://*.fanboy.co.nz/*",
+                        "https://*.github.io/*",
+                        "https://*.letsblock.it/*",
+                        "https://*/*",
+                        "https://easylist.to/*",
+                        "https://filterlists.com/*",
+                        "https://forums.lanik.us/*",
+                        "https://github.com/*"
+                    ]
+                },
+                "allowlist": 1,
+                "commands": {
+                    "launch-element-picker": {
+                        "suggested_key": ""
+                    },
+                    "launch-element-zapper": {
+                        "suggested_key": ""
+                    },
+                    "launch-logger": {
+                        "suggested_key": ""
+                    },
+                    "open-dashboard": {
+                        "suggested_key": ""
+                    },
+                    "relax-blocking-mode": {
+                        "suggested_key": ""
+                    },
+                    "toggle-cosmetic-filtering": {
+                        "suggested_key": ""
+                    }
+                },
+                "content_settings": [],
+                "creation_flags": 9,
+                "events": [],
+                "from_webstore": true,
+                "granted_permissions": {
+                    "api": [
+                        "contextMenus",
+                        "privacy",
+                        "storage",
+                        "tabs",
+                        "unlimitedStorage",
+                        "webNavigation",
+                        "webRequest",
+                        "webRequestBlocking"
+                    ],
+                    "explicit_host": [
+                        "\u003Call_urls>",
+                        "chrome://favicon/*",
+                        "http://*/*",
+                        "https://*/*"
+                    ],
+                    "manifest_permissions": [],
+                    "scriptable_host": [
+                        "http://*/*",
+                        "https://*.fanboy.co.nz/*",
+                        "https://*.github.io/*",
+                        "https://*.letsblock.it/*",
+                        "https://*/*",
+                        "https://easylist.to/*",
+                        "https://filterlists.com/*",
+                        "https://forums.lanik.us/*",
+                        "https://github.com/*"
+                    ]
+                },
+                "incognito_content_settings": [],
+                "incognito_preferences": {},
+                "install_time": "13294883926274493",
+                "location": 1,
+                "manifest": {
+                    "author": "Raymond Hill & contributors",
+                    "background": {
+                        "page": "background.html"
+                    },
+                    "browser_action": {
+                        "default_icon": {
+                            "16": "img/icon_16.png",
+                            "32": "img/icon_32.png"
+                        },
+                        "default_popup": "popup-fenix.html",
+                        "default_title": "uBlock Origin"
+                    },
+                    "commands": {
+                        "launch-element-picker": {
+                            "description": "Enter element picker mode"
+                        },
+                        "launch-element-zapper": {
+                            "description": "Enter element zapper mode"
+                        },
+                        "launch-logger": {
+                            "description": "Open the logger"
+                        },
+                        "open-dashboard": {
+                            "description": "Open the dashboard"
+                        },
+                        "relax-blocking-mode": {
+                            "description": "Relax blocking mode"
+                        },
+                        "toggle-cosmetic-filtering": {
+                            "description": "Toggle cosmetic filtering"
+                        }
+                    },
+                    "content_scripts": [
+                        {
+                            "all_frames": true,
+                            "js": [
+                                "/js/vapi.js",
+                                "/js/vapi-client.js",
+                                "/js/contentscript.js"
+                            ],
+                            "match_about_blank": true,
+                            "matches": [
+                                "http://*/*",
+                                "https://*/*"
+                            ],
+                            "run_at": "document_start"
+                        },
+                        {
+                            "all_frames": false,
+                            "js": [
+                                "/js/scriptlets/subscriber.js"
+                            ],
+                            "matches": [
+                                "https://easylist.to/*",
+                                "https://*.fanboy.co.nz/*",
+                                "https://filterlists.com/*",
+                                "https://forums.lanik.us/*",
+                                "https://github.com/*",
+                                "https://*.github.io/*",
+                                "https://*.letsblock.it/*"
+                            ],
+                            "run_at": "document_idle"
+                        }
+                    ],
+                    "content_security_policy": "script-src 'self'; object-src 'self'",
+                    "current_locale": "en_US",
+                    "default_locale": "en",
+                    "description": "Finally, an efficient blocker. Easy on CPU and memory.",
+                    "differential_fingerprint": "1.0fb563db7457545d600b5b8c7d8ca943cb6b3a57c2a64beedbb18b132228e3a0",
+                    "icons": {
+                        "128": "img/icon_128.png",
+                        "16": "img/icon_16.png",
+                        "32": "img/icon_32.png",
+                        "64": "img/icon_64.png"
+                    },
+                    "incognito": "split",
+                    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmJNzUNVjS6Q1qe0NRqpmfX/oSJdgauSZNdfeb5RV1Hji21vX0TivpP5gq0fadwmvmVCtUpOaNUopgejiUFm/iKHPs0o3x7hyKk/eX0t2QT3OZGdXkPiYpTEC0f0p86SQaLoA2eHaOG4uCGi7sxLJmAXc6IsxGKVklh7cCoLUgWEMnj8ZNG2Y8UKG3gBdrpES5hk7QyFDMraO79NmSlWRNgoJHX6XRoY66oYThFQad8KL8q3pf3Oe8uBLKywohU0ZrDPViWHIszXoE9HEvPTFAbHZ1umINni4W/YVs+fhqHtzRJcaKJtsTaYy+cholu5mAYeTZqtHf6bcwJ8t9i2afwIDAQAB",
+                    "manifest_version": 2,
+                    "minimum_chrome_version": "66.0",
+                    "name": "uBlock Origin",
+                    "options_ui": {
+                        "open_in_tab": true,
+                        "page": "dashboard.html"
+                    },
+                    "permissions": [
+                        "contextMenus",
+                        "privacy",
+                        "storage",
+                        "tabs",
+                        "unlimitedStorage",
+                        "webNavigation",
+                        "webRequest",
+                        "webRequestBlocking",
+                        "\u003Call_urls>"
+                    ],
+                    "short_name": "uBlock₀",
+                    "storage": {
+                        "managed_schema": "managed_storage.json"
+                    },
+                    "update_url": "https://clients2.google.com/service/update2/crx",
+                    "version": "1.42.4",
+                    "web_accessible_resources": [
+                        "/web_accessible_resources/*"
+                    ]
+                },
+                "needs_sync": true,
+                "path": "cjpalhdlnbpafiamejdnhcphjbkeiagm/1.42.4_0",
+                "preferences": {
+                    "enable_a_ping": false,
+                    "net.network_prediction_options": 2
+                },
+                "regular_only_preferences": {},
+                "state": 0,
+                "was_installed_by_default": false,
+                "was_installed_by_oem": false,
+                "withholding_permissions": false
+            },
+            "kmendfapggjehodndflmmgagdbamhnfd": {
+                "active_permissions": {
+                    "api": [
+                        "cryptotokenPrivate",
+                        "externally_connectable.all_urls",
+                        "tabs"
+                    ],
+                    "explicit_host": [
+                        "http://*/*",
+                        "https://*/*"
+                    ],
+                    "manifest_permissions": []
+                },
+                "commands": {},
+                "content_settings": [],
+                "creation_flags": 1,
+                "events": [
+                    "runtime.onConnectExternal"
+                ],
+                "from_webstore": false,
+                "incognito_content_settings": [],
+                "incognito_preferences": {},
+                "install_time": "13294883913176343",
+                "location": 5,
+                "manifest": {
+                    "background": {
+                        "persistent": false,
+                        "scripts": [
+                            "util.js",
+                            "b64.js",
+                            "cbor.js",
+                            "sha256.js",
+                            "timer.js",
+                            "countdown.js",
+                            "countdowntimer.js",
+                            "devicestatuscodes.js",
+                            "approvedorigins.js",
+                            "errorcodes.js",
+                            "webrequest.js",
+                            "messagetypes.js",
+                            "factoryregistry.js",
+                            "requesthelper.js",
+                            "asn1.js",
+                            "enroller.js",
+                            "requestqueue.js",
+                            "signer.js",
+                            "origincheck.js",
+                            "textfetcher.js",
+                            "appid.js",
+                            "watchdog.js",
+                            "logging.js",
+                            "webrequestsender.js",
+                            "window-timer.js",
+                            "cryptotokenorigincheck.js",
+                            "cryptotokenapprovedorigins.js",
+                            "inherits.js",
+                            "individualattest.js",
+                            "googlecorpindividualattest.js",
+                            "cryptotokenbackground.js"
+                        ]
+                    },
+                    "description": "CryptoToken Component Extension",
+                    "externally_connectable": {
+                        "ids": [
+                            "fjajfjhkeibgmiggdfehjplbhmfkialk"
+                        ],
+                        "matches": [
+                            "https://*/*"
+                        ]
+                    },
+                    "incognito": "split",
+                    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq7zRobvA+AVlvNqkHSSVhh1sEWsHSqz4oR/XptkDe/Cz3+gW9ZGumZ20NCHjaac8j1iiesdigp8B1LJsd/2WWv2Dbnto4f8GrQ5MVphKyQ9WJHwejEHN2K4vzrTcwaXqv5BSTXwxlxS/mXCmXskTfryKTLuYrcHEWK8fCHb+0gvr8b/kvsi75A1aMmb6nUnFJvETmCkOCPNX5CHTdy634Ts/x0fLhRuPlahk63rdf7agxQv5viVjQFk+tbgv6aa9kdSd11Js/RZ9yZjrFgHOBWgP4jTBqud4+HUglrzu8qynFipyNRLCZsaxhm+NItTyNgesxLdxZcwOz56KD1Q4IQIDAQAB",
+                    "manifest_version": 2,
+                    "name": "CryptoTokenExtension",
+                    "permissions": [
+                        "cryptotokenPrivate",
+                        "externally_connectable.all_urls",
+                        "tabs",
+                        "https://*/*",
+                        "http://*/*"
+                    ],
+                    "version": "0.9.74"
+                },
+                "path": "/usr/lib/chromium-browser/resources/cryptotoken",
+                "preferences": {},
+                "regular_only_preferences": {},
+                "state": 1,
+                "was_installed_by_default": false,
+                "was_installed_by_oem": false
+            },
+            "mhjfbmdgcfjbbpaeojofohoefgiehjai": {
+                "active_permissions": {
+                    "api": [
+                        "contentSettings",
+                        "fileSystem",
+                        "fileSystem.write",
+                        "metricsPrivate",
+                        "tabs",
+                        "resourcesPrivate"
+                    ],
+                    "explicit_host": [
+                        "chrome://resources/*"
+                    ],
+                    "manifest_permissions": []
+                },
+                "commands": {},
+                "content_settings": [],
+                "creation_flags": 1,
+                "events": [],
+                "from_webstore": false,
+                "incognito_content_settings": [],
+                "incognito_preferences": {},
+                "install_time": "13294883913174594",
+                "location": 5,
+                "manifest": {
+                    "content_security_policy": "script-src 'self' 'wasm-eval' blob: filesystem: chrome://resources; object-src * blob: externalfile: file: filesystem: data:",
+                    "description": "",
+                    "incognito": "split",
+                    "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDN6hM0rsDYGbzQPQfOygqlRtQgKUXMfnSjhIBL7LnReAVBEd7ZmKtyN2qmSasMl4HZpMhVe2rPWVVwBDl6iyNE/Kok6E6v6V3vCLGsOpQAuuNVye/3QxzIldzG/jQAdWZiyXReRVapOhZtLjGfywCvlWq7Sl/e3sbc0vWybSDI2QIDAQAB",
+                    "manifest_version": 2,
+                    "mime_types": [
+                        "application/pdf"
+                    ],
+                    "mime_types_handler": "index.html",
+                    "name": "Chromium PDF Viewer",
+                    "offline_enabled": true,
+                    "permissions": [
+                        "chrome://resources/",
+                        "contentSettings",
+                        "metricsPrivate",
+                        "resourcesPrivate",
+                        "tabs",
+                        {
+                            "fileSystem": [
+                                "write"
+                            ]
+                        }
+                    ],
+                    "version": "1"
+                },
+                "path": "/usr/lib/chromium-browser/resources/pdf",
+                "preferences": {},
+                "regular_only_preferences": {},
+                "state": 1,
+                "was_installed_by_default": false,
+                "was_installed_by_oem": false
+            }
+        },
+        "theme": {
+            "id": "",
+            "use_system": true
+        }
+    },
+    "first_run_tabs": [
+        "https://welcome.raspberrypi.org/raspberry-pi-os?id=UNIDENTIFIED"
+    ],
+    "gaia_cookie": {
+        "changed_time": 1650410316.633445,
+        "hash": "2jmj7l5rSw0yVb/vlWAYkK/YBwk=",
+        "last_list_accounts_data": "[\"gaia.l.a.r\",[]]"
+    },
+    "gcm": {
+        "product_category_for_subtypes": "org.chromium.linux"
+    },
+    "google": {
+        "services": {
+            "signin_scoped_device_id": "82e2a603-09eb-4031-ba2c-5726d902e910"
+        }
+    },
+    "http_original_content_length": "12825",
+    "http_received_content_length": "12825",
+    "intl": {
+        "selected_languages": "en-US,en"
+    },
+    "invalidation": {
+        "per_sender_topics_to_handler": {
+            "1013309121859": {},
+            "8181035976": {}
+        }
+    },
+    "media": {
+        "device_id_salt": "33E453E17898FEB80C4CE7507DF71419",
+        "engagement": {
+            "schema_version": 4
+        }
+    },
+    "media_router": {
+        "receiver_id_hash_token": "YL+OF4hI3JbcC8Nz130vCECiLccaQcQxoziz32T5f0Wec9gNnzWrfBuLYgs5xCz1KYjFxuedz8xMmXGCg1BB1Q=="
+    },
+    "ntp": {
+        "num_personal_suggestions": 2
+    },
+    "optimization_guide": {
+        "hintsfetcher": {
+            "hosts_successfully_fetched": {},
+            "last_fetch_attempt": "13294893192728475"
+        },
+        "predictionmodelfetcher": {
+            "last_fetch_attempt": "13294894434802079"
+        },
+        "previously_registered_optimization_types": {
+            "ABOUT_THIS_SITE": true
+        }
+    },
+    "pinned_tabs": [],
+    "plugins": {
+        "plugins_list": []
+    },
+    "profile": {
+        "avatar_bubble_tutorial_shown": 2,
+        "avatar_index": 26,
+        "content_settings": {
+            "enable_quiet_permission_ui_enabling_method": {
+                "notifications": 1
+            },
+            "exceptions": {
+                "accessibility_events": {},
+                "app_banner": {},
+                "ar": {},
+                "auto_select_certificate": {},
+                "automatic_downloads": {},
+                "autoplay": {},
+                "background_sync": {},
+                "bluetooth_chooser_data": {},
+                "bluetooth_guard": {},
+                "bluetooth_scanning": {},
+                "camera_pan_tilt_zoom": {},
+                "client_hints": {},
+                "clipboard": {},
+                "cookies": {},
+                "durable_storage": {},
+                "file_system_access_chooser_data": {},
+                "file_system_last_picked_directory": {},
+                "file_system_read_guard": {},
+                "file_system_write_guard": {},
+                "font_access": {},
+                "formfill_metadata": {},
+                "geolocation": {},
+                "hid_chooser_data": {},
+                "hid_guard": {},
+                "http_allowed": {},
+                "idle_detection": {},
+                "images": {},
+                "important_site_info": {},
+                "insecure_private_network": {},
+                "installed_web_app_metadata": {},
+                "intent_picker_auto_display": {},
+                "javascript": {},
+                "javascript_jit": {},
+                "legacy_cookie_access": {},
+                "media_engagement": {
+                    "https://content.minetest.net:443,*": {
+                        "expiration": "0",
+                        "last_modified": "13294892275280115",
+                        "model": 0,
+                        "setting": {
+                            "hasHighScore": false,
+                            "lastMediaPlaybackTime": 0.0,
+                            "mediaPlaybacks": 0,
+                            "visits": 8
+                        }
+                    },
+                    "https://duckduckgo.com:443,*": {
+                        "expiration": "0",
+                        "last_modified": "13294888785197807",
+                        "model": 0,
+                        "setting": {
+                            "hasHighScore": false,
+                            "lastMediaPlaybackTime": 0.0,
+                            "mediaPlaybacks": 0,
+                            "visits": 5
+                        }
+                    },
+                    "https://wiki.minetest.net:443,*": {
+                        "expiration": "0",
+                        "last_modified": "13294886152484717",
+                        "model": 0,
+                        "setting": {
+                            "hasHighScore": false,
+                            "lastMediaPlaybackTime": 0.0,
+                            "mediaPlaybacks": 0,
+                            "visits": 1
+                        }
+                    }
+                },
+                "media_stream_camera": {},
+                "media_stream_mic": {},
+                "midi_sysex": {},
+                "mixed_script": {},
+                "nfc": {},
+                "notifications": {},
+                "password_protection": {},
+                "payment_handler": {},
+                "permission_autoblocking_data": {},
+                "permission_autorevocation_data": {},
+                "popups": {},
+                "ppapi_broker": {},
+                "protocol_handler": {},
+                "safe_browsing_url_check_data": {},
+                "sensors": {},
+                "serial_chooser_data": {},
+                "serial_guard": {},
+                "site_engagement": {
+                    "http://localhost:1880,*": {
+                        "expiration": "0",
+                        "last_modified": "13294894207900424",
+                        "model": 0,
+                        "setting": {
+                            "lastEngagementTime": 1.3294894207900016e+16,
+                            "lastShortcutLaunchTime": 0.0,
+                            "pointsAddedToday": 7.199999999999998,
+                            "rawScore": 7.199999999999998
+                        }
+                    },
+                    "http://localhost:8002,*": {
+                        "expiration": "0",
+                        "last_modified": "13294894470526240",
+                        "model": 0,
+                        "setting": {
+                            "lastEngagementTime": 1.3294894470525644e+16,
+                            "lastShortcutLaunchTime": 0.0,
+                            "pointsAddedToday": 15.0,
+                            "rawScore": 15.0
+                        }
+                    },
+                    "https://content.minetest.net:443,*": {
+                        "expiration": "0",
+                        "last_modified": "13294892109868746",
+                        "model": 0,
+                        "setting": {
+                            "lastEngagementTime": 1.3294892109868436e+16,
+                            "lastShortcutLaunchTime": 0.0,
+                            "pointsAddedToday": 15.0,
+                            "rawScore": 15.0
+                        }
+                    },
+                    "https://duckduckgo.com:443,*": {
+                        "expiration": "0",
+                        "last_modified": "13294888636309342",
+                        "model": 0,
+                        "setting": {
+                            "lastEngagementTime": 1.3294888636308812e+16,
+                            "lastShortcutLaunchTime": 0.0,
+                            "pointsAddedToday": 11.1,
+                            "rawScore": 11.1
+                        }
+                    },
+                    "https://forum.minetest.net:443,*": {
+                        "expiration": "0",
+                        "last_modified": "13294886287043024",
+                        "model": 0,
+                        "setting": {
+                            "lastEngagementTime": 1.3294886287042706e+16,
+                            "lastShortcutLaunchTime": 0.0,
+                            "pointsAddedToday": 3.9000000000000004,
+                            "rawScore": 3.9000000000000004
+                        }
+                    },
+                    "https://wiki.minetest.net:443,*": {
+                        "expiration": "0",
+                        "last_modified": "13294886148846033",
+                        "model": 0,
+                        "setting": {
+                            "lastEngagementTime": 1.3294886148846e+16,
+                            "lastShortcutLaunchTime": 0.0,
+                            "pointsAddedToday": 2.1,
+                            "rawScore": 2.1
+                        }
+                    },
+                    "https://www.raspberrypi.com:443,*": {
+                        "expiration": "0",
+                        "last_modified": "13294883918310632",
+                        "model": 0,
+                        "setting": {
+                            "lastEngagementTime": 1.3294883918310582e+16,
+                            "lastShortcutLaunchTime": 0.0,
+                            "pointsAddedToday": 3.0,
+                            "rawScore": 3.0
+                        }
+                    }
+                },
+                "sound": {},
+                "ssl_cert_decisions": {},
+                "storage_access": {},
+                "subresource_filter": {},
+                "subresource_filter_data": {},
+                "usb_chooser_data": {},
+                "usb_guard": {},
+                "vr": {},
+                "webid_active_session": {},
+                "webid_request": {},
+                "webid_share": {},
+                "window_placement": {}
+            },
+            "pref_version": 1
+        },
+        "created_by_version": "98.0.4758.106",
+        "creation_time": "13294883911650144",
+        "exit_type": "Crashed",
+        "last_engagement_time": "13294894470525643",
+        "last_time_obsolete_http_credentials_removed": 1650410829.866427,
+        "managed_user_id": "",
+        "name": "Person 1",
+        "password_account_storage_settings": {},
+        "were_old_google_logins_removed": true
+    },
+    "protection": {
+        "macs": {
+            "browser": {
+                "show_home_button": "904452986128BBEE5A7B1FFB8F342100C3150E3D9FD76C4105DF33EB021E22FD"
+            },
+            "default_search_provider_data": {
+                "template_url_data": "330431447B0BE11B1D5FEC5EA61B0DE0ED42E80817EAE96D500B9BC230A67FCD"
+            },
+            "extensions": {
+                "settings": {
+                    "ahfgeienlihckogmohjhadlkjgocpleb": "155E24A09193D99B94016BF22AC2C74BBC8C5DFB6604EA3DD32655E9A4231C9D",
+                    "aleakchihdccplidncghkekgioiakgal": "523B98EBEE2E110CC131980825B6B02E1D70DA9F8DEA6F1D79DF4FEC48D44A41",
+                    "cjpalhdlnbpafiamejdnhcphjbkeiagm": "7DCE04CAD9FBDAF310A34F9BE2D13CF7A7B92AD78A3E3421B7F68E8EE3BA00B6",
+                    "kmendfapggjehodndflmmgagdbamhnfd": "3488C654478B82EC99863B8BEB36DE12E675080A8B70D54BCA78D4BF36AE5494",
+                    "mhjfbmdgcfjbbpaeojofohoefgiehjai": "D097D30CE7FA59DA3ABF2839A87337868CF18350B450E32131F913E52546C9A4"
+                }
+            },
+            "google": {
+                "services": {
+                    "account_id": "E5B4CD7C5FA271A47D07D462465AFD63DBF6A8CDFAFEF4839D13F8F552131486",
+                    "last_account_id": "6C67156FD15665D53CD24B5098D16B462BA8B8A0EFDD969A317C3235E973A4A3",
+                    "last_username": "24FCEF9BF7DF12A2935BE143E58951E09DBAA1D3E0E24430C0FF93009F5D6AFD"
+                }
+            },
+            "homepage": "B1E9FE8108A84F532486D13AAC43C0AFDA16D3DFC9EB2F743AEE11F89F2F163E",
+            "homepage_is_newtabpage": "3680F776D17E3C099431BAF5381FAB9BCC0C2C70FEA4C74D12324BC94A207119",
+            "media": {
+                "storage_id_salt": "E1848263E6199A89D48A7FDF168364BF0F31246A18227F3D149D4088C7F4D667"
+            },
+            "pinned_tabs": "699F1AC92729A024B80605AFC3C63BFB2A35B70C4214581BBE108F851528E9E8",
+            "prefs": {
+                "preference_reset_time": "95C909F3D0669D5931907B455F099C510E7770D9F0BA6FF13E4C76101B44F757"
+            },
+            "safebrowsing": {
+                "incidents_sent": "569707D9A4676B72F48BE92B740BE3EF895419C8A646F1AE1BA70BD9C3B41845"
+            },
+            "search_provider_overrides": "1E1EBA3A4DC28A23BEFCF6ED5D71CE71E9814DD587A305F6B14F72E834AF75DD",
+            "session": {
+                "restore_on_startup": "F9BD26F5D1AA6AB5258754888529CB2A82AE68D1703BCC2A97DEAEE5DDDA190E",
+                "startup_urls": "8BB8DBC1D7CA5C58F821C38254FB2B9C874F8EE9B9905B57DE48C731C6C91837"
+            }
+        }
+    },
+    "safebrowsing": {
+        "event_timestamps": {},
+        "metrics_last_log_time": "13294883913"
+    },
+    "search": {
+        "suggest_enabled": false
+    },
+    "sessions": {
+        "event_log": [
+            {
+                "crashed": false,
+                "time": "13294883913117475",
+                "type": 0
+            },
+            {
+                "crashed": true,
+                "time": "13294884369862203",
+                "type": 0
+            },
+            {
+                "error_count": 72,
+                "time": "13294885769728345",
+                "type": 3,
+                "unrecoverable_error_count": 0
+            },
+            {
+                "crashed": true,
+                "time": "13294888250125251",
+                "type": 0
+            },
+            {
+                "crashed": true,
+                "time": "13294888553468518",
+                "type": 0
+            },
+            {
+                "did_schedule_command": true,
+                "first_session_service": true,
+                "tab_count": 4,
+                "time": "13294889003259470",
+                "type": 2,
+                "window_count": 1
+            },
+            {
+                "crashed": false,
+                "time": "13294891639088725",
+                "type": 0
+            },
+            {
+                "did_schedule_command": true,
+                "first_session_service": true,
+                "tab_count": 3,
+                "time": "13294892275128195",
+                "type": 2,
+                "window_count": 1
+            },
+            {
+                "crashed": false,
+                "time": "13294893186396931",
+                "type": 0
+            }
+        ],
+        "session_data_status": 1
+    },
+    "signin": {
+        "allowed": false
+    },
+    "spellcheck": {
+        "dictionaries": [
+            "en-US"
+        ],
+        "dictionary": ""
+    },
+    "sync": {
+        "requested": false
+    },
+    "translate_site_blacklist": [],
+    "translate_site_blacklist_with_time": {},
+    "unified_consent": {
+        "migration_state": 10
+    },
+    "updateclientdata": {
+        "apps": {
+            "aleakchihdccplidncghkekgioiakgal": {
+                "cohort": "1::",
+                "cohortname": "",
+                "dlrc": 5587,
+                "fp": "1.7eb40708580d9969cd534a6c570b5a3b5d96b637d978fe3e1f1fe20124b7dd42",
+                "pf": "ac47cd59-4190-4be2-a16b-4846ffcc120d",
+                "pv": "1.1.0"
+            },
+            "cjpalhdlnbpafiamejdnhcphjbkeiagm": {
+                "cohort": "1::",
+                "cohortname": "",
+                "dlrc": 5587,
+                "fp": "1.0fb563db7457545d600b5b8c7d8ca943cb6b3a57c2a64beedbb18b132228e3a0",
+                "pf": "96b2e505-738e-4de3-bb01-ea9b683b2869",
+                "pv": "1.42.4"
+            }
+        }
+    },
+    "web_apps": {
+        "did_migrate_default_chrome_apps": [
+            "MigrateDefaultChromeAppToWebAppsGSuite",
+            "MigrateDefaultChromeAppToWebAppsNonGSuite"
+        ],
+        "last_preinstall_synchronize_version": "98",
+        "system_web_app_failure_count": 0,
+        "system_web_app_last_attempted_language": "en-US",
+        "system_web_app_last_attempted_update": "98.0.4758.106",
+        "system_web_app_last_installed_language": "en-US",
+        "system_web_app_last_update": "98.0.4758.106"
+    }
+}

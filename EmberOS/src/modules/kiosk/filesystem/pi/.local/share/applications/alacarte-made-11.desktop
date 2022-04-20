@@ -1,8 +1,0 @@
-[Desktop Entry]
-Comment=
-Terminal=false
-Name=Edit GUI Startup Apps
-Exec=pcmanfm ~/.config/autostart/
-Type=Application
-Icon=gnome-panel-launcher
-Categories=Settings
