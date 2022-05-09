@@ -35,8 +35,9 @@ apt-get -y install libreoffice-draw libreoffice-writer libreoffice-calc
 ! apt purge -y code-the-classics
 ! apt purge -y openjdk-11-jdk
 ! apt purge -y openjdk-11-jdk-headless
-! apt purge -y thonny
 ! apt purge -y bluej
+
+pip3 uninstall mu-editor
 
 ! rm -r /opt/Wolfram
 ! rm -r /usr/share/code-the-classics

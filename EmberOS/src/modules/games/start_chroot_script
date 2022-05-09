@@ -22,6 +22,7 @@ then
 ! apt-get -y install ardentryst
 ! apt-get -y install open-invaders
 ! apt-get -y install monsterz
+! apt-get -y install tuxtype
 # ! apt-get -y --no-install-recommends install performous
 # ! apt-get -y install performous-composer
 

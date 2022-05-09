@@ -32,6 +32,11 @@ sudo apt-get -y install eatmydata
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmydata
 export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 
+groupadd i2c
+usermod -aG i2c pi
+# We want an i2c group
+echo 'KERNEL=="i2c-[0-9]*", GROUP="i2c", MODE="0660"' >> /etc/udev/rules.d/10-local_i2c_group.rules
+
 
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
@@ -111,7 +116,8 @@ usermod -aG rtkit pi
 echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99-force-ipv4
 
 
-
+# Now that we can't get certain py2 libs easily. This fixes arduino ide
+sudo apt-get  install -y python-is-python3
 
 apt update -y --allow-releaseinfo-change
 #Upgrade everything BEFORE we build an initramfs
@@ -937,7 +943,7 @@ set showmode
 EOF
 
 # Disable uBlock Origin. It crashed several times, and might not even be supported in a year.
-cat << EOF > /etc/chromium/master-preferences
+cat << EOF > /etc/chromium/master_preferences
 {
 	"alternate_error_pages":{
 		"enabled":false
@@ -1034,8 +1040,6 @@ cat << EOF > /etc/chromium/master-preferences
 
 EOF
 
-# Have to also disable it in pi confs
-cat /filesystem/chromeprefs.json /home/pi/.config/chromium/Default/Preferences
 
 cat /filesystem/xonshrc > /home/pi/.xonshrc
 

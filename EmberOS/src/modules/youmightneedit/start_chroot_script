@@ -284,26 +284,30 @@ apt-get -y install dfu-programmer
 
 sudo apt-get -y install v4l-utils
 
+# Fix programs that expect it in /usr/bin when that is not where it goes
+ln -s /usr/local/bin/yt-dlp /usr/bin/yt-dlp
+
 python3 -m pip install -U yt-dlp
 
-# pip3 install flask
-# pip3 install peewee_migrate
-# pip3 install pydantic
-# sudo apt-get -y install python3-tflite-runtime
-# pip3 install ws4py
-# echo "VERSION='0.9.4-hackystandalone'" > frigate/version.py
 
-# # $CONFIG_FILE = "/home/daniel/frigate/config.yml"
-# cat << EOF > /sketch/frigate/config.yml
-# mqtt:
-#     host:localhost
-# EOF
+
+# Make it discoverable
+cat << EOF > /usr/share/applications/tartube.desktop
+[Desktop Entry]
+Name=Tartube(Video sites)
+Icon=audio-card
+Type=Application
+Exec=tartube
+Terminal=false
+Categories=AudioVideo
+EOF
+pip3 install tartube
 
 
 #Mega GUI apps
 if [ -z "$EMBER_MICRO" ]
 then
-apt-get -y install audacious audacious-plugins tuxguitar zeal inkscape filezilla gimp pulseview qdirstat gthumb simple-scan solaar
+apt-get -y install audacious audacious-plugins tuxguitar zeal inkscape filezilla gimp pulseview qdirstat gthumb simple-scan solaar gtkpod evolution
 ! apt-get -y install fbreader
 fi
 
@@ -1287,8 +1291,14 @@ sudo apt-get -y install syncthing-gtk retroshare
 fi
 
 
+cd /build_cache
 
+# This is the program that lets us get the SanDisk industrial health data.
 
+wget -nc  https://github.com/Ognian/sdmon/releases/download/v0.4.0/sdmon-armv7.tar.gz 
+tar zxf sdmon-armv7.tar.gz
+mv sdmon /usr/bin
+chmod 755 /usr/bin/sdmon 
 
 #HW drivers, gamepad mapping app
 sudo apt-get -y install xboxdrv xserver-xorg-input-wacom xserver-xorg-input-joystick antimicro 
@@ -1298,19 +1308,12 @@ apt-get -y install pcscd libpcsclite1 libpcsclite-dev pcsc-tools libtowitoko2 li
 
 apt-get -y install cardpeek
 
-apt-get -y install firmware-realtek python3-gattlib
+
+# Realtek and atheros are nonfree blobs we need for some cheap USB wifis
+apt-get -y install firmware-realtek firmware-atheros firmware-misc-nonfree python3-gattlib
 
 sudo apt-get install -y python3-pyscard
 
-
-##This is currently not included, it has some challenges getting install to work
-#Add the YT client
-# cd /filesystem/tartube
-# python3 setup.py install
-
-# #Hack-around for something setup.py should have beed doing for us
-# mkdir -p /usr/share/tartube/icons
-# cp -ar icons/. /usr/share/tartube/icons
 
 #Also gets firewalld
 # apt-get -y install firewall-config
@@ -1435,6 +1438,8 @@ apt-get -y install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-d
    xclip xsel libjpeg-dev
 
 
+apt-get install python3-evdev python3-xlib
+
 
 pip3 install kivy
 
@@ -1455,14 +1460,14 @@ pip3 install pyfirmata
 pip3 install python-can
 pip3 install pynput
 pip3 install enum-compat
-pip3 install pynput
 pip3 install simpleaudio
 pip3 install yeelight
 pip3 install upnpclient
 pip3 install sqlite3worker
 pip3 install pyusb
+pip3 install monitorcontrol
 
-
+pip3 install openmdao
 
 pip3 install Adafruit-SSD1306
 pip3 install Adafruit-BMP
@@ -1557,7 +1562,7 @@ apt-get -y install python3-dev build-essential gcc cmake make libtool m4 autocon
 
 
 
-apt-get -y install python3 systemd cython3 build-essential python3-serial cutecom xoscope sigrok sigrok-firmware-fx2lafw 
+apt-get -y install python3 systemd cython3 build-essential python3-serial cutecom xoscope sigrok sigrok-firmware-fx2lafw python3-matplotlib
 apt-get -y install python3-pyqt5 python3-pyqt5.qtsvg python3-pyqt5.qtchart libinput-tools
 apt-get -y install python3-tz python3-babel python3-boto3 python3-dateutil lm-sensors python3-lxml python3-six python3-requests avahi-discover python3-psutil backintime-qt4 python3-toml python3-hamlib
 
