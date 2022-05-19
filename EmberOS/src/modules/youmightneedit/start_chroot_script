@@ -15,6 +15,9 @@ apt-get -y install solaar xastir
 
 cd /build_cache
 
+# Openrgb deps
+apt-get -y install libmbedcrypto3 libmbedtls12 libmbedx509-0
+
 wget -nc https://openrgb.org/releases/release_0.7/openrgb_0.7_armhf_raspbian_bullseye_6128731.deb
 sudo apt-get -y install libhidapi-hidraw0 libc6 libgcc-s1
 
@@ -308,7 +311,7 @@ pip3 install tartube
 if [ -z "$EMBER_MICRO" ]
 then
 apt-get -y install audacious audacious-plugins tuxguitar zeal inkscape filezilla gimp pulseview qdirstat gthumb simple-scan solaar gtkpod evolution
-! apt-get -y install fbreader
+! apt-get -y install fbreader zim
 fi
 
 mkdir -p  /home/pi/.config/audacious/
@@ -1299,6 +1302,69 @@ wget -nc  https://github.com/Ognian/sdmon/releases/download/v0.4.0/sdmon-armv7.t
 tar zxf sdmon-armv7.tar.gz
 mv sdmon /usr/bin
 chmod 755 /usr/bin/sdmon 
+
+
+
+
+cat << EOF >> /etc/systemd/system/ember-sdmon-cache.timer
+[Unit]
+Description=Check SD wear status on supported industrial cards
+RefuseManualStart=no # Allow manual starts
+RefuseManualStop=no # Allow manual stops 
+
+[Timer]
+Persistent=no
+OnCalendar=daily
+Unit=ember-sdmon-cache.service
+
+[Install]
+WantedBy=timers.target
+EOF
+
+cat << EOF >> /etc/systemd/system/ember-sdmon-cache.service
+[Unit]
+Description=Check SD wear status on supported industrial cards
+
+[Service] 
+Type=simple
+ExecStart=/bin/bash /usr/bin/ember-sdmon-cache.sh
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat << EOF >> /usr/bin/ember-sdmon-cache.sh
+#!/bin/bash
+sdmon /dev/mmcblk0 > /dev/shm/sdmon_cache_mmcblk0~
+mv /dev/shm/sdmon_cache_mmcblk0~ /dev/shm/sdmon_cache_mmcblk0
+EOF
+
+cat << EOF >> /usr/bin/get-sdmon-remaining.py
+#!/usr/bin/python3
+import os
+import json
+if os.path.exists("/dev/shm/sdmon_cache_mmcblk0"):
+  with open("/dev/shm/sdmon_cache_mmcblk0") as f:
+    d = json.load(f)
+  if "enduranceRemainLifePercent" in d:
+    print(str(d["enduranceRemainLifePercent"])+'%')
+  elif "healthStatusPercentUsed" in d:
+    print(str(100 - d["healthStatusPercentUsed"])+'%')
+  else:
+    print("unknown %")
+
+EOF
+
+
+chmod 755 /usr/bin/ember-sdmon-cache.sh
+
+systemctl enable ember-sdmon-cache.timer
+
+
+
+
+
 
 #HW drivers, gamepad mapping app
 sudo apt-get -y install xboxdrv xserver-xorg-input-wacom xserver-xorg-input-joystick antimicro 

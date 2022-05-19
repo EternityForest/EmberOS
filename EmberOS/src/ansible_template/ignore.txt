@@ -4,44 +4,44 @@
 # Compiled python files no matter where they are
 **.pyc
 
-home/pi/kaithem/modules/data/Examples/**
+home/*/kaithem/modules/data/Examples/**
 
 # The old backup data dirs are named after timestamps
 # We don't want those
-home/pi/kaithem/modules/1*
-home/pi/kaithem/modules/2*
-home/pi/kaithem/modules/3*
-home/pi/kaithem/modules/4*
-home/pi/kaithem/modules/5*
-home/pi/kaithem/modules/6*
-home/pi/kaithem/modules/7*
-home/pi/kaithem/modules/8*
-home/pi/kaithem/modules/9*
-home/pi/kaithem/logs/**
+home/*/kaithem/modules/1*
+home/*/kaithem/modules/2*
+home/*/kaithem/modules/3*
+home/*/kaithem/modules/4*
+home/*/kaithem/modules/5*
+home/*/kaithem/modules/6*
+home/*/kaithem/modules/7*
+home/*/kaithem/modules/8*
+home/*/kaithem/modules/9*
+home/*/kaithem/logs/**
 
 
 
-home/pi/kaithem/users/1*
-home/pi/kaithem/users/2*
-home/pi/kaithem/users/3*
-home/pi/kaithem/users/4*
-home/pi/kaithem/users/5*
-home/pi/kaithem/users/6*
-home/pi/kaithem/users/7*
-home/pi/kaithem/users/8*
-home/pi/kaithem/users/9*
+home/*/kaithem/users/1*
+home/*/kaithem/users/2*
+home/*/kaithem/users/3*
+home/*/kaithem/users/4*
+home/*/kaithem/users/5*
+home/*/kaithem/users/6*
+home/*/kaithem/users/7*
+home/*/kaithem/users/8*
+home/*/kaithem/users/9*
 
-home/pi/kaithem/registry/1*
-home/pi/kaithem/registry/2*
-home/pi/kaithem/registry/3*
-home/pi/kaithem/registry/4*
-home/pi/kaithem/registry/5*
-home/pi/kaithem/registry/6*
-home/pi/kaithem/registry/7*
-home/pi/kaithem/registry/8*
-home/pi/kaithem/registry/9*
+home/*/kaithem/registry/1*
+home/*/kaithem/registry/2*
+home/*/kaithem/registry/3*
+home/*/kaithem/registry/4*
+home/*/kaithem/registry/5*
+home/*/kaithem/registry/6*
+home/*/kaithem/registry/7*
+home/*/kaithem/registry/8*
+home/*/kaithem/registry/9*
 
-home/pi/Downloads
+home/*/Downloads
 
 usr/share/zoneinfo/**
 usr/share/ca-certificates/**
@@ -56,16 +56,16 @@ usr/share/zimwikis/archlinux/**
 ssh/**
 
 
-home/pi/.local/share/marble/**
-home/pi/.local/share/Zeal/**
-home/pi/.kodi/addons/script.globalsearch/**
+home/*/.local/share/marble/**
+home/*/.local/share/Zeal/**
+home/*/.kodi/addons/script.globalsearch/**
 opt/**
 usr/share/**
 
 etc/apache2/mods-available/**
 
 # We probably don't want to be syncing every youtube vid...
-home/pi/tartube-data/**
+home/*/tartube-data/**
 
 # Standard apache2 stuff. I wish there was a better way to do this.
 # But everything has to be in this file so we can rsync it.
@@ -104,51 +104,77 @@ etc/apache2/mods-enabled/reqtimeout.load
 
 var/cache
 
-home/pi/.cache
+home/*/.cache
 
 #It is rather unfortunate that rhasspy/profiles/en mixes up their stuff
 
-home/pi/.config/rhasspy/profiles/en/acoustic_model/**
-home/pi/.config/rhasspy/profiles/en/deepspeech/model/*/output_graph.pbmm
-home/pi/.config/rhasspy/profiles/en/tts/**
+home/*/.config/rhasspy/profiles/en/acoustic_model/**
+home/*/.config/rhasspy/profiles/en/deepspeech/model/*/output_graph.pbmm
+home/*/.config/rhasspy/profiles/en/tts/**
 
-home/pi/.config/rhasspy/profiles/en/base_dictionary.txt.gz
-home/pi/.config/rhasspy/profiles/en/base_language_model.txt.gz
-home/pi/.config/rhasspy/profiles/en/clean.sh  
-home/pi/.config/rhasspy/profiles/en/espeak_phonemes.txt
-home/pi/.config/rhasspy/profiles/en/frequent_words.txt
-home/pi/.config/rhasspy/profiles/en/g2p.fst.gz
-home/pi/.config/rhasspy/profiles/en/g2p.fst
-home/pi/.config/rhasspy/profiles/en/g2p.corpus
+home/*/.config/rhasspy/profiles/en/base_dictionary.txt.gz
+home/*/.config/rhasspy/profiles/en/base_language_model.txt.gz
+home/*/.config/rhasspy/profiles/en/clean.sh  
+home/*/.config/rhasspy/profiles/en/espeak_phonemes.txt
+home/*/.config/rhasspy/profiles/en/frequent_words.txt
+home/*/.config/rhasspy/profiles/en/g2p.fst.gz
+home/*/.config/rhasspy/profiles/en/g2p.fst
+home/*/.config/rhasspy/profiles/en/g2p.corpus
 
-home/pi/.config/rhasspy/profiles/en/ipa_phonemes.txt
-home/pi/.config/rhasspy/profiles/en/LICENSE
-home/pi/.config/rhasspy/profiles/en/supervisord.pid
-home/pi/.config/rhasspy/profiles/en/supervisord.log
-home/pi/.config/rhasspy/profiles/en/docker-compose.yaml
+home/*/.config/rhasspy/profiles/en/ipa_phonemes.txt
+home/*/.config/rhasspy/profiles/en/LICENSE
+home/*/.config/rhasspy/profiles/en/supervisord.pid
+home/*/.config/rhasspy/profiles/en/supervisord.log
+home/*/.config/rhasspy/profiles/en/docker-compose.yaml
 
-home/pi/.config/rhasspy/profiles/en/marytts/**
-home/pi/.config/rhasspy/profiles/en/marytts_phonemes.txt
-home/pi/.config/rhasspy/profiles/en/phoneme_examples.txt
-home/pi/.config/rhasspy/profiles/en/README
-home/pi/.config/rhasspy/profiles/en/SOURCE
-home/pi/.config/rhasspy/profiles/en/stop_words.txt
-home/pi/.config/rhasspy/profiles/en/test/**
+home/*/.config/rhasspy/profiles/en/marytts/**
+home/*/.config/rhasspy/profiles/en/marytts_phonemes.txt
+home/*/.config/rhasspy/profiles/en/phoneme_examples.txt
+home/*/.config/rhasspy/profiles/en/README
+home/*/.config/rhasspy/profiles/en/SOURCE
+home/*/.config/rhasspy/profiles/en/stop_words.txt
+home/*/.config/rhasspy/profiles/en/test/**
+
+
 
 
 #I don't think we usually want shell history backups
-home/pi/.local/share/xonsh
+home/*/.local/share/xonsh
 
-home/pi/.local/share/marble/maps
+home/*/.local/share/marble/maps
 
-home/pi/AgentDVR/**
+home/*/AgentDVR/**
 #This line lets you back up AgentDVR config
-+ home/pi/AgentDVR/Media/**
-- home/pi/AgentDVR/Media/log_*
++ home/*/AgentDVR/Media/**
+- home/*/AgentDVR/Media/log_*
 
 # This stops backup from pulling actual video files, which you might not want.
-- home/pi/AgentDVR/Media/WebServerRoot/Media/**
+- home/*/AgentDVR/Media/WebServerRoot/Media/**
 
 
 # NVR Recordings. Maybe not wanted?
-home/pi/NVR/**
+home/*/NVR/**
+
+
+home/*/.wiki_indexes/**
+
+var/lib/dpkg/**
+var/lib/apt/**
+var/spool/**
+var/lib/fwupd
+
+var/lib/upower/*.dat
+var/lib/PackageKit
+var/lib/plymouth
+
+.overlay_work
+
+usr/bin
+usr/lib
+usr/share
+
+home/*/ansible/.tmp
+home/*/zimply.log
+
+
+/etc/ld.so.cache

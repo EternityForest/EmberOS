@@ -1,8 +1,8 @@
 ## Project Name Here
 
 This is an Ansible project folder based on the EmberOS template.  Note: the default template will only
-back up *changed* files from the writable overlay.  With a few exceptions like /boot it will not capture any of the default EmberOS
-data.
+back up *changed* files from the writable overlay.  You will most likely need to customize the playbooks to choose what to back up and restore.
+
 
 
 
@@ -51,13 +51,13 @@ For every project, copy the src/ansible template into your project folder, and r
 
 Add your machines to the inventory.ini file under the \[emberos\] role.
 
-Run the backup playbook and it will pull a backup from each machine, in roles/emberos/HOST/sketch and roles/emberos/HOST/boot.
+Run the backup playbook(With backup.sh) and it will pull a backup from each machine, in roles/emberos/HOST/sketch and roles/emberos/HOST/boot.
 
 You can have as many as you want, they stay separated by the actual hostname on the machine(Not the name given in the inventory file!).
 
 To change what is included or excluded, see /roles/emberos/ignore.txt.
 
-Use the deploy.yml to deploy everything.  
+Use the provision_all.yml to deploy everything.  
 
 
 Note: By default, the backup includes network config from the device and other private data! *It is not meant to share publically!*

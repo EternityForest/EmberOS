@@ -37,6 +37,7 @@
         - "--include=*.py"
         - "--include=*.sh"
         - "--exclude=*"
+        - "--prune-empty-dirs"
     become: yes
 
 
@@ -46,7 +47,6 @@
       dest: machines/{{ansible_hostname}}/root/
       checksum: yes
       mode: pull
-      #Things that presumably *could* be wanted
       rsync_opts:
         - "--exclude-from=ignore.txt"
     become: yes

@@ -17,6 +17,7 @@ aliases['mv']=['mv', '-i']
 aliases['rm']=['rm', '-Iv']
 aliases['mkdir']=['mkdir', '-p']
 aliases['sl']=['sl', '-e']
+aliases['cat']=['batcat', '-p']
 
 
 @events.on_postcommand

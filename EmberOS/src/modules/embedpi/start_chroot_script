@@ -13,6 +13,61 @@ set -e
 source /common.sh
 install_cleanup_trap
 
+
+# Move most of the deletion up front. Otherwise  it will get in the way and slow down the whole build.
+
+! apt purge -y valgrind
+
+! apt purge -y wolfram-engine wolframscript
+! apt purge -y sonic-pi-samples
+! apt purge -y libreoffice-base libreoffice-math 
+! apt purge -y libreoffice-help-common libreoffice-help-en-us
+apt-get -y install libreoffice-draw libreoffice-writer libreoffice-calc
+! apt purge -y nuscratch
+! apt purge -y scratch2
+! apt purge -y scratch3
+! apt purge -y scratch
+! apt purge -y minecraft-pi
+! apt purge -y python-minecraftpi
+! apt purge -y realvnc-vnc-viewer
+! apt purge -y gpicview
+! apt purge -y oracle-java8-jdk
+! apt purge -y oracle-java7-jdk
+! apt purge -y tcsh
+! apt purge -y nodejs-doc
+! apt purge -y smartsim
+
+# Old versions
+! apt purge -y gcc-7
+! apt purge -y gcc-8
+! apt purge -y gcc-9
+
+! apt purge -y ^dillo$  ^idle3$  ^smartsim$ ^sonic-pi$  ^epiphany-browser$  ^python-minecraftpi$ ^bluej$ 
+! apt purge -y ^greenfoot$  ^greenfoot-unbundled$  ^claws-mail$ ^claws-mail-i18n$
+
+! apt purge -y code-the-classics
+! apt purge -y openjdk-11-jdk
+! apt purge -y openjdk-11-jdk-headless
+! apt purge -y bluej
+! apt purge -y rpi-wayland
+
+
+pip3 uninstall mu-editor
+
+! rm -r /opt/Wolfram
+! rm -r /usr/share/code-the-classics
+! rm -r /home/pi/MagPi/*.pdf
+! rm -r /home/pi/Bookshelf/Beginners*.pdf
+
+apt autoremove -y --purge
+
+
+#This is entirely to trick openjre, which doesn't actually need /proc I don't think, but has an old test that fails without it.
+mkdir -p /proc
+mount -t tmpfs -o size=10M tmpfs /proc
+
+
+
 mkdir -p /build_cache/pip3cache
 
 # This can't be used inside the chroot.
@@ -32,10 +87,7 @@ sudo apt-get -y install eatmydata
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmydata
 export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 
-groupadd i2c
 usermod -aG i2c pi
-# We want an i2c group
-echo 'KERNEL=="i2c-[0-9]*", GROUP="i2c", MODE="0660"' >> /etc/udev/rules.d/10-local_i2c_group.rules
 
 
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
@@ -123,10 +175,6 @@ apt update -y --allow-releaseinfo-change
 #Upgrade everything BEFORE we build an initramfs
 #or don't if it crashe in the quemu on ubuntu
 apt-get -y full-upgrade
-
-#This is entirely to trick openjre, which doesn't actually need /proc I don't think, but has an old test that fails without it.
-mkdir -p /proc
-mount -t tmpfs -o size=10M tmpfs /proc
 
 
 # Apt update just the stuff that is likely to break or be a big problem if not updated.

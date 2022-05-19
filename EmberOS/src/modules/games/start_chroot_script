@@ -22,7 +22,10 @@ then
 ! apt-get -y install ardentryst
 ! apt-get -y install open-invaders
 ! apt-get -y install monsterz
-! apt-get -y install tuxtype
+! apt-get -y install klavaro
+! apt-get -y install flobopuyo
+
+
 # ! apt-get -y --no-install-recommends install performous
 # ! apt-get -y install performous-composer
 
@@ -35,6 +38,17 @@ Exec=xbubble
 Terminal=false
 Categories=Game;
 EOF
+
+# ! apt-get -y install pianobooster
+# cat << EOF > /usr/share/applications/pbsnd.desktop
+# [Desktop Entry]
+# Name=PianoBooster(w/sound)
+# Type=Application
+# Exec=bash -c "qsynth& pianobooster"
+# Terminal=false
+# Categories=Game;
+# EOF
+
 
 #! apt-get -y install geekcode
 
