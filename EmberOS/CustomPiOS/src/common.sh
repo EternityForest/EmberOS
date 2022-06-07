@@ -6,19 +6,23 @@ function die () {
 }
 
 function fixLd(){
-  sed -i 's@/usr/lib/arm-linux-gnueabihf/libcofi_rpi.so@\#/usr/lib/arm-linux-gnueabihf/libcofi_rpi.so@' etc/ld.so.preload
-  sed -i 's@/usr/lib/arm-linux-gnueabihf/libarmmem.so@\#/usr/lib/arm-linux-gnueabihf/libarmmem.so@' etc/ld.so.preload
+    if [ -f etc/ld.so.preload ]; then
+        sed -i 's@/usr/lib/arm-linux-gnueabihf/libcofi_rpi.so@\#/usr/lib/arm-linux-gnueabihf/libcofi_rpi.so@' etc/ld.so.preload
+        sed -i 's@/usr/lib/arm-linux-gnueabihf/libarmmem.so@\#/usr/lib/arm-linux-gnueabihf/libarmmem.so@' etc/ld.so.preload
   
-  # Debian Buster/ Raspbian 2019-06-20
-  sed -i 's@/usr/lib/arm-linux-gnueabihf/libarmmem-${PLATFORM}.so@#/usr/lib/arm-linux-gnueabihf/libarmmem-${PLATFORM}.so@' etc/ld.so.preload
+        # Debian Buster/ Raspbian 2019-06-20
+        sed -i 's@/usr/lib/arm-linux-gnueabihf/libarmmem-${PLATFORM}.so@#/usr/lib/arm-linux-gnueabihf/libarmmem-${PLATFORM}.so@' etc/ld.so.preload
+   fi
 }
 
 function restoreLd(){
-  sed -i 's@\#/usr/lib/arm-linux-gnueabihf/libcofi_rpi.so@/usr/lib/arm-linux-gnueabihf/libcofi_rpi.so@' etc/ld.so.preload
-  sed -i 's@\#/usr/lib/arm-linux-gnueabihf/libarmmem.so@/usr/lib/arm-linux-gnueabihf/libarmmem.so@' etc/ld.so.preload
+    if [ -f etc/ld.so.preload ]; then
+        sed -i 's@\#/usr/lib/arm-linux-gnueabihf/libcofi_rpi.so@/usr/lib/arm-linux-gnueabihf/libcofi_rpi.so@' etc/ld.so.preload
+        sed -i 's@\#/usr/lib/arm-linux-gnueabihf/libarmmem.so@/usr/lib/arm-linux-gnueabihf/libarmmem.so@' etc/ld.so.preload
   
-  # Debian Buster/ Raspbian 2019-06-20
-  sed -i 's@#/usr/lib/arm-linux-gnueabihf/libarmmem-${PLATFORM}.so@/usr/lib/arm-linux-gnueabihf/libarmmem-${PLATFORM}.so@' etc/ld.so.preload
+        # Debian Buster/ Raspbian 2019-06-20
+        sed -i 's@#/usr/lib/arm-linux-gnueabihf/libarmmem-${PLATFORM}.so@/usr/lib/arm-linux-gnueabihf/libarmmem-${PLATFORM}.so@' etc/ld.so.preload
+    fi
 }
 
 function pause() {
@@ -42,12 +46,12 @@ function echo_green() {
 function gitclone(){
   # call like this: gitclone OCTOPI_OCTOPRINT_REPO someDirectory -- this will do:
   #
-  #   sudo -u pi git clone -b $OCTOPI_OCTOPRINT_REPO_BRANCH --depth $OCTOPI_OCTOPRINT_REPO_DEPTH $OCTOPI_OCTOPRINT_REPO_BUILD someDirectory
+  #   sudo -u "${BASE_USER}" git clone -b $OCTOPI_OCTOPRINT_REPO_BRANCH --depth $OCTOPI_OCTOPRINT_REPO_DEPTH $OCTOPI_OCTOPRINT_REPO_BUILD someDirectory
   # 
   # and if $OCTOPI_OCTOPRINT_REPO_BUILD != $OCTOPI_OCTOPRINT_REPO_SHIP also:
   #
   #   pushd someDirectory
-  #     sudo -u pi git remote set-url origin $OCTOPI_OCTOPRINT_REPO_SHIP
+  #     sudo -u "${BASE_USER}" git remote set-url origin $OCTOPI_OCTOPRINT_REPO_SHIP
   #   popd
   # 
   # if second parameter is not provided last URL segment of the BUILD repo URL
@@ -58,12 +62,6 @@ function gitclone(){
   repo_branch_var=$1_BRANCH
   repo_depth_var=$1_DEPTH
   repo_recursive_var=$1_RECURSIVE
-  
-  repo_dir=$2
-  if [ ! -n "$repo_dir" ]
-  then
-    repo_dir=$(echo ${REPO} | sed 's%^.*/\([^/]*\)\(\.git\)?$%\1%g')
-  fi
 
   repo_depth=${!repo_depth_var}
   if [ -n "$repo_depth" ]
@@ -102,13 +100,23 @@ function gitclone(){
   then
     clone_params="$clone_params --depth $depth"
   fi
-
-  sudo -u pi git clone $clone_params "$build_repo" "$repo_dir"
+  
+  repo_dir=$2
+  if [ ! -n "$repo_dir" ]
+  then
+    repo_dir=$(echo ${repo_dir} | sed 's%^.*/\([^/]*\)\(\.git\)?$%\1%g')
+  fi
+  
+  if [ "$repo_dir" == "" ]; then
+      sudo -u "${BASE_USER}" git clone $clone_params "$build_repo"
+  else
+      sudo -u "${BASE_USER}" git clone $clone_params "$build_repo" "$repo_dir"
+  fi
 
   if [ "$build_repo" != "$ship_repo" ]
   then
     pushd "$repo_dir"
-      sudo -u pi git remote set-url origin "$ship_repo"
+      sudo -u "${BASE_USER}" git remote set-url origin "$ship_repo"
     popd
   fi
 }
@@ -145,14 +153,29 @@ function detach_all_loopback(){
   # Cleans up mounted loopback devices from the image name
   # NOTE: it might need a better way to grep for the image name, its might clash with other builds
   for img in $(losetup  | grep $1 | awk '{ print $1 }' );  do
-    losetup -d $img
+    if [[ -f $img ]]; then
+    	losetup -d $img
+    fi
   done
+}
+
+function test_for_image(){
+  if [ ! -f "$1" ]; then
+    echo "Warning, can't see image file: $image"
+  fi
 }
 
 function mount_image() {
   image_path=$1
   root_partition=$2
   mount_path=$3
+  
+  boot_mount_path=boot
+  if [ "$#" -gt 3 ]
+  then
+    boot_mount_path=$4
+  fi
+  
   echo $2
 
   # dump the partition table, locate boot partition and root partition
@@ -166,15 +189,18 @@ function mount_image() {
   # mount root and boot partition
   
   detach_all_loopback $image_path
+  echo "Mounting root parition"
   sudo losetup -f
   sudo mount -o loop,offset=$root_offset $image_path $mount_path/
   if [[ "$boot_partition" != "$root_partition" ]]; then
+	  echo "Mounting boot partition"
 	  sudo losetup -f
-	  sudo mount -o loop,offset=$boot_offset,sizelimit=$( expr $root_offset - $boot_offset ) $image_path $mount_path/boot
+	  sudo mount -o loop,offset=$boot_offset,sizelimit=$( expr $root_offset - $boot_offset ) "${image_path}" "${mount_path}"/"${boot_mount_path}"
   fi
   sudo mkdir -p $mount_path/dev/pts
   sudo mount -o bind /dev $mount_path/dev
   sudo mount -o bind /dev/pts $mount_path/dev/pts
+  sudo mount -o bind /proc $mount_path/proc
 }
 
 function unmount_image() {
@@ -185,12 +211,13 @@ function unmount_image() {
     force=$2
   fi
 
+  sync
   if [ -n "$force" ]
   then
-    for process in $(sudo lsof $mount_path | awk '{print $2}')
+    for pid in $(sudo lsof -t $mount_path)
     do
-      echo "Killing process id $process..."
-      sudo kill -9 $process
+      echo "Killing process $(ps -p $pid -o comm=) with pid $pid..."
+      sudo kill -9 $pid
     done
   fi
 
@@ -261,6 +288,7 @@ p
 w
 FDISK
   detach_all_loopback $image
+  test_for_image $image
   LODEV=$(losetup -f --show -o $offset $image)
   trap 'losetup -d $LODEV' EXIT
 
@@ -285,6 +313,7 @@ function shrink_ext() {
   offset=$(($start*512))
 
   detach_all_loopback $image
+  test_for_image $image
   LODEV=$(losetup -f --show -o $offset $image)
   trap 'losetup -d $LODEV' EXIT
 
@@ -321,6 +350,7 @@ FDISK
 
   echo "Resizing filesystem ..."
   detach_all_loopback $image
+  test_for_image $image
   LODEV=$(losetup -f --show -o $offset $image)
   trap 'losetup -d $LODEV' EXIT
 
@@ -343,6 +373,7 @@ function minimize_ext() {
   offset=$(($start*512))
 
   detach_all_loopback $image
+  test_for_image $image
   LODEV=$(losetup -f --show -o $offset $image)
   trap 'losetup -d $LODEV' EXIT
 
@@ -376,6 +407,20 @@ function minimize_ext() {
   fi
 }
 
+# Skip apt update if Cache not older than 1 Hour.
+function apt_update_skip() {
+  if [ -f "/var/cache/apt/pkgcache.bin" ] && \
+  [ "$(($(date +%s)-$(stat -c %Y /var/cache/apt/pkgcache.bin)))" -lt "3600" ];
+  then
+      echo_green "APT Cache needs no update! [SKIPPED]"
+  else
+      # force update
+      echo_red "APT Cache needs to be updated!"
+      echo_green "Running 'apt update' ..."
+      apt update
+  fi
+}
+
 function is_installed(){
   # checks if a package is installed, returns 1 if installed and 0 if not.
   # usage: is_installed <package_name>
@@ -389,6 +434,33 @@ function is_in_apt(){
     echo 1
   else
     echo 0
+  fi
+}
+
+### Only install Packages if not installed.
+##  check_install_pkgs $MODULNAME_PKGS_VAR (Replace with your Variable set in config file)
+function check_install_pkgs() {
+  ## Build Array from Var
+  local missing_pkgs
+  for dep in "$@"; do
+    # if in apt cache and not installed add to array
+    if [ $(is_in_apt ${dep}) -eq 1 ] && [ $(is_installed ${dep}) -ne 1 ]; then
+      missing_pkgs+=("${dep}")
+    #if in apt cache and installed
+    elif [ $(is_in_apt ${dep}) -eq 1 ] && [ $(is_installed ${dep}) -eq 1 ]; then
+      echo_green "Package ${dep} already installed. [SKIPPED]"
+    # if not in apt cache and not installed
+    else
+      echo_red "Missing Package ${dep} not found in Apt Repository. [SKIPPED]"
+    fi 
+  done
+  # if missing pkgs install missing else skip that.
+  if [ "${#missing_pkgs[@]}" -ne 0 ]; then
+      echo_red "${#missing_pkgs[@]} missing Packages..."
+      echo_green "Installing ${missing_pkgs[@]}"
+      apt install --yes "${missing_pkgs[@]}"
+  else
+      echo_green "No Dependencies missing... [SKIPPED]"
   fi
 }
 
@@ -440,3 +512,8 @@ function copy_and_export_folder(){
   cp -va $@ | awk -F  "' -> '"  '{print substr($2, 1, length($2)-1)}' | xargs -d"\n" -t bash -x -c 'custompios_export '${OUTPUT}' "$@"' _
 }
 
+function set_config_var() {
+  # Set a value for a specific variable in /boot/config.txt
+  # See https://github.com/RPi-Distro/raspi-config/blob/master/raspi-config#L231
+  raspi-config nonint set_config_var $1 $2 /boot/config.txt
+}

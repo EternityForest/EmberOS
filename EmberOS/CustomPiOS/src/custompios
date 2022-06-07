@@ -12,8 +12,12 @@ source ${CUSTOM_PI_OS_PATH}/common.sh
 function execute_chroot_script() {
 
   # In docker, these extra commands are required to enable this black-magic
-  if [ -f /.dockerenv ]; then
-    update-binfmts --enable qemu-arm
+  if [ -f /.dockerenv ] && [ "$(arch)" != "armv7l" ] && [ "$(arch)" != "aarch64" ] ; then
+    if [ "$BASE_ARCH" == "armv7l" ]; then
+      update-binfmts --enable qemu-arm
+    elif [ "$BASE_ARCH" == "aarch64" ] || [ "$BASE_ARCH" == "arm64" ]; then
+      update-binfmts --enable qemu-aarch64
+    fi
     mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc || true
   fi
   #move filesystem files
@@ -22,14 +26,32 @@ function execute_chroot_script() {
   fi
 
   #black magic of qemu-arm-static
-  cp `which qemu-arm-static` usr/bin
+  # cp `which qemu-arm-static` usr/bin
+  if [ "$(arch)" != "armv7l" ] && [ "$(arch)" != "aarch64" ] ; then
+    if [ "$BASE_ARCH" == "armv7l" ]; then
+      cp `which qemu-arm-static` usr/bin/qemu-arm-static
+    elif [ "$BASE_ARCH" == "aarch64" ] || [ "$BASE_ARCH" == "arm64" ]; then
+      cp `which qemu-aarch64-static` usr/bin/qemu-aarch64-static
+    fi
+  fi
   
   cp $2 chroot_script
   chmod 755 chroot_script
-  cp ${CUSTOM_PI_OS_PATH}/common.sh common.sh
+  cp "${CUSTOM_PI_OS_PATH}"/common.sh common.sh
   chmod 755 common.sh
   
-  chroot . usr/bin/qemu-arm-static /bin/bash /chroot_script
+  if [ "$(arch)" != "armv7l" ] && [ "$(arch)" != "aarch64" ] && [ "$(arch)" != "arm64" ] ; then
+    if [ "$BASE_ARCH" == "armv7l" ]; then
+      echo "Building on non-ARM device a armv7l system, using qemu-arm-static"
+      chroot . usr/bin/qemu-arm-static /bin/bash /chroot_script
+    elif [ "$BASE_ARCH" == "aarch64" ] || [ "$BASE_ARCH" == "arm64" ]; then
+      echo "Building on non-ARM device a aarch64/arm64 system, using qemu-aarch64-static"
+      chroot . usr/bin/qemu-aarch64-static /bin/bash /chroot_script
+    fi
+  else
+    echo "Building on ARM device a armv7l/aarch64/arm64 system, not using qemu"
+    chroot . /bin/bash /chroot_script
+  fi
   
   # Handle exported items
   if [ -d "custompios_export" ]; then
@@ -69,7 +91,14 @@ pushd $BASE_WORKSPACE
     echo "Error: could not find image: $BASE_ZIP_IMG"
     exit 1
   fi
-  7za x -aoa "$BASE_ZIP_IMG"
+  
+  if [[ $BASE_ZIP_IMG =~ \.img$ ]]; then
+    # if the image is already extracted copy over
+    cp "$BASE_ZIP_IMG" .
+  else
+    7za x -aoa "$BASE_ZIP_IMG"
+  fi
+  
   BASE_IMG_PATH=`ls | grep '.img$\|.raw$' | head -n 1`
   if [ ! -f "$BASE_IMG_PATH" ]; then
     echo "Error, can't find image path, did you place an image in the image folder?"
@@ -84,16 +113,18 @@ pushd $BASE_WORKSPACE
   fi
 
   # mount root and boot partition
-  mount_image $BASE_IMG_PATH $BASE_ROOT_PARTITION $BASE_MOUNT_PATH
+  mount_image "${BASE_IMG_PATH}" "${BASE_ROOT_PARTITION}" "${BASE_MOUNT_PATH}" "${BASE_BOOT_MOUNT_PATH}"
   if [ -n "$BASE_APT_CACHE" ] && [ "$BASE_APT_CACHE" != "no" ]
   then
     mkdir -p "$BASE_APT_CACHE"
     mount --bind "$BASE_APT_CACHE" $BASE_MOUNT_PATH/var/cache/apt
   fi
 
+
   mkdir -p $BASE_WORKSPACE/build_cache
   mkdir -p $BASE_MOUNT_PATH/build_cache
   mount --bind $BASE_WORKSPACE/build_cache $BASE_MOUNT_PATH/build_cache
+
 
   #Edit pi filesystem
   pushd $BASE_MOUNT_PATH
@@ -124,7 +155,7 @@ pushd $BASE_WORKSPACE
     CHROOT_SCRIPT=${BASE_WORKSPACE}/chroot_script
     python3 ${CUSTOM_PI_OS_PATH}/execution_order.py "${MODULES}" ${CHROOT_SCRIPT}
     export -f execute_chroot_script
-    ${CHROOT_SCRIPT}
+    bash -x "${CHROOT_SCRIPT}"
     
     
     # if building a variant, execute its post-chroot script

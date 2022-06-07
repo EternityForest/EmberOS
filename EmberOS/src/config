@@ -3,4 +3,4 @@ export DIST_VERSION=0.1.0
 export MODULES="base(embedpi(netcfg,youmightneedit,kaithem,genfortune,audiomanage,timemanagement, rtc,youwontneedit,games,fileserver,kiosk,hostnameconfig))"
 export BASE_IMAGE_ENLARGEROOT=8192
 export BASE_IMAGE_RESIZEROOT=1024
-
+export BASE_ARCH=aarch64

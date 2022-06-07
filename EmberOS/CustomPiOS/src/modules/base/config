@@ -1,8 +1,9 @@
+#!/bin/bash
 ###############################################################################
 # All our config settings must start with BASE_
 
 # CustomPiOS version
-BASE_VERSION=1.3.0
+BASE_VERSION=1.5.0
 
 [ -n "$BASE_PRESCRIPT" ] || BASE_PRESCRIPT=
 [ -n "$BASE_POSTSCRIPT" ] || BASE_POSTSCRIPT=
@@ -11,17 +12,52 @@ BASE_VERSION=1.3.0
 [ -n "$BASE_IMAGE_PATH" ] || BASE_IMAGE_PATH=${DIST_PATH}/image
 [ -n "$BASE_IMAGE_RASPBIAN" ] || BASE_IMAGE_RASPBIAN=yes
 
-[ -n "$BASE_ZIP_IMG" ] || BASE_ZIP_IMG=`ls -t $BASE_IMAGE_PATH/*-raspbian*.zip | head -n 1`
+# Distro
+[ -n "$BASE_DISTRO" ] || BASE_DISTRO=raspbian
+
+# Note: Set BASE_ZIP_IMG relative to the distro/src/workspace directory to pass a custom named file or an already extracted '.img'-file.
+if [ "${BASE_DISTRO}" == "ubuntu" ]; then
+    # Default image ubuntu
+    [ -n "$BASE_ZIP_IMG" ] || BASE_ZIP_IMG=`ls -t $BASE_IMAGE_PATH/ubuntu-*.xz | head -n 1`
+    # Default user ubuntu
+    [ -n "$BASE_USER" ] || BASE_USER=ubuntu
+    
+    # Add base user if does not exist
+    [ -n "$BASE_ADD_USER" ] || BASE_ADD_USER=yes
+    # When adding a base user which password to use
+    [ -n "$BASE_USER_PASSWORD" ] || BASE_USER_PASSWORD=ubuntu
+    elif [ "${BASE_DISTRO}" == "raspios64" ]; then
+    [ -n "$BASE_ZIP_IMG" ] || BASE_ZIP_IMG=`ls -t $BASE_IMAGE_PATH/*-{raspbian,raspios}-*-arm64-*.{zip,7z,xz} | head -n 1`
+    [ -n "$BASE_ADD_USER" ] || BASE_ADD_USER=no
+else
+    # Default image raspbian
+    [ -n "$BASE_ZIP_IMG" ] || BASE_ZIP_IMG=`ls -t $BASE_IMAGE_PATH/*-{raspbian,raspios}*.{zip,7z,xz} | head -n 1`
+    # Default user raspbian
+    [ -n "$BASE_USER" ] || BASE_USER=pi
+    [ -n "$BASE_ADD_USER" ] || BASE_ADD_USER=no
+fi
+
+# Release compression
+[ -n "$BASE_RELEASE_COMPRESS" ] || BASE_RELEASE_COMPRESS=yes
+
+[ -n "$BASE_RELEASE_IMG_NAME" ] || BASE_RELEASE_IMG_NAME=default
+[ -n "$BASE_RELEASE_ZIP_NAME" ] || BASE_RELEASE_ZIP_NAME=default
 
 [ -n "$BASE_WORKSPACE" ] || BASE_WORKSPACE=${DIST_PATH}/workspace$WORKSPACE_POSTFIX
 # [ -n "$BASE_CHROOT_SCRIPT_PATH" ] || BASE_CHROOT_SCRIPT_PATH=$BASE_SCRIPT_PATH/chroot_script
 [ -n "$BASE_MOUNT_PATH" ] || BASE_MOUNT_PATH=$BASE_WORKSPACE/mount
 
+if [ "${BASE_DISTRO}" == "ubuntu" ]; then
+  [ -n "${BASE_BOOT_MOUNT_PATH}" ] || BASE_BOOT_MOUNT_PATH=boot/firmware
+else
+  [ -n "${BASE_BOOT_MOUNT_PATH}" ] || BASE_BOOT_MOUNT_PATH=boot
+fi
+
 # The root partiton of the image filesystem, 2 for raspbian
 [ -n "$BASE_ROOT_PARTITION" ] || BASE_ROOT_PARTITION=2
 
 # if set will enlarge root parition prior to build by provided size in MB
-[ -n "$BASE_IMAGE_ENLARGEROOT" ] || BASE_IMAGE_ENLARGEROOT=400
+[ -n "$BASE_IMAGE_ENLARGEROOT" ] || BASE_IMAGE_ENLARGEROOT=200
 
 # if set will resize root partition on image after build to minimum size + 
 # provided size in MB
@@ -58,3 +94,10 @@ BASE_VERSION=1.3.0
 
 #Keyboard
 [ -n "$BASE_CONFIG_KEYBOARD" ] || BASE_CONFIG_KEYBOARD=default
+
+# Arch for now either armv7l, arm64 or aarch64
+[ -n "$BASE_ARCH" ] || BASE_ARCH=armv7l
+
+# If you want your variant not to have the name appending, enable this
+[ -n "$BASE_IGNORE_VARIANT_NAME" ] || BASE_IGNORE_VARIANT_NAME=no
+

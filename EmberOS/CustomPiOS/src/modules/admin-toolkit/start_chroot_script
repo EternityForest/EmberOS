@@ -13,36 +13,44 @@ source /common.sh
 install_cleanup_trap
 
 #####################################################################
+
 ### Add a user if in config
 if [ "$ADMIN_TOOLKIT_NAME" != "default" ]
 then
 
-    # add user
+    # add user if it doesn't already exist
     if [ "$ADMIN_TOOLKIT_FULLNAME" != "default" ]
     then
         echo "Adding user $ADMIN_TOOLKIT_NAME with GECOS fields"
-        useradd -m -s $(which bash) -G sudo,adm "${ADMIN_TOOLKIT_NAME}" -c "${ADMIN_TOOLKIT_FULLNAME}"
+        id "${ADMIN_TOOLKIT_NAME}" || useradd -m -s $(which bash) -G sudo,adm "${ADMIN_TOOLKIT_NAME}" -c "${ADMIN_TOOLKIT_FULLNAME}"
     else
         echo "Adding user $ADMIN_TOOLKIT_NAME"
-        useradd -m -s $(which bash) -G sudo,adm "${ADMIN_TOOLKIT_NAME}"
+        id "${ADMIN_TOOLKIT_NAME}" || useradd -m -s $(which bash) -G sudo,adm "${ADMIN_TOOLKIT_NAME}"
     fi
 
     # check for override password
     if [ "$ADMIN_TOOLKIT_PASSWORD" != "default" ]
     then
         echo "${ADMIN_TOOLKIT_NAME}:${ADMIN_TOOLKIT_PASSWORD}" | chpasswd
+        # if creating a user other than 'pi', set pi's password to a random string
+        if [ "${ADMIN_TOOLKIT_NAME}" != "pi" ]
+        then
+            RANDOM_PW=$(date +%s | sha256sum | base64 | head -c 32)
+            echo "pi:${RANDOM_PW}" | chpasswd
+        fi
     else
         echo "${ADMIN_TOOLKIT_NAME}:raspberry" | chpasswd
     fi
 
+
     # check for ssh key install and do other ssh things
     if [ "$ADMIN_TOOLKIT_SSH" != "default" ]
     then
-        echo "Installign ssh key"
+        echo "Installing ssh key"
         mkdir -p /home/"${ADMIN_TOOLKIT_NAME}"/.ssh
         echo "${ADMIN_TOOLKIT_SSH}" > /home/"${ADMIN_TOOLKIT_NAME}"/.ssh/authorized_keys
         chown -R "${ADMIN_TOOLKIT_NAME}" /home/"${ADMIN_TOOLKIT_NAME}"/.ssh
-        chmod 775 /home/"${ADMIN_TOOLKIT_NAME}"/.ssh
+        chmod 700 /home/"${ADMIN_TOOLKIT_NAME}"/.ssh
         chmod 600 /home/"${ADMIN_TOOLKIT_NAME}"/.ssh/authorized_keys
 
         # disable ssh password
@@ -78,6 +86,7 @@ then
     then
         unpack /filesystem/tools/HostNameScript /home/"${ADMIN_TOOLKIT_NAME}"/scripts ${ADMIN_TOOLKIT_NAME}
         chmod +x /home/"${ADMIN_TOOLKIT_NAME}"/scripts/hostname_change.sh
+        chown -R "${ADMIN_TOOLKIT_NAME}:${ADMIN_TOOLKIT_NAME}" /home/"${ADMIN_TOOLKIT_NAME}"/scripts
     fi
 
 fi 
@@ -131,7 +140,7 @@ if [ "$ADMIN_TOOLKIT_CRON_JOB" == "yes" ]
 then
     if [ "$ADMIN_TOOLKIT_CRON_USER" != "no" ]
     then
-        unpack /filesystem/tools/cronJobs/user /home/"${ADMIN_TOOLKIT_CRON_USER}" ${ADMIN_TOOLKIT_CRON_USER}
+        unpack /filesystem/tools/cronJobs/User /home/"${ADMIN_TOOLKIT_CRON_USER}" ${ADMIN_TOOLKIT_CRON_USER}
         crontab -u "${ADMIN_TOOLKIT_CRON_USER}" /home/"${ADMIN_TOOLKIT_CRON_USER}"/"${ADMIN_TOOLKIT_CRON_USER}"
     fi
 
@@ -149,11 +158,28 @@ then
     chmod +x /home/pi/scripts/tv_off.sh
 fi
 
-fi
-
 #  User added scripts
 if [ "$ADMIN_TOOLKIT_USER_SCRIPTS" == "yes" ]
 then
     unpack /filesystem/tools/scripts /home/"${ADMIN_TOOLKIT_USER_SCRIPTS_NAME}"/scripts ${ADMIN_TOOLKIT_USER_SCRIPTS_NAME}
     chmod +x `find /home/"${ADMIN_TOOLKIT_USER_SCRIPTS_NAME}"/scripts -type f`
+fi
+
+# Screen Rotation
+if [ "$ADMIN_TOOLKIT_SCREEN_ROTATION" != "normal" ]
+then
+    # Handle rotation if the gui module closes after this module
+    echo "Adding screen rotation..."
+    if grep -q "GUI_SESSION_PLACEHOLDEFR" /home/pi/scripts/start_gui ; then
+        sed -i /home/pi/scripts/start_gui -e "s/^GUI_SESSION_PLACEHOLDEFR/export DISPLAY=:0/"
+        echo "/home/pi/scripts/rotate.sh $ADMIN_TOOLKIT_SCREEN_ROTATION"  >> /home/pi/scripts/start_gui
+        echo 'GUI_SESSION_PLACEHOLDEFR' >> /home/pi/scripts/start_gui
+    elif grep -q "/home/pi/scripts/run_onepageos" /home/pi/scripts/start_gui ; then
+        sed -i /home/pi/scripts/start_gui -e "s/^\/home\/pi\/scripts\/run_onepageos/export DISPLAY=:0/"
+        echo "/home/pi/scripts/rotate.sh $ADMIN_TOOLKIT_SCREEN_ROTATION"  >> /home/pi/scripts/start_gui
+        echo '/home/pi/scripts/run_onepageos' >> /home/pi/scripts/start_gui
+    else
+        echo "Couldn't add screen rotation... are you building with the gui module?"
+    fi
+
 fi

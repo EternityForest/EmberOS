@@ -2,24 +2,28 @@
 set -x
 set -e
 
-whoami
-
 export DIST_PATH=/distro
 export CUSTOM_PI_OS_PATH=/CustomPiOS
 
-if [ "$#" -gt 0 ]; then
-  BUILD_VARIANT="$1"
-else
-  BUILD_VARIANT=default
-fi
+source "$CUSTOM_PI_OS_PATH/argparse.bash" || exit 1
+argparse "$@" <<EOF || exit 1
+
+parser.add_argument('WORKSPACE_SUFFIX', nargs='?', default="default", help="The workspace folder suffix used folder")
+parser.add_argument('-r', '--rpi_imager', action='store_true', help='Create a rpi-imager snipplet to be published')
+parser.add_argument('-u', '--rpi_imager_url', type=str, default="MISSING_URL", help='url to the uploaded image url')
+EOF
 
 WORKSPACE_POSTFIX=
-if [ $BUILD_VARIANT != 'default' ]; then
-  WORKSPACE_POSTFIX=-$BUILD_VARIANT
+if [ "${WORKSPACE_SUFFIX}" != 'default' ]; then
+  WORKSPACE_POSTFIX=-"${WORKSPACE_SUFFIX}"
 fi
 
 #Update repos used
 #sudo -u guy /home/guy/stuff/scripts/gitmirror/update_git_mirrors
+if [ "${SHA256}" == "yes" ]; then
+    echo "Saving image hash type sha256"
+    sha256sum "${IMG_FILENAME}" > "${IMG_FILENAME}".sha256
+fi
 
 for i in `lsof "${DIST_PATH}/workspace${WORKSPACE_POSTFIX}/mount" | awk '{print $2}'`; do kill -9 $i; done || true
 
@@ -36,12 +40,28 @@ pushd "${DIST_PATH}"
     #export OCTOPI_OCTOPRINT_REPO_BUILD='http://localhost/git/OctoPrint.git/'
     #export OCTOPI_MJPGSTREAMER_REPO_BUILD='http://localhost/git/mjpg-streamer.git/'
     #export OCTOPI_WIRINGPI_REPO_BUILD='http://localhost/git/wiringPi.git/'
-    ${CUSTOM_PI_OS_PATH}/build_custom_os $1
+    ${CUSTOM_PI_OS_PATH}/build_custom_os "${WORKSPACE_SUFFIX}"
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "build script failed"
         exit $exit_code
     fi
-    bash -x ${CUSTOM_PI_OS_PATH}/release $1
+    EXTRA_FLAGS=""
+    if [ "${RPI_IMAGER}" == "yes" ]; then
+        echo "Creating a rpi-imager json snipplet"
+        EXTRA_FLAGS="--sha256"
+    fi
+    
+    bash -x ${CUSTOM_PI_OS_PATH}/release ${EXTRA_FLAGS} "${WORKSPACE_SUFFIX}"
+    
+    if [ "${RPI_IMAGER}" == "yes" ]; then
+        if [ -z "${CUSTOM_PI_OS_PATH}" ];then
+            echo "Error: you must have \${CUSTOM_PI_OS_PATH} to generate a rpi-imager snipplet"
+            exit 1
+        fi
+        source "${CUSTOM_PI_OS_PATH}/config" "${WORKSPACE_SUFFIX}"
+        "${CUSTOM_PI_OS_PATH}/make_rpi-imager-snipplet.py" --rpi_imager_url "${RPI_IMAGER_URL}" -- "${WORKSPACE_SUFFIX}"
+    fi
+    
     chmod 777 ${DIST_PATH}/workspace${WORKSPACE_POSTFIX}/*
 popd

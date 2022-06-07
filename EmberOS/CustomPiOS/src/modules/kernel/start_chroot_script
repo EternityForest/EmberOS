@@ -22,9 +22,10 @@ pushd /home/pi
     #REVERT_COMMIT="120ec1e4cdddfc16c31581c2c30511c6c16fe0fd" # patch fail
     # page 1
     
-    wget ${KERNEL_URL}/${KERNEL_COMMIT}.tar.gz
+    wget "${KERNEL_URL}/${KERNEL_COMMIT}.tar.gz" -O "${KERNEL_COMMIT}.tar.gz"
     
     # unzip -q ${KERNEL_COMMIT}.zip
     tar xzvf ${KERNEL_COMMIT}.tar.gz
-    mv linux-${KERNEL_COMMIT} linux
+    FOLDER_NAME=$(tar -ztvf "${KERNEL_COMMIT}.tar.gz" | head -n 1 | awk '{ print $6 }')
+    mv "${FOLDER_NAME%?}" linux
 popd

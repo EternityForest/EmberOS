@@ -144,6 +144,8 @@ Clone this repo with all submodules.   Install eatmydata and duperemove.
 
 Put a fresh zipped raspbian full image in the src/images dir
 
+If you are starting from a 64 bit raspbian, you'll need to add export BASE_ARCH=aarch64 to config.
+
 Run sudo eatmydata tmux -c ./build_dist in the src dir. This may take over an hour, and 
 you need internet access the whole time, but almost all large downloads are cached between builds.
 

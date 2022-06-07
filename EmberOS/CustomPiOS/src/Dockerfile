@@ -15,8 +15,12 @@ RUN set -x \
         qemu-user-static \
         sudo \
         zip \
+        xz-utils \
         lsof \
     && rm -rf /var/lib/apt/lists/*
+
+RUN ln -s /CustomPiOS/nightly_build_scripts/custompios_nightly_build /usr/bin/build
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 COPY . /CustomPiOS
 

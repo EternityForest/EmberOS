@@ -7,27 +7,52 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}/usr/lib/libeatmyd
 export LD_PRELOAD=${LD_PRELOAD:+"$LD_PRELOAD "}libeatmydata.so
 
 
+
+
 # Do these up front,  they will ask for manual intervention.
 # Use plugdev, yes to ax25 to non superusers.
 if [ -z "$EMBER_MICRO" ]
 then
 apt-get -y install solaar xastir
+fi
+
+#Mega GUI apps
+if [ -z "$EMBER_MICRO" ]
+then
+apt-get -y install audacious audacious-plugins tuxguitar inkscape filezilla gimp pulseview qdirstat gthumb simple-scan gtkpod evolution
+! apt-get -y install fbreader zim calibre
+fi
+
 
 cd /build_cache
 
 # Openrgb deps
-apt-get -y install libmbedcrypto3 libmbedtls12 libmbedx509-0
+apt-get -y install libmbedcrypto3 libmbedtls12 libmbedx509-0 libqt5core5a libqt5gui5 libqt5widgets5 libstdc++6 libusb-1.0-0
+apt-get -y install libhidapi-hidraw0 libc6 libgcc-s1
 
 wget -nc https://openrgb.org/releases/release_0.7/openrgb_0.7_armhf_raspbian_bullseye_6128731.deb
-sudo apt-get -y install libhidapi-hidraw0 libc6 libgcc-s1
 
 # This has to be hidden to stop a postinst script from running which doesn't 
 # work here and isn't needed.
 mv /bin/udevadm hide
-dpkg -i openrgb_0.7_armhf_raspbian_bullseye_6128731.deb
+! dpkg -i openrgb_0.7_armhf_raspbian_bullseye_6128731.deb
+sudo apt-get -f install
 mv hide /bin/udevadm
-fi
 
+
+# Gui and CLI tools for dealing with CDs and DVDs
+apt-get -y install sound-juicer python3-cdio
+apt-get -y install abcde --no-install-recommends
+apt-get -y install glyrc imagemagick libdigest-sha-perl vorbis-tools atomicparsley eject eyed3 id3 id3v2 mkcue normalize-audio vorbisgain
+apt-get -y install k3b
+
+apt-get -y install openjdk-17-jre openjdk-17-jdk
+
+
+# Can't forget about GPG!
+# kleopatra does not let you change subkey expiration so we need both.
+
+apt-get -y install kleopatra seahorse
 
 # This IPTV Player is pretty small with lpw dependencies.
 
@@ -36,6 +61,22 @@ wget -nc http://packages.linuxmint.com/pool/main/h/hypnotix/hypnotix_2.6_all.deb
 ! dpkg -i hypnotix_2.6_all.deb
 apt -y --fix-broken install
 
+
+pip3 install tasmotizer
+
+cat << EOF > /usr/share/applications/Tasmotizer.desktop
+[Desktop Entry]
+Name=Tasmotizer
+Type=Application
+Exec=cd /usr/share/public.files/emberos/Firmware/Tasmota/ESP8266; python3 -m tasmotizer
+Terminal=false
+Categories=Utility;Settings;
+EOF
+
+
+## Ti Calculator stuff!
+
+apt-get -y install tilp2
 
 
 
@@ -154,16 +195,17 @@ netgroup:       nis
 EOF
 
 
-# FM transmitter TX
-cd /build_cache
-if [ ! -d /build_cache/fm_transmitter ]
-then
-git clone https://github.com/markondej/fm_transmitter
-fi
+# Removed because... We have bluetooth now.  Also it needs special settings on pi4
+# # FM transmitter TX
+# cd /build_cache
+# if [ ! -d /build_cache/fm_transmitter ]
+# then
+# git clone https://github.com/markondej/fm_transmitter
+# fi
 
-cd fm_transmitter
-make
-cp fm_transmitter /usr/local/bin
+# cd fm_transmitter
+# make
+# cp fm_transmitter /usr/local/bin
 
 
 
@@ -180,9 +222,8 @@ fi
 
 
 # This lits us capture frames from DSLRs and the like
-sudo apt-get -y install gphoto2
+sudo apt-get -y install gphoto2 python3-gphoto2cffi
 sudo apt-get -y  install libexif12 libgphoto2-6 libgphoto2-port12 libltdl7 gtkam entangle
-sudo pip3 install gphoto2
 
 #Get from repos
 pip3 install --no-dependencies .
@@ -229,6 +270,22 @@ EOF
 
 
 sudo apt-get -y install cec-utils
+
+
+apt-get -y install cockpit
+systemctl disable cockpit.socket
+
+cd /build_cache
+
+
+wget -nc https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.8/cockpit-navigator_0.5.8-1focal_all.deb
+apt install -y ./cockpit-navigator_0.5.8-1focal_all.deb
+
+
+
+
+
+
 
 cd /build_cache
 
@@ -307,12 +364,7 @@ EOF
 pip3 install tartube
 
 
-#Mega GUI apps
-if [ -z "$EMBER_MICRO" ]
-then
-apt-get -y install audacious audacious-plugins tuxguitar zeal inkscape filezilla gimp pulseview qdirstat gthumb simple-scan solaar gtkpod evolution
-! apt-get -y install fbreader zim
-fi
+
 
 mkdir -p  /home/pi/.config/audacious/
 
@@ -403,6 +455,9 @@ apt-get -y install marble-qt marble-maps marble-plugins
 fi
 
 
+
+# Pentest ish stuff.  This should probably not be documented in EmberOS readmes, or 
+apt-get -y install pdfcrack john fcrackzip
 
 apt-get -y install nmap robotfindskitten ncdu mc curl fatrace gstreamer1.0-tools pavucontrol xawtv evince stegosuite unzip
 
@@ -942,6 +997,20 @@ sudo apt-get -y install hplip hplip-gui sane sane-utils libsane-extras xsane
 apt-get -y install npm
 
 
+# Beer? Food?
+apt-get -y install brewtarget cronometer
+
+
+# Gotta have this one
+apt-get -y install kdeconnect nuntius
+
+
+# IPod stuff
+sudo apt-get -y install ifuse
+sudo apt-get -y install libimobiledevice-utils
+
+
+
 #I don't think this makes a difference, we provide our own samba conf
 echo "samba-common samba-common/dhcp boolean true" | sudo debconf-set-selections
 echo "samba-common samba-common/do_debconf boolean true" | sudo debconf-set-selections
@@ -994,8 +1063,16 @@ SyslogIdentifier=rhasspy
 WantedBy=multi-user.target
 EOF
 
+
+# This is a high performance thing that likely matters a lot.
+
+if [ $BASE_ARCH == "aarch64" ]; then
+wget -nc https://github.com/rhasspy/rhasspy/releases/latest/download/rhasspy_arm64.deb
+dpkg -i rhasspy_armhf.deb
+else
 wget -nc https://github.com/rhasspy/rhasspy/releases/latest/download/rhasspy_armhf.deb
 dpkg -i rhasspy_armhf.deb
+fi
 
 #Gonna do ThingMagic's Mercury API to enable RFID reading
 apt-get install -y unzip patch xsltproc gcc libreadline-dev python3-dev python3-setuptools
@@ -1041,8 +1118,6 @@ fi
 apt-get install -y ppp usb-modeswitch wvdial
 
 
-# OBD Scanner for the ELM tools
-apt-get install -y scantool
 
 # Control smart USB hubs per-port power, usb HID relays
 apt-get -y install uhubctl usbrelay
@@ -1278,9 +1353,9 @@ echo "deb http://apt.syncthing.net/ syncthing release" | sudo tee -a /etc/apt/so
 
 
 #Retroshare
-#wget -qO - http://download.opensuse.org/repositories/network:retroshare/Raspbian_9.0/Release.key | sudo apt-key add -
+#wget -qO - http://download.opensuse.org/repositories/network:retroshare/Raspbian_10.0/Release.key | sudo apt-key add -
 sudo cp /filesystem/retroshare.pubkey /etc/apt/trusted.gpg.d/retroshare.asc
-echo 'deb http://download.opensuse.org/repositories/network:/retroshare/Raspbian_9.0/ /' > /etc/apt/sources.list.d/retroshare.list
+echo 'deb http://download.opensuse.org/repositories/network:/retroshare/Raspbian_10.0/ /' > /etc/apt/sources.list.d/retroshare.list
 
 #Something seems to break when we ubgrade curl and libcurl,
 #so do it explicitly here, right before and update to hopefully fix that.
@@ -1369,16 +1444,10 @@ systemctl enable ember-sdmon-cache.timer
 #HW drivers, gamepad mapping app
 sudo apt-get -y install xboxdrv xserver-xorg-input-wacom xserver-xorg-input-joystick antimicro 
 
-# Common smartcard reader drivers
-apt-get -y install pcscd libpcsclite1 libpcsclite-dev pcsc-tools libtowitoko2 libccid libgempc430 libasedrive-usb opensc libnfc6
-
-apt-get -y install cardpeek
-
 
 # Realtek and atheros are nonfree blobs we need for some cheap USB wifis
 apt-get -y install firmware-realtek firmware-atheros firmware-misc-nonfree python3-gattlib
 
-sudo apt-get install -y python3-pyscard
 
 
 #Also gets firewalld
@@ -1393,6 +1462,20 @@ apt-get -y install lame gnome-disk-utility gnome-firmware unclutter imagemagick 
 #Ham radio stuff
 apt-get -y install fldigi flrig flmsg flamp chirp librtlsdr0 wsjtx
 
+pip3 install --upgrade meshtastic-pygui
+pip3 install --upgrade pytap2
+pip3 install --upgrade meshtastic
+pip3 install --upgrade meshtastic-flasher
+
+cat << EOF > /usr/share/applications/MeshFlasher.desktop
+[Desktop Entry]
+Comment=
+Terminal=false
+Name=Meshtastic Flasher
+Exec=cd ~/Meshtastic/flasher; meshtastic-flasher
+Type=Application
+Categories=Utility;HamRadio
+EOF
 
 
 if [ -z "$EMBER_MICRO" ]
@@ -1508,6 +1591,7 @@ apt-get install python3-evdev python3-xlib
 
 
 pip3 install kivy
+pip3 install vibora
 
 #Python Bluez API
 pip3 install tcpbridge
@@ -1550,8 +1634,119 @@ pip3 install adafruit-circuitpython-neopixel
 pip3 install rpi_ws281x
 
 
+# Common smartcard reader drivers
+apt-get -y install pcscd libpcsclite1 libpcsclite-dev pcsc-tools libtowitoko2 libccid libgempc430 libasedrive-usb opensc libnfc6
 
-# These aren't "really" there, it's pure best effort
+apt-get -y install cardpeek
+
+apt-get install -y python3-pyscard
+
+
+
+apt-get -y install python3-yubico libu2f-udev swig
+
+pip3 install fido2[pcsc]
+
+
+cat << EOF > /etc/udev/rules.d/70-u2f.rules
+# Copyright (C) 2013-2015 Yubico AB
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+# this udev file should be used with udev 188 and newer
+ACTION!="add|change", GOTO="u2f_end"
+
+# Yubico YubiKey
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0113|0114|0115|0116|0120|0121|0200|0402|0403|0406|0407|0410", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# Happlink (formerly Plug-Up) Security KEY
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="2581", ATTRS{idProduct}=="f1d0", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# Neowave Keydo and Keydo AES
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1e0d", ATTRS{idProduct}=="f1d0|f1ae", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# HyperSecu HyperFIDO
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="096e|2ccf", ATTRS{idProduct}=="0880", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# Feitian ePass FIDO, BioPass FIDO2
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="096e", ATTRS{idProduct}=="0850|0852|0853|0854|0856|0858|085a|085b|085d|0866|0867", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# JaCarta U2F
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="24dc", ATTRS{idProduct}=="0101|0501", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# U2F Zero
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="8acf", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# VASCO SecureClick
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1a44", ATTRS{idProduct}=="00bb", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# Bluink Key
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="2abe", ATTRS{idProduct}=="1002", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# Thetis Key
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1ea8", ATTRS{idProduct}=="f025", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# Nitrokey FIDO U2F, Nitrokey FIDO2, Safetech SafeKey
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="4287|42b1|42b3", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# Google Titan U2F
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="18d1", ATTRS{idProduct}=="5026", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# Tomu board + chopstx U2F + SoloKeys
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="cdab|a2ca", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# SoloKeys
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="5070|50b0", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# Trezor
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="534c", ATTRS{idProduct}=="0001", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="53c1", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# Infineon FIDO
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="058b", ATTRS{idProduct}=="022d", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# Ledger Blue, Nano S and Nano X
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="2c97", ATTRS{idProduct}=="0000|0001|0004|0005|0015|1005|1015|4005|4015", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# Kensington VeriMark
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="06cb", ATTRS{idProduct}=="0088", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# Longmai mFIDO
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="4c4d", ATTRS{idProduct}=="f703", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# eWBM FIDO2 - Goldengate 310, 320, 500, 450
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="311f", ATTRS{idProduct}=="4a1a|4c2a|5c2f|f47c", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# OnlyKey (FIDO2 / U2F)
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1d50", ATTRS{idProduct}=="60fc", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# GoTrust Idem Key
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1fc9", ATTRS{idProduct}=="f143", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# ellipticSecure MIRKey
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="a2ac", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+LABEL="u2f_end"
+
+EOF
+
+pip3 install yubikey-manager
+
+
+
+
+# These aren't "really" there, it's pure best effort.
  ! pip3 install sparkfun-qwiic
  ! pip3 install sparkfun-qwiic-bme280
  ! pip3 install sparkfun-qwiic-keypad

@@ -62,11 +62,6 @@ pip3 uninstall mu-editor
 apt autoremove -y --purge
 
 
-#This is entirely to trick openjre, which doesn't actually need /proc I don't think, but has an old test that fails without it.
-mkdir -p /proc
-mount -t tmpfs -o size=10M tmpfs /proc
-
-
 
 mkdir -p /build_cache/pip3cache
 
